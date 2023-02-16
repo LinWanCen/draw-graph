@@ -7,11 +7,11 @@ updates:
   - package-ecosystem: "gradle"
     directory: "/"
     target-branch: "next"
-    schedule:
-      interval: "daily"
+#    schedule:
+#      interval: "daily"
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     target-branch: "next"
-    schedule:
-      interval: "daily"
+#    schedule:
+#      interval: "daily"
