@@ -1,6 +1,6 @@
-package org.jetbrains.plugins.template.services
+package com.github.linwancen.drawgraph.services
 
-import org.jetbrains.plugins.template.MyBundle
+import com.github.linwancen.drawgraph.MyBundle
 
 class MyApplicationService {
 
