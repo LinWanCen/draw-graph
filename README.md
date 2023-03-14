@@ -1,26 +1,79 @@
 # draw-graph
 
 ![Build](https://github.com/LinWanCen/draw-graph/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
+[![Version](https://img.shields.io/jetbrains/plugin/v/21242-draw-graph.svg)](https://plugins.jetbrains.com/plugin/21242-draw-graph)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/21242-draw-graph.svg)](https://plugins.jetbrains.com/plugin/21242-draw-graph)
 
-## Template ToDo list
-- [x] Create a new [IntelliJ Platform Plugin Template][template] project.
-- [ ] Get familiar with the [template documentation][template].
-- [ ] Verify the [pluginGroup](./gradle.properties), [plugin ID](./src/main/resources/META-INF/plugin.xml) and [sources package](./src/main/kotlin).
-- [ ] Review the [Legal Agreements](https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html?from=IJPluginTemplate).
-- [ ] [Publish a plugin manually](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginTemplate) for the first time.
-- [ ] Set the Plugin ID in the above README badges.
-- [ ] Set the [Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html?from=IJPluginTemplate) related [secrets](https://github.com/JetBrains/intellij-platform-plugin-template#environment-variables).
-- [ ] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html?from=IJPluginTemplate).
-- [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
+## Plugin description 插件介绍
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+Method call usage graph and maven dependency graph
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
+生成 方法调用图 和 Maven 依赖图
 
-To keep everything working, do not remove `<!-- ... -->` sections. 
+
+# English
+
+## How to Use
+
+One java call graph or all pom.xml dep graph:
+1. Open <kbd>Graph</kbd> ToolWindow at Right
+2. Open *.java/pom.xml file
+
+Mutil java call graph or partial pom.xml dep graph:
+1. Select mutil file
+2. Open Right Click Menu
+3. Select <kbd>Call Graph</kbd>
+
+## About
+
+Only support 2020.2+ because mermaid.js only use in jcef(chrome),  
+2020.1- is JavaFx WebView.
+
+## My Plugin
+- Show doc comment at the Project view Tree, line End, json etc: [Show Comment]
+- Method call usage graph and maven dependency graph: [Draw Graph]
+- Find author/comment of multiple files or lines and export Find: [Find Author]
+- Auto sync coverage and capture coverage during debug: [Sync Coverage]
+
+---
+
+# 中文
+
+## 用法
+
+单个 java 文件调用图 或 所有 pom.xml 依赖图：
+1. 打开右边的<kbd>图</kbd>工具栏
+2. 打开 *.java/pom.xml 文件
+
+多个 java 文件调用图 或 部分 pom.xml 依赖图：
+1. 选择多个文件
+2. 打开右键菜单
+3. 选择<kbd>调用图</kbd>
+
+## 关于
+
+只支持 2020.2 以上因为 mermaid.js 只能在 jcef(chrome) 中使用，  
+2020.1 以下用的是 JavaFx WebView。
+
+## 我的项目
+- 在文件树、行末、JSON、COBOL 显示注释：[Show Comment]
+- 生成 方法调用图 和 Maven 依赖图：[Draw Graph]
+- 查找多个文件或行的作者 与 导出搜索：[Find Author]
+- 自动同步覆盖率 和 调试中抓取覆盖率：[Sync Coverage]
+
+---
+
+# 支持
+
+如果对你有所帮助，别忘了给 [本项目 GitHub 主页][Draw Graph GitHub] 一个 Star，您的支持是项目前进的动力。
+
+[Show Comment]: https://plugins.jetbrains.com/plugin/18553-show-comment
+[Draw Graph]: https://plugins.jetbrains.com/plugin/21242-draw-graph
+[Find Author]: https://plugins.jetbrains.com/plugin/20557-find-author
+[Sync Coverage]: https://plugins.jetbrains.com/plugin/20780-sync-coverage
+[Draw Graph GitHub]: https://github.com/LinWanCen/draw-graph
+
 <!-- Plugin description end -->
 
 ## Installation
@@ -35,6 +88,7 @@ To keep everything working, do not remove `<!-- ... -->` sections.
   Download the [latest release](https://github.com/LinWanCen/draw-graph/releases/latest) and install it manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
+[Changelog 更新说明](CHANGELOG.md)
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].

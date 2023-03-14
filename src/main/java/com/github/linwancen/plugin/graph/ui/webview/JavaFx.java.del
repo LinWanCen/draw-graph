@@ -1,0 +1,53 @@
+package com.github.linwancen.plugin.graph.ui.webview;
+
+import com.intellij.ui.DocumentAdapter;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import java.awt.*;
+
+public class JavaFx extends WebUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(JavaFx.class);
+
+    static {
+        LOG.info("WebUtils load {}", JavaFx.class.getName());
+        WebUtils.map.put(JavaFx.class.getName(), new JavaFx());
+    }
+
+    @Override
+    String addImpl(JPanel htmlPanel, JTextArea textArea) {
+        try {
+            JFXPanel jfxPanel = new JFXPanel();
+            Platform.runLater(() -> {
+                Group group = new Group();
+                WebView webView = new WebView();
+                group.getChildren().add(webView);
+                Scene scene = new Scene(group);
+                jfxPanel.setScene(scene);
+                htmlPanel.add(jfxPanel, BorderLayout.CENTER);
+
+                WebEngine engine = webView.getEngine();
+                engine.loadContent(textArea.getText());
+
+                textArea.getDocument().addDocumentListener(new DocumentAdapter() {
+                    @Override
+                    protected void textChanged(@NotNull DocumentEvent e) {
+                        Platform.runLater(() -> engine.loadContent(textArea.getText()));
+                    }
+                });
+            });
+            return null;
+        } catch (Throwable e) {
+            return e.toString();
+        }
+    }
+}

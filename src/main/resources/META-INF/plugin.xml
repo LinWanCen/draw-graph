@@ -1,18 +1,34 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
-<idea-plugin>
+<idea-plugin url="https://plugins.jetbrains.com/plugin/21242-draw-graph">
     <id>com.github.linwancen.drawgraph</id>
-    <name>IntelliJ Platform Plugin draw-graph</name>
-    <vendor>linwancen</vendor>
+    <name>Draw Graph</name>
+    <vendor email="1498425439@qq.com" url="https://github.com/LinWanCen/draw-graph">林万程</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="java.xml">com.intellij.modules.java</depends>
+    <depends optional="true" config-file="xml.xml">com.intellij.modules.xml</depends>
+
+    <projectListeners>
+        <listener class="com.github.linwancen.plugin.graph.listeners.TabListener"
+                  topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </projectListeners>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.linwancen.drawgraph.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.linwancen.drawgraph.services.MyProjectService"/>
+        <requiredForSmartModeStartupActivity implementation="com.github.linwancen.plugin.graph.ui.webview.Jcef"/>
+        <applicationService serviceImplementation="com.github.linwancen.plugin.graph.settings.DrawGraphAppState"/>
+        <projectService serviceImplementation="com.github.linwancen.plugin.graph.settings.DrawGraphProjectState"/>
+        <!-- https://jetbrains.design/intellij/resources/icons_list/ -->
+        <toolWindow id="Graph" secondary="false" icon="AllIcons.Graph.Layout" anchor="right"
+                    factoryClass="com.github.linwancen.plugin.graph.ui.GraphWindowFactory"/>
     </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.linwancen.drawgraph.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
+    <actions>
+        <action
+            id="com.github.linwancen.plugin.graph.action.TreeAction"
+            class="com.github.linwancen.plugin.graph.action.TreeAction"
+            icon="AllIcons.Graph.Layout"
+            text="Call Graph">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>

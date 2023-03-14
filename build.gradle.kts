@@ -1,5 +1,7 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 fun properties(key: String) = project.findProperty(key).toString()
 
@@ -19,7 +21,8 @@ plugins {
 }
 
 group = properties("pluginGroup")
-version = properties("pluginVersion")
+val ver = "${properties("pluginVersion")}.${DateTimeFormatter.ofPattern("yyyy.MM.dd_HH.mm").format(LocalDateTime.now())}"
+version = ver
 
 // Configure project's dependencies
 repositories {
@@ -66,7 +69,7 @@ tasks {
     }
 
     patchPluginXml {
-        version.set(properties("pluginVersion"))
+        version.set(ver)
         sinceBuild.set(properties("pluginSinceBuild"))
         untilBuild.set(properties("pluginUntilBuild"))
 
