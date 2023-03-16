@@ -45,11 +45,11 @@ graph LR
 $src
 </pre>
 <!-- https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.js -->
-<script src="file:///C:/Program Files/mermaid.js"></script>
-<script src="file:///D:/Program Files/mermaid.js"></script>
-<script src="file:///Applications/mermaid.js"></script>
-<script src="file:///var/lib/mermaid.js"></script>
-<script src="file:///usr/lib/mermaid.js"></script>
+<script src="file:///C:/Users/Public/draw-graph/mermaid.js"></script>
+<script src="file:///D:/draw-graph/mermaid.js"></script>
+<script src="file:///Applications/draw-graph/mermaid.js"></script>
+<script src="file:///var/lib/draw-graph/mermaid.js"></script>
+<script src="file:///usr/lib/draw-graph/mermaid.js"></script>
 <script type="module">
   mermaid.initialize({ startOnLoad: true });
 </script>
