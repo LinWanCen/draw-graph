@@ -1,5 +1,6 @@
 package com.github.linwancen.plugin.graph.ui.webview;
 
+import com.github.linwancen.plugin.graph.ui.DrawGraphBundle;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity.RequiredForSmartMode;
 import com.intellij.ui.components.JBTextArea;
@@ -24,7 +25,10 @@ public abstract class WebUtils implements RequiredForSmartMode {
             if (s == null) {
                 return;
             }
-            errMsg.append(errMsg).append("\n");
+            errMsg.append(s).append("\n");
+        }
+        if (errMsg.length() == 0) {
+            errMsg.append(DrawGraphBundle.message("web.load.err.msg"));
         }
         JBTextArea errTip = new JBTextArea();
         errTip.setText(errMsg.toString());

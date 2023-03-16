@@ -3,14 +3,18 @@ package com.github.linwancen.plugin.graph.ui.webview;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.jcef.JBCefBrowser;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.*;
 
 public class Jcef extends WebUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(Jcef.class);
 
     static {
+        LOG.info("WebUtils load {}", Jcef.class.getName());
         WebUtils.map.put(Jcef.class.getName(), new Jcef());
     }
 
