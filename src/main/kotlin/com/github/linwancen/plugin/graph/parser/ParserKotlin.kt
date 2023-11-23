@@ -1,0 +1,80 @@
+package com.github.linwancen.plugin.graph.parser
+
+import com.github.linwancen.plugin.common.text.Skip
+import com.github.linwancen.plugin.graph.comment.JavaComment
+import com.github.linwancen.plugin.graph.printer.Printer
+import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiMethod
+import org.jetbrains.kotlin.asJava.classes.KtUltraLightClass
+import org.jetbrains.kotlin.idea.KotlinLanguage
+import org.jetbrains.kotlin.psi.KtFile
+import org.slf4j.LoggerFactory
+
+class ParserKotlin : Parser() {
+    private val log = LoggerFactory.getLogger(this::class.java)
+
+    init {
+        log.info("load ParserKotlin")
+        SERVICES[KotlinLanguage.INSTANCE.id] = this
+    }
+
+    override fun srcImpl(project: Project, printer: Array<out Printer>, files: Array<out VirtualFile>) {
+        val state = DrawGraphProjectState.of(project)
+        // use method support same sign
+        val callListMap = mutableMapOf<PsiMethod, List<PsiMethod>>()
+        for (file in files) {
+            val psiFile = PsiManager.getInstance(project).findFile(file) ?: return
+            printer.forEach { it.beforePsiFile(psiFile) }
+            if (psiFile !is KtFile) {
+                continue
+            }
+            val classes = psiFile.classes
+            classes.forEach { psiClass ->
+                val classMap = mutableMapOf<String, String>()
+                psiClass.name?.let { classMap["name"] = it }
+                psiClass.qualifiedName?.let { classMap["sign"] = it }
+                JavaComment.addDocParam(psiClass.docComment, classMap)
+                printer.forEach { it.beforeGroup(classMap) }
+                if (psiClass is KtUltraLightClass) {
+                    val methods = psiClass.methods
+                    for (method in methods) {
+                        val sign = "${psiClass.qualifiedName}#${method.name}"
+                        if (Skip.skip(sign, state.includePattern, state.excludePattern)) {
+                            continue
+                        }
+                        val methodMap = mutableMapOf<String, String>()
+                        methodMap["sign"] = sign
+                        methodMap["name"] = method.name
+                        JavaComment.addDocParam(method.docComment, methodMap)
+                        if (!(method.isConstructor && !method.hasParameters())) {
+                            printer.forEach { it.item(methodMap) }
+                        }
+
+                        val callList = callList(method)
+                        // even empty list should put for `callListMap.containsKey(call)`
+                        callListMap[method] = callList
+                    }
+                }
+                printer.forEach { it.afterGroup(classMap) }
+            }
+            printer.forEach { it.afterPsiFile(psiFile) }
+        }
+        for ((usage, callList) in callListMap) {
+            for (call in callList) {
+                if (callListMap.containsKey(call)) {
+                    val usageSign = "${usage.containingClass?.qualifiedName}#${usage.name}"
+                    val callSign = "${call.containingClass?.qualifiedName}#${call.name}"
+                    val skip = Skip.skip(callSign, state.includePattern, state.excludePattern)
+                    val emptyConstructor = call.isConstructor && !call.hasParameters()
+                    if (!skip && !emptyConstructor) {
+                        printer.forEach { it.call(usageSign, callSign) }
+                    }
+                }
+            }
+        }
+    }
+
+}

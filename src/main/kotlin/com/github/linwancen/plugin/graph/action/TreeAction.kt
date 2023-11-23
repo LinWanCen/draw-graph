@@ -9,12 +9,11 @@ import com.intellij.openapi.project.DumbAwareAction
 object TreeAction : DumbAwareAction() {
 
     override fun update(e: AnActionEvent) {
-        super.update(e)
         e.presentation.text = DrawGraphBundle.message("call.graph")
     }
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
         val files = event.getData(CommonDataKeys.VIRTUAL_FILE_ARRAY) ?: return
-        RelController.forFile(project, files)
+        RelController.forFile(project, files, true)
     }
 }

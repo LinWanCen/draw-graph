@@ -1,6 +1,6 @@
-package com.github.linwancen.plugin.graph.rel.xml
+package com.github.linwancen.plugin.graph.parser.xml
 
-import com.github.linwancen.plugin.graph.draw.RelHandle
+import com.github.linwancen.plugin.graph.printer.Printer
 import com.intellij.psi.xml.XmlDocument
 import com.intellij.psi.xml.XmlFile
 import com.intellij.psi.xml.XmlTag
@@ -13,7 +13,7 @@ object RelServicePom {
     fun parsePom(
         psiFile: XmlFile,
         callListMap: MutableMap<String, List<String>>,
-        relHandle: Array<out RelHandle>,
+        printer: Array<out Printer>,
     ) {
         for (it in psiFile.children) {
             if (it !is XmlDocument) {
@@ -25,7 +25,7 @@ object RelServicePom {
             val callList = mutableListOf<String>()
             callListMap[sign] = callList
 
-            module(root, relHandle, rootInfo)
+            module(root, printer, rootInfo)
 
             dependencies(root, callList)
         }
@@ -33,24 +33,24 @@ object RelServicePom {
 
     private fun module(
         root: XmlTag,
-        relHandle: Array<out RelHandle>,
+        printer: Array<out Printer>,
         rootInfo: MutableMap<String, String>,
     ) {
         val modules = root.findFirstSubTag("modules")
         if (modules == null) {
-            relHandle.forEach { it.item(rootInfo) }
+            printer.forEach { it.item(rootInfo) }
         } else {
             val items = modules.findSubTags("module")
             if (items.isEmpty()) {
-                relHandle.forEach { it.item(rootInfo) }
+                printer.forEach { it.item(rootInfo) }
             } else {
-                relHandle.forEach { it.beforeGroup(rootInfo) }
+                printer.forEach { it.beforeGroup(rootInfo) }
                 for (item in items) {
                     val info = mutableMapOf<String, String>()
                     info["sign"] = item.value.text
-                    relHandle.forEach { it.item(info) }
+                    printer.forEach { it.item(info) }
                 }
-                relHandle.forEach { it.afterGroup(rootInfo) }
+                printer.forEach { it.afterGroup(rootInfo) }
             }
         }
     }

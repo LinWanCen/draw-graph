@@ -1,0 +1,144 @@
+package com.github.linwancen.plugin.graph.printer
+
+import com.github.linwancen.plugin.common.file.SysPath
+import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.Project
+import com.intellij.util.ExceptionUtil
+import net.sourceforge.plantuml.FileFormat
+import net.sourceforge.plantuml.FileFormatOption
+import net.sourceforge.plantuml.SourceStringReader
+import org.apache.commons.lang3.StringUtils
+import java.io.File
+import java.io.FileOutputStream
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.function.Consumer
+
+
+class PrinterPlantuml : Printer() {
+
+    val sb = StringBuilder()
+
+    override fun beforeGroup(groupMap: MutableMap<String, String>) {
+        label(groupMap)
+        sb.append(" {\n")
+    }
+
+    override fun afterGroup(groupMap: MutableMap<String, String>) {
+        sb.append("}\n\n")
+    }
+
+    override fun item(itemMap: MutableMap<String, String>) {
+        label(itemMap)
+        sb.append("\n")
+    }
+
+    private fun label(map: MutableMap<String, String>) {
+        sb.append("component ${sign(map["sign"] ?: return)}")
+        if (map["name"] != null) {
+            sb.append(" as \" ")
+            addLine(map["@1"], sb)
+            addLine(map["@2"], sb)
+            addLine(map["@3"], sb)
+            sb.append("${map["name"]}\"")
+        }
+    }
+
+    override fun call(usageSign: String, callSign: String) {
+        sb.append("${sign(usageSign)} --> ${sign(callSign)}\n")
+    }
+
+    override fun src(): String? {
+        if (sb.isBlank()) {
+            return null
+        }
+        sb.insert(
+            0, """@startuml
+hide empty circle
+hide empty members
+left to right direction 
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+
+"""
+        )
+        sb.append("\n@enduml")
+        return sb.toString()
+    }
+
+    companion object {
+        /**
+         * [parse error with word graph #4079](https://github.com/mermaid-js/mermaid/issues/4079)
+         */
+        @JvmStatic
+        val keyword = Regex("\\b(graph|end)\\b")
+
+        @JvmStatic
+        private fun sign(input: String) = deleteSymbol(keyword.replace(input, "$1_"))
+
+        /**
+         * [support not english symbol #4138](https://github.com/mermaid-js/mermaid/issues/4138)
+         */
+        @JvmStatic
+        val canNotUseSymbol = Regex("[-#。？！，、；：“”‘’（）《》【】~@()|'\"<{}\\[\\]]")
+        private fun deleteSymbol(input: String) = canNotUseSymbol.replace(input, "_")
+
+        @JvmStatic
+        private fun addLine(s: String?, sb: StringBuilder) {
+            if (s != null) {
+                sb.append("${s.replace("\"", "")}\\n")
+            }
+        }
+
+        @JvmStatic
+        fun build(src: String?, project: Project, func: Consumer<String>) {
+            if (StringUtils.isBlank(src ?: return)) {
+                return
+            }
+            val paths = SysPath.lib() ?: return
+            object : Task.Backgroundable(project, "draw PlantUML") {
+                override fun run(indicator: ProgressIndicator) {
+                    for (path in paths) {
+                        try {
+                            val plantumlPath = "${path}draw-graph/plantuml.puml"
+                            val svgOut = FileOutputStream("${path}draw-graph/plantuml.svg")
+                            val pngOut = FileOutputStream("${path}draw-graph/plantuml.png")
+                            File(plantumlPath).parentFile.mkdirs()
+                            Files.write(Path.of(plantumlPath), src.toByteArray(StandardCharsets.UTF_8))
+                            val reader = SourceStringReader(src)
+                            val svgDesc = reader.outputImage(svgOut, FileFormatOption(FileFormat.SVG))
+                            val pngDesc = reader.outputImage(pngOut, FileFormatOption(FileFormat.PNG))
+                            func.accept(
+                                """
+<embed src="file:///${path}draw-graph/plantuml.svg" type="image/svg+xml" />
+<br>
+$svgDesc
+<br>
+$pngDesc
+<br>
+${DrawGraphBundle.message("graphviz.msg")}
+<br>
+"""
+                            )
+                            return
+                        } catch (e: Exception) {
+                            func.accept(
+                                """
+<embed src="file:///${path}draw-graph/plantuml.svg" type="image/svg+xml" />
+<br>
+${DrawGraphBundle.message("graphviz.msg")}
+<br>
+${ExceptionUtil.getThrowableText(e)}
+"""
+                            )
+                        }
+                    }
+                }
+            }.queue()
+        }
+    }
+}

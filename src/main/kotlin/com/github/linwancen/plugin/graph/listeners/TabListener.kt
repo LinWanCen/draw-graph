@@ -11,14 +11,14 @@ object TabListener : FileEditorManagerListener {
     override fun fileOpened(source: FileEditorManager, file: VirtualFile) {
         val project = source.project
         if (DrawGraphProjectState.of(project).autoLoad) {
-            RelController.forFile(project, arrayOf(file))
+            RelController.forFile(project, arrayOf(file), false)
         }
     }
 
     override fun selectionChanged(event: FileEditorManagerEvent) {
         val project = event.manager.project
         if (DrawGraphProjectState.of(project).autoLoad) {
-            RelController.forFile(project, arrayOf(event.newFile ?: return))
+            RelController.forFile(project, arrayOf(event.newFile ?: return), false)
         }
     }
 }

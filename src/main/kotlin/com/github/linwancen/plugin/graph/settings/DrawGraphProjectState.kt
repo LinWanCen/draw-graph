@@ -11,7 +11,8 @@ import com.intellij.util.xmlb.XmlSerializerUtil
     name = "com.github.linwancen.plugin.graph.settings.ProjectState",
     storages = [Storage("draw-graph-settings/DrawGraphProjectState.xml")]
 )
-class DrawGraphProjectState : PersistentStateComponent<DrawGraphProjectState?> {
+class DrawGraphProjectState : PersistentStateComponent<DrawGraphProjectState?>, AbstractDrawGraphState() {
+
     var autoLoad : Boolean = true
 
     override fun getState(): DrawGraphProjectState {
@@ -24,9 +25,16 @@ class DrawGraphProjectState : PersistentStateComponent<DrawGraphProjectState?> {
 
     companion object {
         @JvmStatic
+        val default: DrawGraphProjectState = DrawGraphProjectState()
+
+        @JvmStatic
         fun of(project: Project? = null): DrawGraphProjectState {
             val manager = project ?: ApplicationManager.getApplication()
             return manager.getService(DrawGraphProjectState::class.java) ?: return DrawGraphProjectState()
         }
+    }
+
+    fun reset() {
+        super.resetAbstract(default)
     }
 }

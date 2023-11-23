@@ -1,6 +1,6 @@
 package com.github.linwancen.plugin.graph.ui
 
-import com.github.linwancen.plugin.graph.draw.InstallMermaid
+import com.github.linwancen.plugin.graph.printer.InstallMermaid
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
@@ -14,9 +14,11 @@ class GraphWindowFactory : ToolWindowFactory {
         toolWindow.title = title
     }
 
-    companion object{
-       val winMap = mutableMapOf<Project, GraphWindow>()
+    companion object {
+        @JvmStatic
+        val winMap = mutableMapOf<Project, GraphWindow>()
     }
+
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         InstallMermaid.checkAndInstall()
         val authorWindow = GraphWindow(project, toolWindow)

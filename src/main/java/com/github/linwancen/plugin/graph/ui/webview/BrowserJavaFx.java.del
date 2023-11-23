@@ -1,0 +1,56 @@
+package com.github.linwancen.plugin.graph.ui.webview;
+
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class BrowserJavaFx extends Browser {
+    private static final Logger LOG = LoggerFactory.getLogger(BrowserJavaFx.class);
+
+    static {
+        LOG.info("load BrowserJavaFx");
+        map.put(BrowserJavaFx.class.getName(), BrowserJavaFx.class);
+    }
+
+    private WebEngine engine;
+
+    @Override
+    String add(JPanel out) {
+        try {
+            JFXPanel jfxPanel = new JFXPanel();
+            Platform.runLater(() -> {
+                Group group = new Group();
+                WebView webView = new WebView();
+                group.getChildren().add(webView);
+                Scene scene = new Scene(group);
+                jfxPanel.setScene(scene);
+                out.add(jfxPanel, BorderLayout.CENTER);
+
+                engine = webView.getEngine();
+            });
+            return null;
+        } catch (Throwable e) {
+            return e.toString();
+        }
+    }
+
+    @Override
+    public String load(String html) {
+        try {
+            if (engine != null && html != null) {
+                Platform.runLater(() -> engine.loadContent(html));
+            }
+            return null;
+        } catch (Throwable e) {
+            return e.toString();
+        }
+    }
+}

@@ -20,10 +20,12 @@ One java call graph or all pom.xml dep graph:
 1. Open <kbd>Graph</kbd> ToolWindow at Right
 2. Open *.java/pom.xml file
 
-Mutil java call graph or partial pom.xml dep graph:
-1. Select mutil file
+Multi java call graph or partial pom.xml dep graph:
+1. Select multi file
 2. Open Right Click Menu
 3. Select <kbd>Call Graph</kbd>
+
+Install [Graphviz] and set xx/bin to env Path for PlantUML and Graphviz.
 
 ## About
 
@@ -51,13 +53,15 @@ Only support 2020.2+ because mermaid.js only use in jcef(chrome),
 2. 打开右键菜单
 3. 选择<kbd>调用图</kbd>
 
+安装 [Graphviz] 并设置 bin 目录为环境变量以便使用 PlantUML 和 Graphviz。
+
 ## 关于
 
 只支持 2020.2 以上因为 mermaid.js 只能在 jcef(chrome) 中使用，  
 2020.1 以下用的是 JavaFx WebView。
 
 ## 我的项目
-- 在文件树、行末、JSON、COBOL 显示注释：[Show Comment]
+- 在文件树、行末、JSON 显示注释：[Show Comment]
 - 生成 方法调用图 和 Maven 依赖图：[Draw Graph]
 - 查找多个文件或行的作者 与 导出搜索：[Find Author]
 - 自动同步覆盖率 和 调试中抓取覆盖率：[Sync Coverage]
@@ -68,6 +72,7 @@ Only support 2020.2+ because mermaid.js only use in jcef(chrome),
 
 如果对你有所帮助，别忘了给 [本项目 GitHub 主页][Draw Graph GitHub] 一个 Star，您的支持是项目前进的动力。
 
+[Graphviz]: https://graphviz.org/download/
 [Show Comment]: https://plugins.jetbrains.com/plugin/18553-show-comment
 [Draw Graph]: https://plugins.jetbrains.com/plugin/21242-draw-graph
 [Find Author]: https://plugins.jetbrains.com/plugin/20557-find-author

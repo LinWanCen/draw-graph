@@ -1,7 +1,7 @@
-package com.github.linwancen.plugin.graph.rel.xml
+package com.github.linwancen.plugin.graph.parser.xml
 
-import com.github.linwancen.plugin.graph.draw.RelHandle
-import com.github.linwancen.plugin.graph.rel.RelService
+import com.github.linwancen.plugin.graph.printer.Printer
+import com.github.linwancen.plugin.graph.parser.Parser
 import com.intellij.lang.xml.XMLLanguage
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -14,17 +14,19 @@ import org.slf4j.LoggerFactory
 /**
  * for pom.xml
  */
-object RelServiceXml : RelService() {
-    private val LOG = LoggerFactory.getLogger(this::class.java)
+class ParserXml : Parser() {
+    private val log = LoggerFactory.getLogger(this::class.java)
+
+    companion object {
+        private const val POM_FILE = "pom.xml"
+    }
 
     init {
-        LOG.info("RelService load {}", this.javaClass.simpleName)
+        log.info("RelService load {}", this.javaClass.simpleName)
         SERVICES[XMLLanguage.INSTANCE.id] = this
     }
 
-    private const val POM_FILE = "pom.xml"
-
-    override fun srcImpl(project: Project, relHandle: Array<out RelHandle>, files: Array<out VirtualFile>) {
+    override fun srcImpl(project: Project, printer: Array<out Printer>, files: Array<out VirtualFile>) {
         // use method support same sign
         val callListMap = mutableMapOf<String, List<String>>()
         val psiFiles = if (files.size == 1 && POM_FILE == files[0].name) {
@@ -33,16 +35,16 @@ object RelServiceXml : RelService() {
             files.mapNotNull { PsiManager.getInstance(project).findFile(it) }.filter { POM_FILE == it.name }
         }
         for (psiFile in psiFiles) {
-            relHandle.forEach { it.beforePsiFile(psiFile) }
+            printer.forEach { it.beforePsiFile(psiFile) }
             if (psiFile !is XmlFile) {
                 continue
             }
-            RelServicePom.parsePom(psiFile, callListMap, relHandle)
+            RelServicePom.parsePom(psiFile, callListMap, printer)
         }
         for ((usage, callList) in callListMap) {
             for (call in callList) {
                 if (callListMap.containsKey(call)) {
-                    relHandle.forEach { it.call(usage, call) }
+                    printer.forEach { it.call(usage, call) }
                 }
             }
         }

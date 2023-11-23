@@ -6,6 +6,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends optional="true" config-file="java.xml">com.intellij.modules.java</depends>
+    <depends optional="true" config-file="kotlin.xml">org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="xml.xml">com.intellij.modules.xml</depends>
 
     <projectListeners>
@@ -14,7 +15,7 @@
     </projectListeners>
 
     <extensions defaultExtensionNs="com.intellij">
-        <requiredForSmartModeStartupActivity implementation="com.github.linwancen.plugin.graph.ui.webview.Jcef"/>
+        <!--<requiredForSmartModeStartupActivity implementation="com.github.linwancen.plugin.graph.ui.webview.BrowserJcef"/>-->
         <applicationService serviceImplementation="com.github.linwancen.plugin.graph.settings.DrawGraphAppState"/>
         <projectService serviceImplementation="com.github.linwancen.plugin.graph.settings.DrawGraphProjectState"/>
         <!-- https://jetbrains.design/intellij/resources/icons_list/ -->
