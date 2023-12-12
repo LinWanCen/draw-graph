@@ -1,6 +1,7 @@
 package com.github.linwancen.plugin.graph.printer
 
 import com.github.linwancen.plugin.common.file.SysPath
+import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -15,11 +16,11 @@ import java.util.function.Consumer
 
 class PrinterMermaid : Printer() {
 
-    val sb = StringBuilder()
+    val sb = StringBuilder("graph LR\n\n")
 
     override fun beforeGroup(groupMap: MutableMap<String, String>) {
         sb.append("subgraph ")
-        item(groupMap)
+        label(groupMap, false)
         sb.append("direction LR\n")
     }
 
@@ -28,55 +29,39 @@ class PrinterMermaid : Printer() {
     }
 
     override fun item(itemMap: MutableMap<String, String>) {
-        sb.append(sign(itemMap["sign"] ?: return))
+        label(itemMap, true)
+    }
+
+    private fun label(itemMap: MutableMap<String, String>, isItem: Boolean) {
+        sb.append("'${sign(itemMap["sign"] ?: return)}'")
         if (itemMap["name"] != null) {
-            sb.append("[\"")
+            sb.append(if (isItem) "(" else "[")
+            sb.append("\"")
             addLine(itemMap["@1"], sb)
             addLine(itemMap["@2"], sb)
             addLine(itemMap["@3"], sb)
-            sb.append("${itemMap["name"]}\"]")
+            sb.append("${itemMap["name"]}\"")
+            sb.append(if (isItem) ")" else "]")
         }
         sb.append("\n")
     }
 
     override fun call(usageSign: String, callSign: String) {
-        sb.append("${sign(usageSign)} --> ${sign(callSign)}\n")
+        sb.append("'${sign(usageSign)}' --> '${sign(callSign)}'\n")
     }
 
-    override fun src(): String? {
-        if (sb.isBlank()) {
-            return null
-        }
-        sb.insert(0, "graph LR\n")
+    override fun toSrc(relData: RelData): String {
+        printerData(relData)
         return sb.toString()
     }
 
+    override fun toHtml(src: String, project: Project, func: Consumer<String>) {
+        PrinterGraphviz.build(src, project, func)
+    }
+
     companion object {
-        /**
-         * [parse error with word graph #4079](https://github.com/mermaid-js/mermaid/issues/4079)
-         */
         @JvmStatic
-        val keyword = Regex("\\b(graph|end)\\b")
-
-        @JvmStatic
-        private fun sign(input: String) = "'${deleteSymbol(keyword.replace(input, "$1_"))}'"
-
-        /**
-         * [support not english symbol #4138](https://github.com/mermaid-js/mermaid/issues/4138)
-         */
-        @JvmStatic
-        val canNotUseSymbol = Regex("[。？！，、；：“”‘’（）《》【】~@()|'\"<{}\\[\\]]")
-        private fun deleteSymbol(input: String) = canNotUseSymbol.replace(input, "_")
-
-        @JvmStatic
-        private fun addLine(s: String?, sb: StringBuilder) {
-            if (s != null) {
-                sb.append("${s.replace("\"","")}\\n")
-            }
-        }
-
-        @JvmStatic
-        fun build(src : String?, project: Project, func : Consumer<String>) {
+        fun build(src: String?, project: Project, func: Consumer<String>) {
             if (StringUtils.isBlank(src ?: return)) {
                 return
             }

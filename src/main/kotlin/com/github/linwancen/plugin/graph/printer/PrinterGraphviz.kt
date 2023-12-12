@@ -1,6 +1,7 @@
 package com.github.linwancen.plugin.graph.printer
 
 import com.github.linwancen.plugin.common.file.SysPath
+import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.intellij.execution.CommandLineUtil
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -19,13 +20,22 @@ import java.util.function.Consumer
 
 class PrinterGraphviz : Printer() {
 
-    val sb = StringBuilder()
+    val sb = StringBuilder(
+        """digraph{
+rankdir=LR
+fontname = "Microsoft YaHei,Consolas"
+node [shape = "record", style="rounded,filled", fillcolor = "#F1F1F1", fontname = "Microsoft YaHei,Consolas"]
+edge [arrowhead = "empty", fontname = "Microsoft YaHei,Consolas"]
+graph [compound=true]
+
+"""
+    )
 
     override fun beforeGroup(groupMap: MutableMap<String, String>) {
         sb.append(
-            "subgraph \"${sign(groupMap["sign"] ?: return)}\" {\n" +
-                    "edge [\"dir\"=\"none\"]\n" +
-                    "graph [\"color\"=\"blue\"]\n"
+            "subgraph \"cluster_${sign(groupMap["sign"] ?: return)}\" {\n" +
+                    "edge [\"dir\"=\"none\"]\n"
+                    + "graph [style=\"rounded\"]\n"
         )
         label(groupMap, false)
         sb.append("\n")
@@ -36,7 +46,7 @@ class PrinterGraphviz : Printer() {
     }
 
     override fun item(itemMap: MutableMap<String, String>) {
-        sb.append("\"${sign(itemMap["sign"] ?: return)}\"")
+        sb.append("\"cluster_${sign(itemMap["sign"] ?: return)}\"")
         label(itemMap, true)
         sb.append("\n")
     }
@@ -58,51 +68,20 @@ class PrinterGraphviz : Printer() {
     }
 
     override fun call(usageSign: String, callSign: String) {
-        sb.append("\"${sign(usageSign)}\" -> \"${sign(callSign)}\"\n")
+        sb.append("\"cluster_${sign(usageSign)}\" -> \"cluster_${sign(callSign)}\"\n")
     }
 
-    override fun src(): String? {
-        if (sb.isBlank()) {
-            return null
-        }
-        sb.insert(
-            0,
-            """digraph{
-rankdir=LR
-fontname = "Microsoft YaHei,Consolas"
-node [shape = "record", fontname = "Microsoft YaHei,Consolas"]
-edge [arrowhead = "empty", fontname = "Microsoft YaHei,Consolas"]
-graph [compound=true]
-
-"""
-        )
+    override fun toSrc(relData: RelData): String {
+        printerData(relData)
         sb.append("\n}")
         return sb.toString()
     }
 
+    override fun toHtml(src: String, project: Project, func: Consumer<String>) {
+        build(src, project, func)
+    }
+
     companion object {
-        /**
-         * [parse error with word graph #4079](https://github.com/mermaid-js/mermaid/issues/4079)
-         */
-        @JvmStatic
-        val keyword = Regex("\\b(graph|end)\\b")
-
-        @JvmStatic
-        private fun sign(input: String) = "cluster_" + deleteSymbol(keyword.replace(input, "$1_"))
-
-        /**
-         * [support not english symbol #4138](https://github.com/mermaid-js/mermaid/issues/4138)
-         */
-        @JvmStatic
-        val canNotUseSymbol = Regex("[。？！，、；：“”‘’（）《》【】~@()|'\"<{}\\[\\]]")
-        private fun deleteSymbol(input: String) = canNotUseSymbol.replace(input, "_")
-
-        @JvmStatic
-        private fun addLine(s: String?, sb: StringBuilder) {
-            if (s != null) {
-                sb.append("${s.replace("\"", "")}\\n")
-            }
-        }
 
         @JvmStatic
         fun build(src: String?, project: Project, func: Consumer<String>) {

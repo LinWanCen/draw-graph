@@ -2,7 +2,6 @@ package com.github.linwancen.plugin.graph.parser
 
 import com.github.linwancen.plugin.common.text.Skip
 import com.github.linwancen.plugin.graph.comment.JavaComment
-import com.github.linwancen.plugin.graph.printer.Printer
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.project.Project
@@ -20,13 +19,12 @@ class ParserJava : Parser() {
         SERVICES[JavaLanguage.INSTANCE.id] = this
     }
 
-    override fun srcImpl(project: Project, printer: Array<out Printer>, files: Array<out VirtualFile>) {
+    override fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>) {
         val state = DrawGraphProjectState.of(project)
         // use method support same sign
         val callListMap = mutableMapOf<PsiMethod, List<PsiMethod>>()
         for (file in files) {
             val psiFile = PsiManager.getInstance(project).findFile(file) ?: return
-            printer.forEach { it.beforePsiFile(psiFile) }
             if (psiFile !is PsiJavaFile) {
                 continue
             }
@@ -36,7 +34,6 @@ class ParserJava : Parser() {
                 psiClass.name?.let { classMap["name"] = it }
                 psiClass.qualifiedName?.let { classMap["sign"] = it }
                 JavaComment.addDocParam(psiClass.docComment, classMap)
-                printer.forEach { it.beforeGroup(classMap) }
                 val methods = psiClass.methods
                 for (method in methods) {
                     val sign = "${psiClass.qualifiedName}#${method.name}"
@@ -48,16 +45,14 @@ class ParserJava : Parser() {
                     methodMap["name"] = method.name
                     JavaComment.addDocParam(method.docComment, methodMap)
                     if (!(method.isConstructor && !method.hasParameters())) {
-                        printer.forEach { it.item(methodMap) }
+                        relData.regParentChild(classMap, methodMap)
                     }
 
                     val callList = callList(method)
                     // even empty list should put for `callListMap.containsKey(call)`
                     callListMap[method] = callList
                 }
-                printer.forEach { it.afterGroup(classMap) }
             }
-            printer.forEach { it.afterPsiFile(psiFile) }
         }
         for ((usage, callList) in callListMap) {
             for (call in callList) {
@@ -67,7 +62,7 @@ class ParserJava : Parser() {
                     val skip = Skip.skip(callSign, state.includePattern, state.excludePattern)
                     val emptyConstructor = call.isConstructor && !call.hasParameters()
                     if (!skip && !emptyConstructor) {
-                        printer.forEach { it.call(usageSign, callSign) }
+                        relData.regCall(usageSign, callSign)
                     }
                 }
             }

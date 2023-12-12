@@ -1,6 +1,7 @@
 package com.github.linwancen.plugin.graph.ui
 
 import com.github.linwancen.plugin.graph.parser.Parser
+import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.printer.PrinterGraphviz
 import com.github.linwancen.plugin.graph.printer.PrinterMermaid
 import com.github.linwancen.plugin.graph.printer.PrinterPlantuml
@@ -38,15 +39,15 @@ object RelController {
 
     @JvmStatic
     fun buildSrc(project: Project, window: GraphWindow, files: Array<VirtualFile>) {
-        val mermaid = PrinterMermaid()
-        val graphviz = PrinterGraphviz()
-        val plantuml = PrinterPlantuml()
-        Parser.src(project, arrayOf(mermaid, graphviz, plantuml), files)
-
+        val relData = RelData()
+        Parser.src(project, relData, files)
+        if (relData.itemMap.isEmpty()) {
+            return
+        }
         window.toolWindow.activate(null)
-        window.mermaidSrc.text = mermaid.src()
-        window.graphvizSrc.text = graphviz.src()
-        window.plantumlSrc.text = plantuml.src()
+        window.mermaidSrc.text = PrinterMermaid().toSrc(relData)
+        window.graphvizSrc.text = PrinterGraphviz().toSrc(relData)
+        window.plantumlSrc.text = PrinterPlantuml().toSrc(relData)
         PrinterMermaid.build(window.mermaidSrc.text, project) { window.mermaidHtml.text = it; }
         PrinterGraphviz.build(window.graphvizSrc.text, project) { window.graphvizHtml.text = it; }
         PrinterPlantuml.build(window.plantumlSrc.text, project) { window.plantumlHtml.text = it; }

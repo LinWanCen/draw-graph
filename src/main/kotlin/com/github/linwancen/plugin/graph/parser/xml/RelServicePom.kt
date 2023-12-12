@@ -1,6 +1,6 @@
 package com.github.linwancen.plugin.graph.parser.xml
 
-import com.github.linwancen.plugin.graph.printer.Printer
+import com.github.linwancen.plugin.graph.parser.RelData
 import com.intellij.psi.xml.XmlDocument
 import com.intellij.psi.xml.XmlFile
 import com.intellij.psi.xml.XmlTag
@@ -13,7 +13,7 @@ object RelServicePom {
     fun parsePom(
         psiFile: XmlFile,
         callListMap: MutableMap<String, List<String>>,
-        printer: Array<out Printer>,
+        relData: RelData,
     ) {
         for (it in psiFile.children) {
             if (it !is XmlDocument) {
@@ -25,7 +25,7 @@ object RelServicePom {
             val callList = mutableListOf<String>()
             callListMap[sign] = callList
 
-            module(root, printer, rootInfo)
+            module(root, relData, rootInfo)
 
             dependencies(root, callList)
         }
@@ -33,24 +33,22 @@ object RelServicePom {
 
     private fun module(
         root: XmlTag,
-        printer: Array<out Printer>,
+        relData: RelData,
         rootInfo: MutableMap<String, String>,
     ) {
         val modules = root.findFirstSubTag("modules")
         if (modules == null) {
-            printer.forEach { it.item(rootInfo) }
+            relData.regParentChild(rootInfo)
         } else {
             val items = modules.findSubTags("module")
             if (items.isEmpty()) {
-                printer.forEach { it.item(rootInfo) }
+                relData.regParentChild(rootInfo)
             } else {
-                printer.forEach { it.beforeGroup(rootInfo) }
                 for (item in items) {
                     val info = mutableMapOf<String, String>()
                     info["sign"] = item.value.text
-                    printer.forEach { it.item(info) }
+                    relData.regParentChild(rootInfo, info)
                 }
-                printer.forEach { it.afterGroup(rootInfo) }
             }
         }
     }

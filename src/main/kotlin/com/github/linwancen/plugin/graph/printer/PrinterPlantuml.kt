@@ -1,6 +1,7 @@
 package com.github.linwancen.plugin.graph.printer
 
 import com.github.linwancen.plugin.common.file.SysPath
+import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -20,7 +21,15 @@ import java.util.function.Consumer
 
 class PrinterPlantuml : Printer() {
 
-    val sb = StringBuilder()
+    val sb = StringBuilder("""@startuml
+hide empty circle
+hide empty members
+left to right direction 
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+
+""")
 
     override fun beforeGroup(groupMap: MutableMap<String, String>) {
         label(groupMap)
@@ -51,49 +60,17 @@ class PrinterPlantuml : Printer() {
         sb.append("${sign(usageSign)} --> ${sign(callSign)}\n")
     }
 
-    override fun src(): String? {
-        if (sb.isBlank()) {
-            return null
-        }
-        sb.insert(
-            0, """@startuml
-hide empty circle
-hide empty members
-left to right direction 
-skinparam shadowing false
-skinparam componentStyle rectangle
-skinparam defaultTextAlignment center
-
-"""
-        )
+    override fun toSrc(relData: RelData): String {
+        printerData(relData)
         sb.append("\n@enduml")
         return sb.toString()
     }
 
+    override fun toHtml(src: String, project: Project, func: Consumer<String>) {
+        PrinterGraphviz.build(src, project, func)
+    }
+
     companion object {
-        /**
-         * [parse error with word graph #4079](https://github.com/mermaid-js/mermaid/issues/4079)
-         */
-        @JvmStatic
-        val keyword = Regex("\\b(graph|end)\\b")
-
-        @JvmStatic
-        private fun sign(input: String) = deleteSymbol(keyword.replace(input, "$1_"))
-
-        /**
-         * [support not english symbol #4138](https://github.com/mermaid-js/mermaid/issues/4138)
-         */
-        @JvmStatic
-        val canNotUseSymbol = Regex("[-#。？！，、；：“”‘’（）《》【】~@()|'\"<{}\\[\\]]")
-        private fun deleteSymbol(input: String) = canNotUseSymbol.replace(input, "_")
-
-        @JvmStatic
-        private fun addLine(s: String?, sb: StringBuilder) {
-            if (s != null) {
-                sb.append("${s.replace("\"", "")}\\n")
-            }
-        }
-
         @JvmStatic
         fun build(src: String?, project: Project, func: Consumer<String>) {
             if (StringUtils.isBlank(src ?: return)) {

@@ -1,6 +1,5 @@
 package com.github.linwancen.plugin.graph.parser
 
-import com.github.linwancen.plugin.graph.printer.Printer
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity.RequiredForSmartMode
 import com.intellij.openapi.vfs.VirtualFile
@@ -14,18 +13,18 @@ abstract class Parser : RequiredForSmartMode {
         // only load
     }
 
-    protected abstract fun srcImpl(project: Project, printer: Array<out Printer>, files: Array<out VirtualFile>)
+    protected abstract fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>)
 
     companion object {
         @JvmStatic
         val SERVICES = mutableMapOf<String, Parser>()
 
         @JvmStatic
-        fun src(project: Project, printer: Array<out Printer>, files: Array<out VirtualFile>) {
+        fun src(project: Project, relData: RelData, files: Array<out VirtualFile>) {
             for (file in files) {
                 val psiFile = PsiManager.getInstance(project).findFile(file) ?: return
                 val usageService = SERVICES[psiFile.language.id] ?: continue
-                usageService.srcImpl(project, printer, files)
+                usageService.srcImpl(project, relData, files)
                 return
             }
         }
