@@ -5,11 +5,16 @@ import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.printer.PrinterGraphviz
 import com.github.linwancen.plugin.graph.printer.PrinterMermaid
 import com.github.linwancen.plugin.graph.printer.PrinterPlantuml
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.runInEdt
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindowManager
+import org.slf4j.LoggerFactory
 
 object RelController {
+    private val LOG = LoggerFactory.getLogger(this::class.java)
 
     @JvmStatic
     val lastFilesMap = mutableMapOf<Project, Array<VirtualFile>>()
@@ -24,17 +29,25 @@ object RelController {
      */
     @JvmStatic
     fun forFile(project: Project, files: Array<VirtualFile>, fromAction: Boolean) {
-        lastFilesMap[project] = files
-        if (fromAction) {
-            // let it init
-            ToolWindowManager.getInstance(project).getToolWindow("Graph")?.activate(null)
+        ApplicationManager.getApplication().executeOnPooledThread {
+            runReadAction {
+                try {
+                    lastFilesMap[project] = files
+                    if (fromAction) {
+                        // let it init
+                        ToolWindowManager.getInstance(project).getToolWindow("Graph")?.activate(null)
+                    }
+                    val window = GraphWindowFactory.winMap[project] ?: return@runReadAction
+                    if (!fromAction && !window.toolWindow.isVisible) {
+                        return@runReadAction
+                    }
+                    // for before 201.6668.113
+                    buildSrc(project, window, files)
+                } catch (e: Throwable) {
+                    LOG.info("RelController catch Throwable but log to record.", e);
+                }
+            }
         }
-        val window = GraphWindowFactory.winMap[project] ?: return
-        if (!fromAction && !window.toolWindow.isVisible) {
-            return
-        }
-        // for before 201.6668.113
-        buildSrc(project, window, files)
     }
 
     @JvmStatic
@@ -44,13 +57,16 @@ object RelController {
         if (relData.itemMap.isEmpty()) {
             return
         }
-        window.toolWindow.activate(null)
-        window.mermaidSrc.text = PrinterMermaid().toSrc(relData)
-        window.graphvizSrc.text = PrinterGraphviz().toSrc(relData)
-        window.plantumlSrc.text = PrinterPlantuml().toSrc(relData)
-        PrinterMermaid.build(window.mermaidSrc.text, project) { window.mermaidHtml.text = it; }
-        PrinterGraphviz.build(window.graphvizSrc.text, project) { window.graphvizHtml.text = it; }
-        PrinterPlantuml.build(window.plantumlSrc.text, project) { window.plantumlHtml.text = it; }
-        window.load()
+        runInEdt {
+        // EdtExecutorService.getInstance().submit {
+            window.toolWindow.activate(null)
+            window.mermaidSrc.text = PrinterMermaid().toSrc(relData)
+            window.graphvizSrc.text = PrinterGraphviz().toSrc(relData)
+            window.plantumlSrc.text = PrinterPlantuml().toSrc(relData)
+            PrinterMermaid.build(window.mermaidSrc.text, project) { window.mermaidHtml.text = it; }
+            PrinterGraphviz.build(window.graphvizSrc.text, project) { window.graphvizHtml.text = it; }
+            PrinterPlantuml.build(window.plantumlSrc.text, project) { window.plantumlHtml.text = it; }
+            window.load()
+        }
     }
 }
