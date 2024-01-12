@@ -42,7 +42,8 @@ class ParserJava : Parser() {
                     }
                     val methodMap = mutableMapOf<String, String>()
                     methodMap["sign"] = sign
-                    methodMap["name"] = method.name
+                    val v = ParserJavaModifier.symbol(method)
+                    methodMap["name"] = "$v ${method.name}"
                     JavaComment.addDocParam(method.docComment, methodMap)
                     if (!(method.isConstructor && !method.hasParameters())) {
                         relData.regParentChild(classMap, methodMap)

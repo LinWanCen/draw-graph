@@ -6,13 +6,16 @@ import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiModifier
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.idea.KotlinLanguage
+import org.jetbrains.kotlin.idea.search.declarationsSearch.isOverridableElement
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
+import org.jetbrains.kotlin.psi.psiUtil.hasActualModifier
 import org.slf4j.LoggerFactory
 
 class ParserKotlin : Parser() {
@@ -39,7 +42,7 @@ class ParserKotlin : Parser() {
                 psiClass.fqName?.let { classMap["sign"] = it.asString() }
                 KotlinComment.addDocParam(psiClass.docComment, classMap)
                 if (psiClass is KtClassOrObject) {
-                    val methods = PsiTreeUtil.findChildrenOfType(psiFile, KtNamedFunction::class.java)
+                    val methods = PsiTreeUtil.findChildrenOfType(psiClass, KtNamedFunction::class.java)
                     for (method in methods) {
                         val sign = "${psiClass.fqName}#${method.name}"
                         if (Skip.skip(sign, state.includePattern, state.excludePattern)) {
@@ -47,7 +50,8 @@ class ParserKotlin : Parser() {
                         }
                         val methodMap = mutableMapOf<String, String>()
                         methodMap["sign"] = sign
-                        methodMap["name"] = method.name.toString()
+                        val v = ParserKotlinModifier.symbol(method)
+                        methodMap["name"] = "$v ${method.name}"
                         KotlinComment.addDocParam(method.docComment, methodMap)
                         relData.regParentChild(classMap, methodMap)
 

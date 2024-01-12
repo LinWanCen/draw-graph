@@ -74,7 +74,7 @@ object RelServicePom {
         info["sign"] = artifactId
         info["name"] = artifactId
 
-        val description = xmlTag.findFirstSubTag("description")?.value?.text ?: ""
+        val description = xmlTag.findFirstSubTag("description")?.value?.text?.trim() ?: ""
         if (description.isNotEmpty()) {
             info["@0"] = description
             info["@1"] = description
