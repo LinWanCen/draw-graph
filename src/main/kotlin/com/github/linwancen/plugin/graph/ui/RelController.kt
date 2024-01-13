@@ -29,44 +29,44 @@ object RelController {
      */
     @JvmStatic
     fun forFile(project: Project, files: Array<VirtualFile>, fromAction: Boolean) {
-        ApplicationManager.getApplication().executeOnPooledThread {
-            runReadAction {
-                try {
-                    lastFilesMap[project] = files
-                    if (fromAction) {
-                        // let it init
-                        ToolWindowManager.getInstance(project).getToolWindow("Graph")?.activate(null)
-                    }
-                    val window = GraphWindowFactory.winMap[project] ?: return@runReadAction
-                    if (!fromAction && !window.toolWindow.isVisible) {
-                        return@runReadAction
-                    }
-                    // for before 201.6668.113
-                    buildSrc(project, window, files)
-                } catch (e: Throwable) {
-                    LOG.info("RelController catch Throwable but log to record.", e);
-                }
+        try {
+            lastFilesMap[project] = files
+            if (fromAction) {
+                // let it init
+                ToolWindowManager.getInstance(project).getToolWindow("Graph")?.activate(null)
             }
+            val window = GraphWindowFactory.winMap[project] ?: return
+            if (!fromAction && !window.toolWindow.isVisible) {
+                return
+            }
+            // for before 201.6668.113
+            buildSrc(project, window, files)
+        } catch (e: Throwable) {
+            LOG.info("RelController catch Throwable but log to record.", e);
         }
     }
 
     @JvmStatic
     fun buildSrc(project: Project, window: GraphWindow, files: Array<VirtualFile>) {
-        val relData = RelData()
-        Parser.src(project, relData, files)
-        if (relData.itemMap.isEmpty()) {
-            return
-        }
-        runInEdt {
-        // EdtExecutorService.getInstance().submit {
-            window.toolWindow.activate(null)
-            window.mermaidSrc.text = PrinterMermaid().toSrc(relData)
-            window.graphvizSrc.text = PrinterGraphviz().toSrc(relData)
-            window.plantumlSrc.text = PrinterPlantuml().toSrc(relData)
-            PrinterMermaid.build(window.mermaidSrc.text, project) { window.mermaidHtml.text = it; }
-            PrinterGraphviz.build(window.graphvizSrc.text, project) { window.graphvizHtml.text = it; }
-            PrinterPlantuml.build(window.plantumlSrc.text, project) { window.plantumlHtml.text = it; }
-            window.load()
+        ApplicationManager.getApplication().executeOnPooledThread {
+            runReadAction {
+                val relData = RelData()
+                Parser.src(project, relData, files)
+                if (relData.itemMap.isEmpty()) {
+                    return@runReadAction
+                }
+                runInEdt {
+                    // EdtExecutorService.getInstance().submit {
+                    window.toolWindow.activate(null)
+                    window.mermaidSrc.text = PrinterMermaid().toSrc(relData)
+                    window.graphvizSrc.text = PrinterGraphviz().toSrc(relData)
+                    window.plantumlSrc.text = PrinterPlantuml().toSrc(relData)
+                    PrinterMermaid.build(window.mermaidSrc.text, project) { window.mermaidHtml.text = it; }
+                    PrinterGraphviz.build(window.graphvizSrc.text, project) { window.graphvizHtml.text = it; }
+                    PrinterPlantuml.build(window.plantumlSrc.text, project) { window.plantumlHtml.text = it; }
+                    window.load()
+                }
+            }
         }
     }
 }
