@@ -51,7 +51,7 @@ abstract class Printer {
         relData.callList.forEach { call(it.first, it.second) }
     }
 
-    private fun printerChildren(relData: RelData, parent: String, children: MutableList<String>) {
+    private fun printerChildren(relData: RelData, parent: String, children: List<String>) {
         val parentMap = relData.itemMap[parent] ?: return
         beforeGroup(parentMap)
         for (child in children) {

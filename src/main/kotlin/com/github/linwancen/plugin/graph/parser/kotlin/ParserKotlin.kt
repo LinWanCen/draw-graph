@@ -1,21 +1,20 @@
-package com.github.linwancen.plugin.graph.parser
+package com.github.linwancen.plugin.graph.parser.kotlin
 
 import com.github.linwancen.plugin.common.text.Skip
 import com.github.linwancen.plugin.graph.comment.KotlinComment
+import com.github.linwancen.plugin.graph.parser.Parser
+import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiModifier
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.idea.KotlinLanguage
-import org.jetbrains.kotlin.idea.search.declarationsSearch.isOverridableElement
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
-import org.jetbrains.kotlin.psi.psiUtil.hasActualModifier
 import org.slf4j.LoggerFactory
 
 class ParserKotlin : Parser() {

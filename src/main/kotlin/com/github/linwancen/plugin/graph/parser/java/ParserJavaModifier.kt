@@ -1,4 +1,4 @@
-package com.github.linwancen.plugin.graph.parser
+package com.github.linwancen.plugin.graph.parser.java
 
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier

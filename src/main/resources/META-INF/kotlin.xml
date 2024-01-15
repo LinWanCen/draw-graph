@@ -1,5 +1,5 @@
 <idea-plugin>
   <extensions defaultExtensionNs="com.intellij">
-    <requiredForSmartModeStartupActivity implementation="com.github.linwancen.plugin.graph.parser.ParserKotlin"/>
+    <requiredForSmartModeStartupActivity implementation="com.github.linwancen.plugin.graph.parser.kotlin.ParserKotlin"/>
   </extensions>
 </idea-plugin>

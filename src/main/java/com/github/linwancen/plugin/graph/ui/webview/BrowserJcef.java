@@ -8,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class BrowserJcef extends Browser {
-    private static final Logger LOG = LoggerFactory.getLogger(BrowserJcef.class);
 
     static {
         // load move to Browser

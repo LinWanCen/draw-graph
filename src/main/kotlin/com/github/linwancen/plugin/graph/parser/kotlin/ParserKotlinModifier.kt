@@ -1,6 +1,5 @@
-package com.github.linwancen.plugin.graph.parser
+package com.github.linwancen.plugin.graph.parser.kotlin
 
-import org.jetbrains.kotlin.lexer.KtModifierKeywordToken
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtNamedFunction
 

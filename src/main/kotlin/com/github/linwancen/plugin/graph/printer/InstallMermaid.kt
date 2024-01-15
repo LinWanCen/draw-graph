@@ -82,7 +82,9 @@ object InstallMermaid {
                         generalCommandLine.setWorkDirectory(path)
                         ScriptRunnerUtil.getProcessOutput(generalCommandLine)
                         return
-                    } catch (ignore: Exception) {}
+                    } catch (ignore: Exception) {
+                        // ignore
+                    }
                 }
             }
         }.queue()

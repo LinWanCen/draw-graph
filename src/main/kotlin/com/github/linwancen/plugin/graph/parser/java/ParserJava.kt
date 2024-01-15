@@ -1,8 +1,9 @@
-package com.github.linwancen.plugin.graph.parser
+package com.github.linwancen.plugin.graph.parser.java
 
 import com.github.linwancen.plugin.common.text.Skip
 import com.github.linwancen.plugin.graph.comment.JavaComment
-import com.github.linwancen.plugin.graph.parser.java.GetSetIs
+import com.github.linwancen.plugin.graph.parser.Parser
+import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.project.Project

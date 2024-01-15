@@ -51,7 +51,7 @@ graph [compound=true]
         sb.append("\n")
     }
 
-    private fun label(map: MutableMap<String, String>, isItem: Boolean) {
+    private fun label(map: Map<String, String>, isItem: Boolean) {
         if (map["name"] != null) {
             if (isItem) {
                 sb.append('[')
