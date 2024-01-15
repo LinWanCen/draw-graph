@@ -32,7 +32,16 @@ public class GraphWindow {
         reset.addActionListener(e -> initOut());
 
         autoLoad.setSelected(projectState.getAutoLoad());
-        autoLoad.addActionListener(e -> projectState.setAutoLoad(autoLoad.isSelected()));
+        autoLoad.addActionListener(e -> {
+            projectState.setAutoLoad(autoLoad.isSelected());
+            RelController.reload(project);
+        });
+
+        skipGetSetIs.setSelected(projectState.getSkipGetSetIs());
+        skipGetSetIs.addActionListener(e -> {
+            projectState.setSkipGetSetIs(skipGetSetIs.isSelected());
+            RelController.reload(project);
+        });
 
         UiUtils.onChange(include, projectState.getInclude(), projectState::setInclude);
         UiUtils.onChange(exclude, projectState.getExclude(), projectState::setExclude);
@@ -112,5 +121,6 @@ public class GraphWindow {
     private JButton resetSetting;
     private JTextField include;
     private JTextField exclude;
+    private JCheckBox skipGetSetIs;
     // endregion setting
 }

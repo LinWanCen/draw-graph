@@ -3,12 +3,15 @@ package com.github.linwancen.plugin.graph.settings
 import java.util.regex.Pattern
 
 open class AbstractDrawGraphState {
+
+    var skipGetSetIs = true
+
     @Transient
     var includePattern = Pattern.compile("")!!
         private set
 
     @Transient
-    var excludePattern = Pattern.compile("(?:get|set|is)\\w")!!
+    var excludePattern = Pattern.compile("")!!
         private set
 
     fun getInclude(): String {

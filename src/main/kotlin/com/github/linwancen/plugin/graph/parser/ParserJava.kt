@@ -2,6 +2,7 @@ package com.github.linwancen.plugin.graph.parser
 
 import com.github.linwancen.plugin.common.text.Skip
 import com.github.linwancen.plugin.graph.comment.JavaComment
+import com.github.linwancen.plugin.graph.parser.java.GetSetIs
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.project.Project
@@ -36,6 +37,9 @@ class ParserJava : Parser() {
                 JavaComment.addDocParam(psiClass.docComment, classMap)
                 val methods = psiClass.methods
                 for (method in methods) {
+                    if (state.skipGetSetIs && GetSetIs.isGetSetIs(method, psiClass)) {
+                        continue
+                    }
                     val sign = "${psiClass.qualifiedName}#${method.name}"
                     if (Skip.skip(sign, state.includePattern, state.excludePattern)) {
                         continue
