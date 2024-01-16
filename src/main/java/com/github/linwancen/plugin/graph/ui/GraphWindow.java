@@ -7,11 +7,13 @@ import com.github.linwancen.plugin.graph.printer.PrinterMermaid;
 import com.github.linwancen.plugin.graph.printer.PrinterPlantuml;
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState;
 import com.github.linwancen.plugin.graph.ui.webview.Browser;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.util.concurrency.EdtExecutorService;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -75,20 +77,17 @@ public class GraphWindow {
     private void initEvent(JTextArea src, JTextArea html, Browser browser,
                            TriConsumer<String, Project, Consumer<String>> tri) {
         Consumer<FocusEvent> htmlAndOut = e -> tri.accept(src.getText(), project,
-                s -> {
-                    html.setText(s);
-                    if (browser != null) browser.load(s);
-                });
-        htmlAndOut.accept(null);
+                        s -> EdtExecutorService.getInstance().submit(() -> {
+                            html.setText(s);
+                            if (browser != null) browser.load(s);
+                        }));
+        // reset browser load
+        ApplicationManager.getApplication().executeOnPooledThread(() -> htmlAndOut.accept(null));
 
         UiUtils.onFocusLost(src, project, htmlAndOut);
-        UiUtils.onFocusLost(html, project, e -> {if (browser != null) browser.load(html.getText());});
-    }
-
-    void load() {
-        if (mermaidBrowser != null) mermaidBrowser.load(mermaidHtml.getText());
-        if (graphvizBrowser != null) graphvizBrowser.load(graphvizHtml.getText());
-        if (plantumlBrowser != null) plantumlBrowser.load(plantumlHtml.getText());
+        UiUtils.onFocusLost(html, project, e -> EdtExecutorService.getInstance().submit(() -> {
+            if (browser != null) browser.load(html.getText());
+        }));
     }
 
     JPanel mainPanel;
@@ -101,17 +100,17 @@ public class GraphWindow {
     // region title
 
     // region html
-    private Browser mermaidBrowser;
+    Browser mermaidBrowser;
     JPanel mermaidOut;
     JTextArea mermaidHtml;
     JTextArea mermaidSrc;
 
-    private Browser plantumlBrowser;
+    Browser plantumlBrowser;
     JPanel plantumlOut;
     JTextArea plantumlHtml;
     JTextArea plantumlSrc;
 
-    private Browser graphvizBrowser;
+    Browser graphvizBrowser;
     JPanel graphvizOut;
     JTextArea graphvizHtml;
     JTextArea graphvizSrc;

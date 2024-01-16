@@ -73,12 +73,12 @@ skinparam defaultTextAlignment center
     companion object {
         @JvmStatic
         fun build(src: String?, project: Project, func: Consumer<String>) {
-            if (StringUtils.isBlank(src ?: return)) {
-                return
-            }
-            val paths = SysPath.lib() ?: return
             object : Task.Backgroundable(project, "draw PlantUML") {
                 override fun run(indicator: ProgressIndicator) {
+                    if (StringUtils.isBlank(src ?: return)) {
+                        return
+                    }
+                    val paths = SysPath.lib() ?: return
                     for (path in paths) {
                         if (!File(path).exists()) {
                             continue

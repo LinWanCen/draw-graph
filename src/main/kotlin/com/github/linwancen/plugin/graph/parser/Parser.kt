@@ -19,6 +19,9 @@ abstract class Parser : RequiredForSmartMode {
         @JvmStatic
         val SERVICES = mutableMapOf<String, Parser>()
 
+        /**
+         * need DumbService.getInstance(project).runReadActionInSmartMo
+         */
         @JvmStatic
         fun src(project: Project, relData: RelData, files: Array<out VirtualFile>) {
             for (file in files) {

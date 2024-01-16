@@ -7,7 +7,7 @@ import com.github.linwancen.plugin.graph.printer.PrinterMermaid
 import com.github.linwancen.plugin.graph.printer.PrinterPlantuml
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.runInEdt
-import com.intellij.openapi.application.runReadAction
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindowManager
@@ -42,29 +42,45 @@ object RelController {
             // for before 201.6668.113
             buildSrc(project, window, files)
         } catch (e: Throwable) {
-            LOG.info("RelController catch Throwable but log to record.", e);
+            LOG.info("RelController catch Throwable but log to record.", e)
         }
     }
 
     @JvmStatic
     fun buildSrc(project: Project, window: GraphWindow, files: Array<VirtualFile>) {
         ApplicationManager.getApplication().executeOnPooledThread {
-            runReadAction {
-                val relData = RelData()
+            val relData = RelData()
+            DumbService.getInstance(project).runReadActionInSmartMode {
                 Parser.src(project, relData, files)
-                if (relData.itemMap.isEmpty()) {
-                    return@runReadAction
-                }
+            }
+            if (relData.itemMap.isEmpty()) {
+                return@executeOnPooledThread
+            }
+            val mermaidSrc = PrinterMermaid().toSrc(relData)
+            val graphvizSrc = PrinterGraphviz().toSrc(relData)
+            val plantumlSrc = PrinterPlantuml().toSrc(relData)
+            runInEdt {
+                window.toolWindow.activate(null)
+                window.mermaidSrc.text = mermaidSrc
+                window.graphvizSrc.text = graphvizSrc
+                window.plantumlSrc.text = plantumlSrc
+            }
+            PrinterMermaid.build(mermaidSrc, project) {
                 runInEdt {
-                    // EdtExecutorService.getInstance().submit {
-                    window.toolWindow.activate(null)
-                    window.mermaidSrc.text = PrinterMermaid().toSrc(relData)
-                    window.graphvizSrc.text = PrinterGraphviz().toSrc(relData)
-                    window.plantumlSrc.text = PrinterPlantuml().toSrc(relData)
-                    PrinterMermaid.build(window.mermaidSrc.text, project) { window.mermaidHtml.text = it; }
-                    PrinterGraphviz.build(window.graphvizSrc.text, project) { window.graphvizHtml.text = it; }
-                    PrinterPlantuml.build(window.plantumlSrc.text, project) { window.plantumlHtml.text = it; }
-                    window.load()
+                    window.mermaidHtml.text = it
+                    if (window.mermaidBrowser != null) window.mermaidBrowser.load(it)
+                }
+            }
+            PrinterGraphviz.build(graphvizSrc, project) {
+                runInEdt {
+                    window.graphvizHtml.text = it
+                    if (window.graphvizBrowser != null) window.graphvizBrowser.load(it)
+                }
+            }
+            PrinterPlantuml.build(plantumlSrc, project) {
+                runInEdt {
+                    window.plantumlHtml.text = it
+                    if (window.plantumlBrowser != null) window.plantumlBrowser.load(it)
                 }
             }
         }

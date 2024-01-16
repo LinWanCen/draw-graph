@@ -62,10 +62,12 @@ class PrinterMermaid : Printer() {
     companion object {
         @JvmStatic
         fun build(src: String?, project: Project, func: Consumer<String>) {
-            if (StringUtils.isBlank(src ?: return)) {
-                return
-            }
-            val offline = """
+            object : Task.Backgroundable(project, "draw Mermaid") {
+                override fun run(indicator: ProgressIndicator) {
+                    if (StringUtils.isBlank(src ?: return)) {
+                        return
+                    }
+                    val offline = """
 <pre class="mermaid">
 
 $src
@@ -81,7 +83,7 @@ $src
 </script>
 ${DrawGraphBundle.message("mermaid.msg")}
 """
-            val online = """
+                    val online = """
 <pre class="mermaid">
 
 graph LR
@@ -94,9 +96,7 @@ $src
 </script>
 ${DrawGraphBundle.message("mermaid.msg")}
 """
-            val paths = SysPath.lib() ?: return
-            object : Task.Backgroundable(project, "draw Mermaid") {
-                override fun run(indicator: ProgressIndicator) {
+                    val paths = SysPath.lib() ?: return
                     for (path in paths) {
                         if (!File(path).exists()) {
                             continue
