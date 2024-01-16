@@ -80,6 +80,9 @@ skinparam defaultTextAlignment center
             object : Task.Backgroundable(project, "draw PlantUML") {
                 override fun run(indicator: ProgressIndicator) {
                     for (path in paths) {
+                        if (!File(path).exists()) {
+                            continue
+                        }
                         try {
                             val plantumlPath = "${path}draw-graph/plantuml.puml"
                             val svgOut = FileOutputStream("${path}draw-graph/plantuml.svg")

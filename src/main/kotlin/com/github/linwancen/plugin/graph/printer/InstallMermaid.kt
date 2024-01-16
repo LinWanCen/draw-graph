@@ -30,6 +30,9 @@ object InstallMermaid {
         }
         val src = InstallMermaid.javaClass.getResourceAsStream("/jcef/mermaid.js") ?: return
         for (path in paths) {
+            if (!File(path).exists()) {
+                continue
+            }
             val file = File("${path}draw-graph/mermaid.js")
             try {
                 file.parentFile.mkdirs()
@@ -58,6 +61,9 @@ object InstallMermaid {
         object : Task.Backgroundable(project, "draw open dir") {
             override fun run(indicator: ProgressIndicator) {
                 for (path in paths) {
+                    if (!File(path).exists()) {
+                        continue
+                    }
                     try {
                         val commandLine = when {
                             SystemUtils.IS_OS_WINDOWS -> {

@@ -92,6 +92,9 @@ graph [compound=true]
             object : Task.Backgroundable(project, "draw Graphviz") {
                 override fun run(indicator: ProgressIndicator) {
                     for (path in paths) {
+                        if (!File(path).exists()) {
+                            continue
+                        }
                         try {
                             val dotPath = "${path}draw-graph/graphviz.dot"
                             File(dotPath).parentFile.mkdirs()

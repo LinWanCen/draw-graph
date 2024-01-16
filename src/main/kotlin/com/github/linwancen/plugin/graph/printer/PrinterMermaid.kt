@@ -98,6 +98,9 @@ ${DrawGraphBundle.message("mermaid.msg")}
             object : Task.Backgroundable(project, "draw Mermaid") {
                 override fun run(indicator: ProgressIndicator) {
                     for (path in paths) {
+                        if (!File(path).exists()) {
+                            continue
+                        }
                         try {
                             val onlinePath = path + "draw-graph/mermaid-online.html"
                             File(onlinePath).parentFile.mkdirs()
