@@ -5,6 +5,7 @@ import com.github.linwancen.plugin.graph.printer.InstallMermaid;
 import com.github.linwancen.plugin.graph.printer.PrinterGraphviz;
 import com.github.linwancen.plugin.graph.printer.PrinterMermaid;
 import com.github.linwancen.plugin.graph.printer.PrinterPlantuml;
+import com.github.linwancen.plugin.graph.settings.DrawGraphAppState;
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState;
 import com.github.linwancen.plugin.graph.ui.webview.Browser;
 import com.intellij.openapi.application.ApplicationManager;
@@ -27,6 +28,7 @@ public class GraphWindow {
     public GraphWindow(@NotNull Project project, ToolWindow toolWindow) {
         this.project = project;
         this.toolWindow = toolWindow;
+        DrawGraphAppState appState = DrawGraphAppState.of(null);
         DrawGraphProjectState projectState = DrawGraphProjectState.of(project);
 
         openDir.addActionListener(e -> InstallMermaid.openDir(project));
@@ -42,6 +44,12 @@ public class GraphWindow {
         skipGetSetIs.setSelected(projectState.getSkipGetSetIs());
         skipGetSetIs.addActionListener(e -> {
             projectState.setSkipGetSetIs(skipGetSetIs.isSelected());
+            RelController.reload(project);
+        });
+
+        lr.setSelected(appState.getLr());
+        lr.addActionListener(e -> {
+            appState.setLr(lr.isSelected());
             RelController.reload(project);
         });
 
@@ -121,5 +129,6 @@ public class GraphWindow {
     private JTextField include;
     private JTextField exclude;
     private JCheckBox skipGetSetIs;
+    private JCheckBox lr;
     // endregion setting
 }

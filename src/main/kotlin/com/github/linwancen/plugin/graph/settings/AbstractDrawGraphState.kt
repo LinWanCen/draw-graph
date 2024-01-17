@@ -5,6 +5,7 @@ import java.util.regex.Pattern
 open class AbstractDrawGraphState {
 
     var skipGetSetIs = true
+    var lr = true
 
     @Transient
     var includePattern = Pattern.compile("")!!

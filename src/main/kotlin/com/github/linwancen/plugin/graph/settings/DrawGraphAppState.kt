@@ -11,7 +11,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
     name = "com.github.linwancen.plugin.graph.settings.DrawGraphAppState",
     storages = [Storage("draw-graph-settings/DrawGraphAppState.xml")]
 )
-class DrawGraphAppState : PersistentStateComponent<DrawGraphAppState?> {
+class DrawGraphAppState : PersistentStateComponent<DrawGraphAppState?>, AbstractDrawGraphState() {
     override fun getState(): DrawGraphAppState {
         return this
     }

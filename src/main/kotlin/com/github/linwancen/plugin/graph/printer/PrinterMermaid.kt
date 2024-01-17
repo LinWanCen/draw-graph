@@ -2,6 +2,7 @@ package com.github.linwancen.plugin.graph.printer
 
 import com.github.linwancen.plugin.common.file.SysPath
 import com.github.linwancen.plugin.graph.parser.RelData
+import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -16,12 +17,11 @@ import java.util.function.Consumer
 
 class PrinterMermaid : Printer() {
 
-    val sb = StringBuilder("graph LR\n\n")
+    val sb = StringBuilder("graph ${if (DrawGraphAppState.of().lr) "" else "TD"}\n\n")
 
     override fun beforeGroup(groupMap: MutableMap<String, String>) {
         sb.append("subgraph ")
         label(groupMap, false)
-        sb.append("direction LR\n")
     }
 
     override fun afterGroup(groupMap: MutableMap<String, String>) {

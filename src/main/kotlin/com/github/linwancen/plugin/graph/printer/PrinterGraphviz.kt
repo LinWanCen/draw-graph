@@ -2,6 +2,7 @@ package com.github.linwancen.plugin.graph.printer
 
 import com.github.linwancen.plugin.common.file.SysPath
 import com.github.linwancen.plugin.graph.parser.RelData
+import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.intellij.execution.CommandLineUtil
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -22,7 +23,7 @@ class PrinterGraphviz : Printer() {
 
     val sb = StringBuilder(
         """digraph{
-rankdir=LR
+${if (DrawGraphAppState.of().lr) "rankdir=LR" else ""}
 fontname = "Microsoft YaHei,Consolas"
 node [shape = "record", style="rounded,filled", fillcolor = "#F1F1F1", fontname = "Microsoft YaHei,Consolas"]
 edge [arrowhead = "empty", fontname = "Microsoft YaHei,Consolas"]

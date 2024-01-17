@@ -2,6 +2,7 @@ package com.github.linwancen.plugin.graph.printer
 
 import com.github.linwancen.plugin.common.file.SysPath
 import com.github.linwancen.plugin.graph.parser.RelData
+import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -24,7 +25,7 @@ class PrinterPlantuml : Printer() {
     val sb = StringBuilder("""@startuml
 hide empty circle
 hide empty members
-left to right direction 
+${if (DrawGraphAppState.of().lr) "left to right direction" else ""}
 skinparam shadowing false
 skinparam componentStyle rectangle
 skinparam defaultTextAlignment center
