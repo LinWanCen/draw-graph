@@ -30,7 +30,7 @@ class ParserKotlin : Parser() {
         // use method support same sign
         val callListMap = mutableMapOf<KtNamedFunction, List<KtNamedFunction>>()
         for (file in files) {
-            val psiFile = PsiManager.getInstance(project).findFile(file) ?: return
+            val psiFile = PsiManager.getInstance(project).findFile(file) ?: continue
             if (psiFile !is KtFile) {
                 continue
             }

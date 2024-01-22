@@ -24,10 +24,13 @@ abstract class Parser : RequiredForSmartMode {
          */
         @JvmStatic
         fun src(project: Project, relData: RelData, files: Array<out VirtualFile>) {
+            // not get child dir easy select by shift skip dir
             for (file in files) {
-                val psiFile = PsiManager.getInstance(project).findFile(file) ?: return
+                val psiFile = PsiManager.getInstance(project).findFile(file) ?: continue
                 val usageService = SERVICES[psiFile.language.id] ?: continue
+                // not one by one because pom.xml find all file
                 usageService.srcImpl(project, relData, files)
+                // only one lang srcImpl all and return
                 return
             }
         }

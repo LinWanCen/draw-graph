@@ -26,7 +26,7 @@ class ParserJava : Parser() {
         // use method support same sign
         val callListMap = mutableMapOf<PsiMethod, List<PsiMethod>>()
         for (file in files) {
-            val psiFile = PsiManager.getInstance(project).findFile(file) ?: return
+            val psiFile = PsiManager.getInstance(project).findFile(file) ?: continue
             if (psiFile !is PsiJavaFile) {
                 continue
             }
