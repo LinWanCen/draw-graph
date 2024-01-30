@@ -70,7 +70,7 @@ abstract class Printer {
          * [parse error with word graph #4079](https://github.com/mermaid-js/mermaid/issues/4079)
          */
         @JvmStatic
-        private val keyword = Regex("\\b(graph|end)\\b")
+        private val keyword = Regex("\\b(graph|end|parent)\\b")
 
         /**
          * [support not english symbol #4138](https://github.com/mermaid-js/mermaid/issues/4138)
