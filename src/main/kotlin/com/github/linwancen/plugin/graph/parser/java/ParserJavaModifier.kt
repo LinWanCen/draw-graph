@@ -2,7 +2,6 @@ package com.github.linwancen.plugin.graph.parser.java
 
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
-import org.jetbrains.kotlin.idea.search.declarationsSearch.isOverridableElement
 
 object ParserJavaModifier {
     /**
@@ -19,7 +18,7 @@ object ParserJavaModifier {
             else -> '~'
         } + when {
             modifierList.hasModifierProperty(PsiModifier.STATIC) -> "S"
-            method.isOverridableElement() -> "O"
+            method.hasAnnotation("java.lang.Override") -> "O"
             method.isConstructor -> "C"
             modifierList.hasModifierProperty(PsiModifier.ABSTRACT) -> "A"
             else -> ""
