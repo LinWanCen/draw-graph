@@ -1,5 +1,6 @@
-package com.github.linwancen.plugin.graph.comment
+package com.github.linwancen.plugin.graph.parser.kotlin
 
+import com.github.linwancen.plugin.graph.parser.CommentUtils
 import org.jetbrains.kotlin.kdoc.psi.api.KDoc
 
 object KotlinComment {
@@ -11,7 +12,9 @@ object KotlinComment {
     }
 
     private fun addDescription(docComment: KDoc, map: MutableMap<String, String>) {
-        map["@0"] = docComment.getDefaultSection().getContent()
-        map["@1"] = docComment.getDefaultSection().getContent()
+        val content = docComment.getDefaultSection().getContent()
+        val doc = CommentUtils.doc(content)
+        map["@0"] = doc
+        CommentUtils.split(doc, map)
     }
 }

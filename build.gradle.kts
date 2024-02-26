@@ -33,14 +33,42 @@ kotlin {
     }
 }
 
+val ideTypeStr = properties("platformType")
+
 // Configure Gradle IntelliJ Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
     pluginName.set(properties("pluginName"))
     version.set(properties("platformVersion"))
-    type.set(properties("platformType"))
+    type.set(ideTypeStr)
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
     plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
+}
+
+sourceSets {
+    // cannot use plugin in IDEA IU
+    if ("RD" == ideTypeStr) {
+        main {
+            java {
+                srcDirs("src/main/rider")
+            }
+        }
+    } else if ("CL" == ideTypeStr) {
+        main {
+            java {
+                srcDirs("src/main/clion")
+            }
+        }
+    } else {
+        main {
+            java {
+                srcDirs("src/main/idea")
+            }
+            resources {
+                srcDirs("src/main/other_lang_class")
+            }
+        }
+    }
 }
 
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin

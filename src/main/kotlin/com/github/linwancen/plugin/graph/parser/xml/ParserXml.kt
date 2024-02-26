@@ -27,7 +27,6 @@ class ParserXml : Parser() {
     }
 
     override fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>) {
-        // use method support same sign
         val callListMap = mutableMapOf<String, List<String>>()
         val psiFiles = if (files.size == 1 && POM_FILE == files[0].name) {
             FilenameIndex.getFilesByName(project, POM_FILE, GlobalSearchScope.projectScope(project)).toList()
@@ -40,12 +39,6 @@ class ParserXml : Parser() {
             }
             RelServicePom.parsePom(psiFile, callListMap, relData)
         }
-        for ((usage, callList) in callListMap) {
-            for (call in callList) {
-                if (callListMap.containsKey(call)) {
-                    relData.regCall(usage, call)
-                }
-            }
-        }
+        regCall(callListMap, relData)
     }
 }

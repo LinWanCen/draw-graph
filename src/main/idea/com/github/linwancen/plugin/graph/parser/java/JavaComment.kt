@@ -1,23 +1,28 @@
-package com.github.linwancen.plugin.graph.comment
+package com.github.linwancen.plugin.graph.parser.java
 
 import com.github.linwancen.plugin.common.text.DocText
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.javadoc.PsiDocComment
-import com.intellij.psi.javadoc.PsiDocToken
-import com.intellij.psi.javadoc.PsiInlineDocTag
 
-object JavaComment {
-    fun addDocParam(docComment: PsiDocComment?, map: MutableMap<String, String>) {
+open class JavaComment {
+    companion object {
+        private val INSTANCE = JavaComment()
+
+        fun addDocParam(docComment: PsiDocComment?, map: MutableMap<String, String>) {
+            INSTANCE.addDocParam(docComment, map)
+        }
+    }
+
+    open fun addDocParam(docComment: PsiDocComment?, map: MutableMap<String, String>) {
         if (docComment == null) {
             return
         }
-        addDescription(docComment, map)
+        addDescription(docComment.descriptionElements.asSequence(), map)
         addTag(docComment, map)
     }
 
-    private fun addDescription(docComment: PsiDocComment, map: MutableMap<String, String>) {
-        val elements: Array<PsiElement> = docComment.descriptionElements
+    open fun addDescription(elements: Sequence<PsiElement>, map: MutableMap<String, String>) {
         val all = StringBuilder()
         val currLine = StringBuilder()
         var lineCount = 1
@@ -36,24 +41,25 @@ object JavaComment {
         }
     }
 
-    private fun appendElementText(element: PsiElement, all: StringBuilder, currLine: StringBuilder): Boolean {
-        if (element is PsiDocToken) {
-            DocText.addHtmlText(element.text, all, currLine)
+    open fun appendElementText(element: PsiElement, all: StringBuilder, currLine: StringBuilder): Boolean {
+        if (element is PsiWhiteSpace && currLine.isNotEmpty()) {
+            return true
         }
-        if (element is PsiInlineDocTag) {
-            val children = element.children
+        val children = element.children
+        if (children.isNotEmpty()) {
             if (children.size >= 3) {
                 DocText.addHtmlText(children[children.size - 2].text, all, currLine)
             }
+            return false
         }
-        return element is PsiWhiteSpace && currLine.isNotEmpty()
+        DocText.addHtmlText(element.text, all, currLine)
+        return false
     }
 
-    private fun addTag(docComment: PsiDocComment, map: MutableMap<String, String>) {
+    open fun addTag(docComment: PsiDocComment, map: MutableMap<String, String>) {
         for (tag in docComment.tags) {
-            // @see @param should use getDataElements()
             val name = tag.name
-            val valueElement = tag.valueElement ?: continue
+            val valueElement = tag.valueElement ?: tag.dataElements.firstOrNull() ?: continue
             val value = DocText.addHtmlText(valueElement.text) ?: continue
             map["@$name"] = value
         }

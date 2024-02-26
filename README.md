@@ -11,6 +11,9 @@ Method call usage graph and maven dependency graph
 
 生成 方法调用图 和 Maven 依赖图
 
+- Java, Kotlin, Groovy, Scala
+- C/C++/OC, Python, Go, Rust, Ruby
+- JS/TS, PHP
 
 # English
 
@@ -18,10 +21,10 @@ Method call usage graph and maven dependency graph
 
 One java call graph or all pom.xml dep graph:
 1. Open <kbd>Graph</kbd> ToolWindow at Right
-2. Open *.java/pom.xml file
+2. Open pom.xml/.java/.py... file
 
 Multi java call graph or partial pom.xml dep graph:
-1. Select multi file
+1. Select multi files in the same language
 2. Open Right Click Menu
 3. Select <kbd>Call Graph</kbd>
 
@@ -33,7 +36,8 @@ Only support 2020.2+ because mermaid.js only use in jcef(chrome),
 2020.1- is JavaFx WebView.
 
 ## My Plugin
-- Show doc comment at the Project view Tree, line End, json etc: [Show Comment]
+- Show doc comment in the Project view Tree, line End, json etc.: [Show Comment]
+- show line count for file / method, show children count for dir in project view：[Line Num]
 - Method call usage graph and maven dependency graph: [Draw Graph]
 - Find author/comment of multiple files or lines and export Find: [Find Author]
 - Auto sync coverage and capture coverage during debug: [Sync Coverage]
@@ -46,10 +50,10 @@ Only support 2020.2+ because mermaid.js only use in jcef(chrome),
 
 单个 java 文件调用图 或 所有 pom.xml 依赖图：
 1. 打开右边的<kbd>图</kbd>工具栏
-2. 打开 *.java/pom.xml 文件
+2. 打开 pom.xml/.java/.py 等文件
 
 多个 java 文件调用图 或 部分 pom.xml 依赖图：
-1. 选择多个文件
+1. 选择多个同语言的文件
 2. 打开右键菜单
 3. 选择<kbd>调用图</kbd>
 
@@ -62,6 +66,7 @@ Only support 2020.2+ because mermaid.js only use in jcef(chrome),
 
 ## 我的项目
 - 在文件树、行末、JSON 显示注释：[Show Comment]
+- 在文件树显示行数、文件数：[Line Num]
 - 生成 方法调用图 和 Maven 依赖图：[Draw Graph]
 - 查找多个文件或行的作者 与 导出搜索：[Find Author]
 - 自动同步覆盖率 和 调试中抓取覆盖率：[Sync Coverage]
@@ -74,6 +79,7 @@ Only support 2020.2+ because mermaid.js only use in jcef(chrome),
 
 [Graphviz]: https://graphviz.org/download/
 [Show Comment]: https://plugins.jetbrains.com/plugin/18553-show-comment
+[Line Num]: https://plugins.jetbrains.com/plugin/23300-line-num
 [Draw Graph]: https://plugins.jetbrains.com/plugin/21242-draw-graph
 [Find Author]: https://plugins.jetbrains.com/plugin/20557-find-author
 [Sync Coverage]: https://plugins.jetbrains.com/plugin/20780-sync-coverage

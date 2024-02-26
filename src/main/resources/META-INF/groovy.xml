@@ -1,0 +1,5 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="com.intellij">
+    <requiredForSmartModeStartupActivity implementation="com.github.linwancen.plugin.graph.parser.groovy.GroovyParser"/>
+  </extensions>
+</idea-plugin>

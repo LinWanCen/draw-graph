@@ -3,10 +3,13 @@ package com.github.linwancen.plugin.graph.parser.java
 import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiModifier
 
-object ParserJavaModifier {
+/**
+ * modifierList.hasModifierProperty(PsiModifier.*)
+ */
+object JavaModifier {
     /**
      * + public - private # protected ~ package private(default)
-     * S static O Override A abstract C Constructor
+     * S static O Override A abstract C Constructor F final
      * [PlantUML Class Diagram](https://plantuml.com/en/class-diagram)
      */
     fun symbol(method: PsiMethod): String {
@@ -21,6 +24,7 @@ object ParserJavaModifier {
             method.hasAnnotation("java.lang.Override") -> "O"
             method.isConstructor -> "C"
             modifierList.hasModifierProperty(PsiModifier.ABSTRACT) -> "A"
+            method.hasModifierProperty(PsiModifier.FINAL) -> "F"
             else -> ""
         }
     }

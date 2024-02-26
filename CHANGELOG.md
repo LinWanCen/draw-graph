@@ -4,6 +4,7 @@
 
 ## [1.0.0]
 
+- 1.10 support Python, Go, Rust, C/C++/OC, PHP, JS/TS etc.
 - 1.09 direction setting
 - 1.08 skip get/set/is(FieldName)
 - 1.07 Add Symbol: + public - private # protected ~ package
@@ -18,6 +19,7 @@
 
 # 中文更新日志
 
+- 1.10 支持 Python, Go, Rust, C/C++/OC, PHP, JS/TS 等
 - 1.09 方向设置
 - 1.08 跳过 get/set/is 在有同名字段的时候
 - 1.07 添加符号：+ 公有 - 私有 # 保护 ~ 包级

@@ -3,14 +3,17 @@ package com.github.linwancen.plugin.graph.parser.kotlin
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtNamedFunction
 
-object ParserKotlinModifier {
+/**
+ * modifierList.hasModifier(KtTokens.*_KEYWORD)
+ */
+object KotlinModifier {
     /**
      * + public - private # protected ~ package private(default)
-     * S static o open O Override A abstract C Constructor
-     * [PlantUML Class Diagram](https://plantuml.com/en/class-diagram)
+     * <br>S static o open O Override A abstract C Constructor
+     * <br>[PlantUML Class Diagram](https://plantuml.com/en/class-diagram)
      */
-    fun symbol(method: KtNamedFunction): String {
-        val modifierList = method.modifierList
+    fun symbol(func: KtNamedFunction): String {
+        val modifierList = func.modifierList
         modifierList ?: return ""
         val sb = StringBuilder()
         if (modifierList.hasModifier(KtTokens.PRIVATE_KEYWORD)) {
@@ -29,6 +32,6 @@ object ParserKotlinModifier {
             modifierList.hasModifier(KtTokens.ABSTRACT_KEYWORD) -> sb.append("A")
             modifierList.hasModifier(KtTokens.OVERRIDE_KEYWORD) -> sb.append("O")
         }
-        return sb.toString();
+        return sb.toString()
     }
 }

@@ -3,10 +3,7 @@ package com.github.linwancen.plugin.graph.parser
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity.RequiredForSmartMode
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiIdentifier
 import com.intellij.psi.PsiManager
-import com.intellij.psi.util.PsiTreeUtil
 
 abstract class Parser : RequiredForSmartMode {
     override fun runActivity(project: Project) {
@@ -27,8 +24,10 @@ abstract class Parser : RequiredForSmartMode {
             // not get child dir easy select by shift skip dir
             for (file in files) {
                 val psiFile = PsiManager.getInstance(project).findFile(file) ?: continue
-                val usageService = SERVICES[psiFile.language.id] ?: continue
-                // not one by one because pom.xml find all file
+                var language = psiFile.language
+                language.baseLanguage?.let { language = it }
+                val usageService = SERVICES[language.id] ?: continue
+                // not one by one because pom.xml find all files
                 usageService.srcImpl(project, relData, files)
                 // only one lang srcImpl all and return
                 return
@@ -36,23 +35,13 @@ abstract class Parser : RequiredForSmartMode {
         }
     }
 
-    /**
-     * ```mermaid
-     * usage ..> call
-     * ```
-     */
-    inline fun <reified T : PsiElement> callList(method: T) =
-        PsiTreeUtil
-            .findChildrenOfType(method, PsiIdentifier::class.java)
-            .mapNotNull { it.context }
-            .flatMap { it.references.toList() }
-            .map {
-                try {
-                    it.resolve()
-                } catch (_: Throwable) {
-                    // ignore
+    fun regCall(callListMap: Map<String, List<String>>, relData: RelData) {
+        for ((usage, callList) in callListMap) {
+            for (call in callList) {
+                if (callListMap.containsKey(call)) {
+                    relData.regCall(usage, call)
                 }
             }
-            .distinct()
-            .filterIsInstance<T>()
+        }
+    }
 }
