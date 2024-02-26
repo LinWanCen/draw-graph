@@ -26,14 +26,16 @@ abstract class Printer {
         return canNotUseSymbol.replace(deleteKeyword, "_")
     }
 
-    protected open fun addLine(s: String?, sb: StringBuilder) {
-        if (s != null) {
-            var docLine = s.replace("\"", "")
-            if (docLine.length > 20) {
-                docLine = docLine.substring(0, 20)
-            }
-            sb.append("${docLine}\\n")
+    protected open fun addLine(s: String?, sb: StringBuilder, newLineEscape: Boolean = false) {
+        var docLine = s?.replace("\"", "") ?: return
+        if (docLine.length > 20) {
+            docLine = docLine.substring(0, 20)
         }
+        docLine = "${docLine.trim()}\n"
+        if (newLineEscape) {
+            docLine = docLine.replace("\n", "\\n")
+        }
+        sb.append(docLine)
     }
 
     abstract fun toSrc(relData: RelData): String
@@ -77,6 +79,6 @@ abstract class Printer {
          * PlantUML can not use -#
          */
         @JvmStatic
-        private val canNotUseSymbol = Regex("[-#。？！，、；：“”‘’（）《》【】~@()|'\"<{}\\[\\]]")
+        private val canNotUseSymbol = Regex("[-#。？！，、；：“”‘’（）《》【】~@()|'\"<{}\\[\\]\\\\]")
     }
 }

@@ -58,9 +58,9 @@ graph [compound=true]
                 sb.append('[')
             }
             sb.append("label =\" ")
-            addLine(map["@1"], sb)
-            addLine(map["@2"], sb)
-            addLine(map["@3"], sb)
+            addLine(map["@1"], sb, true)
+            addLine(map["@2"], sb, true)
+            addLine(map["@3"], sb, true)
             sb.append("${map["name"]}\"")
             if (isItem) {
                 sb.append(']')

@@ -1,8 +1,6 @@
 package com.github.linwancen.plugin.graph.ui.webview;
 
 import com.intellij.ui.jcef.JBCefBrowser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
