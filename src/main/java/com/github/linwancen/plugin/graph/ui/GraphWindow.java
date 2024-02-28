@@ -53,6 +53,12 @@ public class GraphWindow {
             RelController.reload(project);
         });
 
+        doc.setSelected(appState.getDoc());
+        doc.addActionListener(e -> {
+            appState.setDoc(doc.isSelected());
+            RelController.reload(project);
+        });
+
         UiUtils.onChange(include, projectState.getInclude(), projectState::setInclude);
         UiUtils.onChange(exclude, projectState.getExclude(), projectState::setExclude);
         resetSetting.addActionListener(e -> {
@@ -130,5 +136,6 @@ public class GraphWindow {
     private JTextField exclude;
     private JCheckBox skipGetSetIs;
     private JCheckBox lr;
+    private JCheckBox doc;
     // endregion setting
 }

@@ -1,6 +1,7 @@
 package com.github.linwancen.plugin.graph.printer
 
 import com.github.linwancen.plugin.graph.parser.RelData
+import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.intellij.openapi.project.Project
 import java.util.function.Consumer
 
@@ -27,6 +28,9 @@ abstract class Printer {
     }
 
     protected open fun addLine(s: String?, sb: StringBuilder, newLineEscape: Boolean = false) {
+        if (!DrawGraphAppState.of().doc) {
+            return
+        }
         var docLine = s?.replace("\"", "") ?: return
         if (docLine.length > 20) {
             docLine = docLine.substring(0, 20)

@@ -15,9 +15,9 @@ Method call usage graph and maven dependency graph
 - C/C++/OC, Python, Go, Rust, Ruby
 - JS/TS, PHP
 
-# English
+#### English Desc
 
-## How to Use
+##### How to Use
 
 One java call graph or all pom.xml dep graph:
 1. Open <kbd>Graph</kbd> ToolWindow at Right
@@ -30,12 +30,12 @@ Multi java call graph or partial pom.xml dep graph:
 
 Install [Graphviz] and set xx/bin to env Path for PlantUML and Graphviz.
 
-## About
+##### About
 
 Only support 2020.2+ because mermaid.js only use in jcef(chrome),  
 2020.1- is JavaFx WebView.
 
-## My Plugin
+##### My Plugin
 - Show doc comment in the Project view Tree, line End, json etc.: [Show Comment]
 - show line count for file / method, show children count for dir in project view：[Line Num]
 - Method call usage graph and maven dependency graph: [Draw Graph]
@@ -44,9 +44,9 @@ Only support 2020.2+ because mermaid.js only use in jcef(chrome),
 
 ---
 
-# 中文
+#### 中文描述
 
-## 用法
+##### 用法
 
 单个 java 文件调用图 或 所有 pom.xml 依赖图：
 1. 打开右边的<kbd>图</kbd>工具栏
@@ -59,12 +59,12 @@ Only support 2020.2+ because mermaid.js only use in jcef(chrome),
 
 安装 [Graphviz] 并设置 bin 目录为环境变量以便使用 PlantUML 和 Graphviz。
 
-## 关于
+##### 关于
 
 只支持 2020.2 以上因为 mermaid.js 只能在 jcef(chrome) 中使用，  
 2020.1 以下用的是 JavaFx WebView。
 
-## 我的项目
+##### 我的项目
 - 在文件树、行末、JSON 显示注释：[Show Comment]
 - 在文件树显示行数、文件数：[Line Num]
 - 生成 方法调用图 和 Maven 依赖图：[Draw Graph]
@@ -73,9 +73,10 @@ Only support 2020.2+ because mermaid.js only use in jcef(chrome),
 
 ---
 
-# 支持
+#### 支持
 
-如果对你有所帮助，别忘了给 [本项目 GitHub 主页][Draw Graph GitHub] 一个 Star，您的支持是项目前进的动力。
+如果对你有所帮助，可以通过群或文章等形式分享给大家，在插件市场好评，
+或者给本项目 [本项目 GitHub 主页][Draw Graph GitHub] 一个 Star，您的支持是项目前进的动力。
 
 [Graphviz]: https://graphviz.org/download/
 [Show Comment]: https://plugins.jetbrains.com/plugin/18553-show-comment

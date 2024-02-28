@@ -1,11 +1,13 @@
 package com.github.linwancen.plugin.graph.settings
 
+import java.util.*
 import java.util.regex.Pattern
 
 open class AbstractDrawGraphState {
 
     var skipGetSetIs = true
     var lr = true
+    var doc = "en" != Locale.getDefault().language
 
     @Transient
     var includePattern = Pattern.compile("")!!
