@@ -30,8 +30,7 @@ class PythonParser : ParserLang<PyFunction>() {
     }
 
     override fun funMap(funMap: MutableMap<String, String>, func: PyFunction) {
-        val v = PythonModifier.symbol(func)
-        funMap["name"] = "$v ${func.name}"
+        funMap["name"] = "${func.name}"
         PythonComment.addDocParam(func.structuredDocString, funMap)
     }
 
