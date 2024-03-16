@@ -33,7 +33,7 @@
         <applicationService serviceImplementation="com.github.linwancen.plugin.graph.settings.DrawGraphAppState"/>
         <projectService serviceImplementation="com.github.linwancen.plugin.graph.settings.DrawGraphProjectState"/>
         <!-- https://jetbrains.design/intellij/resources/icons_list/ -->
-        <toolWindow id="Graph" secondary="false" icon="AllIcons.Graph.Layout" anchor="right"
+        <toolWindow id="Graph" secondary="false" icon="/META-INF/pluginIcon.svg" anchor="right"
                     factoryClass="com.github.linwancen.plugin.graph.ui.GraphWindowFactory"/>
     </extensions>
 
