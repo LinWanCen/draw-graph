@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.ui.components.JBTextArea;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,14 +23,15 @@ public abstract class Browser implements StartupActivity.RequiredForSmartMode {
         map.put(BrowserJcef.class.getName(), BrowserJcef.class);
     }
 
-    public static Browser of(JPanel out) {
+    @Nullable
+    public static Browser of(@NotNull JPanel out, Project project) {
         out.removeAll();
         out.setLayout(new BorderLayout());
         StringBuilder errMsg = new StringBuilder();
         for (Class<? extends Browser> c : map.values()) {
             try {
-                Browser browser = c.getConstructor().newInstance();
-                String s = browser.add(out);
+                @NotNull Browser browser = c.getConstructor().newInstance();
+                @Nullable String s = browser.add(out, project);
                 if (s == null) {
                     return browser;
                 }
@@ -45,7 +47,8 @@ public abstract class Browser implements StartupActivity.RequiredForSmartMode {
         return null;
     }
 
-    abstract String add(JPanel out);
+    @Nullable
+    abstract String add(JPanel out, Project project);
 
     public abstract String load(String html);
 }

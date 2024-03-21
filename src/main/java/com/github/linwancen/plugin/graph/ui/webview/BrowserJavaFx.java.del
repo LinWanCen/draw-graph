@@ -1,13 +1,14 @@
 package com.github.linwancen.plugin.graph.ui.webview;
 
+import com.intellij.openapi.project.Project;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,21 +16,21 @@ import java.awt.*;
 public class BrowserJavaFx extends Browser {
 
     static {
-        LOG.info("load BrowserJavaFx");
         map.put(BrowserJavaFx.class.getName(), BrowserJavaFx.class);
     }
 
     private WebEngine engine;
 
+    @Nullable
     @Override
-    String add(JPanel out) {
+    String add(@NotNull JPanel out, Project project) {
         try {
-            JFXPanel jfxPanel = new JFXPanel();
+            @NotNull JFXPanel jfxPanel = new JFXPanel();
             Platform.runLater(() -> {
-                Group group = new Group();
-                WebView webView = new WebView();
+                @NotNull Group group = new Group();
+                @NotNull WebView webView = new WebView();
                 group.getChildren().add(webView);
-                Scene scene = new Scene(group);
+                @NotNull Scene scene = new Scene(group);
                 jfxPanel.setScene(scene);
                 out.add(jfxPanel, BorderLayout.CENTER);
 

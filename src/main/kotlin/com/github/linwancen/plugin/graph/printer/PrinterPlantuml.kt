@@ -50,9 +50,9 @@ skinparam defaultTextAlignment center
         sb.append("component ${sign(map["sign"] ?: return)}")
         if (map["name"] != null) {
             sb.append(" as \" ")
-            addLine(map["@1"], sb)
-            addLine(map["@2"], sb)
-            addLine(map["@3"], sb)
+            addLine(map["@1"], sb, true)
+            addLine(map["@2"], sb, true)
+            addLine(map["@3"], sb, true)
             sb.append("${map["name"]}\"")
         }
     }

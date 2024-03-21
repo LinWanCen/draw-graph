@@ -44,6 +44,14 @@ class PrinterMermaid : Printer() {
             sb.append(if (isItem) ")" else "]")
         }
         sb.append("\n")
+         val name = if (isItem) {
+            val onlyName = itemMap["name"]
+            onlyName?.substring(onlyName.lastIndexOf(' ') + 1) ?: ""
+        } else {
+            ""
+        }
+        sb.append("click '${sign(itemMap["sign"] ?: return)}' call navigate(\"${itemMap["filePath"]}#${name}\")")
+        sb.append("\n\n")
     }
 
     override fun call(usageSign: String, callSign: String) {
@@ -67,35 +75,19 @@ class PrinterMermaid : Printer() {
                     if (StringUtils.isBlank(src ?: return)) {
                         return
                     }
-                    val offline = """
-<pre class="mermaid">
-
-$src
-</pre>
-<!-- https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.js -->
+                    //language="html"
+                    val offline = temp(src,"""
+<!-- https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.js -->
 <script src="file:///D:/draw-graph/mermaid.js"></script>
 <script src="file:///C:/Users/Public/draw-graph/mermaid.js"></script>
 <script src="file:///Applications/draw-graph/mermaid.js"></script>
 <script src="file:///var/lib/draw-graph/mermaid.js"></script>
 <script src="file:///usr/lib/draw-graph/mermaid.js"></script>
-<script type="module">
-  mermaid.initialize({ startOnLoad: true });
-</script>
-${DrawGraphBundle.message("mermaid.msg")}
-"""
-                    val online = """
-<pre class="mermaid">
-
-graph LR
-$src
-</pre>
-<!-- https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.js -->
+""")
+                    //language="html"
+                    val online = temp(src, """
 <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.js"></script>
-<script type="module">
-  mermaid.initialize({ startOnLoad: true });
-</script>
-${DrawGraphBundle.message("mermaid.msg")}
-"""
+""")
                     val paths = SysPath.lib() ?: return
                     for (path in paths) {
                         if (!File(path).exists()) {
@@ -116,6 +108,45 @@ ${DrawGraphBundle.message("mermaid.msg")}
                     }
                 }
             }.queue()
+        }
+
+        private fun temp(src: String?, mermaidLink: String?): String {
+            //language="html"
+            val online = """<pre class="mermaid">
+
+$src
+</pre>
+$mermaidLink
+<script>
+  function navigate(link) {
+    callJava('navigate:' + link)
+  }
+  function openDevtools() {
+    callJava('openDevtools')
+  }
+  function callJava(cmd) {
+    window.java({
+      request: cmd,
+      onSuccess(response){
+        console.log(response);
+      },
+      onFailure(error_code,error_message){
+        console.log(error_code,error_message);
+      }
+    });
+  }
+  const config = {
+    startOnLoad: true,
+    maxTextSize: Number.MAX_VALUE,
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'cardinal' },
+    securityLevel: 'loose',
+  };
+  mermaid.initialize(config);
+</script>
+<button onclick='openDevtools()'>openDevtools</button><br>
+${DrawGraphBundle.message("mermaid.msg")}
+"""
+            return online
         }
     }
 }

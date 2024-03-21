@@ -4,6 +4,7 @@
 
 ## [1.0.0]
 
+- 1.12 ★ click to navigate in Mermaid
 - 1.11 doc setting
 - 1.10 support Python, Go, Rust, C/C++/OC, PHP, JS/TS etc.
 - 1.09 direction setting
@@ -20,6 +21,7 @@
 
 # 中文更新日志
 
+- 1.12 ★ Mermaid 点击跳转
 - 1.11 注释设置
 - 1.10 支持 Python, Go, Rust, C/C++/OC, PHP, JS/TS 等
 - 1.09 方向设置

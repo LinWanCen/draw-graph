@@ -7,9 +7,9 @@
 ## Plugin description 插件介绍
 
 <!-- Plugin description -->
-Method call usage graph and maven dependency graph
+Method call usage graph and maven dependency graph, click to navigate
 
-生成 方法调用图 和 Maven 依赖图
+生成 方法调用图 和 Maven 依赖图，点击跳转
 
 - Java, Kotlin, Groovy, Scala
 - C/C++/OC, Python, Go, Rust, Ruby

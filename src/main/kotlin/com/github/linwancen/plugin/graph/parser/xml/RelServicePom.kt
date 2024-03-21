@@ -73,6 +73,7 @@ object RelServicePom {
         val artifactId = xmlTag.findFirstSubTag("artifactId")?.value?.text ?: return null
         info["sign"] = artifactId
         info["name"] = artifactId
+        info["filePath"] = xmlTag.containingFile.virtualFile.path
 
         val description = xmlTag.findFirstSubTag("description")?.value?.text?.trim() ?: ""
         if (description.isNotEmpty()) {

@@ -33,7 +33,7 @@ public class GraphWindow {
 
         openDir.addActionListener(e -> InstallMermaid.openDir(project));
         reload.addActionListener(e -> RelController.reload(project));
-        reset.addActionListener(e -> initOut());
+        reset.addActionListener(e -> initOut(project));
 
         autoLoad.setSelected(projectState.getAutoLoad());
         autoLoad.addActionListener(e -> {
@@ -72,13 +72,13 @@ public class GraphWindow {
             VirtualFile file = selectedEditor.getFile();
             RelController.buildSrc(project, this, new VirtualFile[]{file});
         }
-        initOut();
+        initOut(project);
     }
 
-    private void initOut() {
-        mermaidBrowser = Browser.of(mermaidOut);
-        graphvizBrowser = Browser.of(graphvizOut);
-        plantumlBrowser = Browser.of(plantumlOut);
+    private void initOut(Project project) {
+        mermaidBrowser = Browser.of(mermaidOut, project);
+        graphvizBrowser = Browser.of(graphvizOut, project);
+        plantumlBrowser = Browser.of(plantumlOut, project);
         initSrc();
     }
 

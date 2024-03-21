@@ -79,10 +79,11 @@ abstract class Printer {
         private val keyword = Regex("\\b(graph|end|parent)\\b")
 
         /**
-         * [support not english symbol #4138](https://github.com/mermaid-js/mermaid/issues/4138)
-         * PlantUML can not use -#
+         * [not support english symbol #4138](https://github.com/mermaid-js/mermaid/issues/4138)
+         * PlantUML cannot use "-#,"
+         * "-" should in first
          */
         @JvmStatic
-        private val canNotUseSymbol = Regex("[-#。？！，、；：“”‘’（）《》【】~@()|'\"<{}\\[\\]\\\\]")
+        private val canNotUseSymbol = Regex("[-#,。？！，、；：“”‘’（）《》【】~@()|'\"<>{}\\[\\]\\\\ ]")
     }
 }

@@ -44,6 +44,7 @@ abstract class ParserLang<F : PsiElement> : Parser() {
                 }
                 val funMap = mutableMapOf<String, String>()
                 funMap["sign"] = sign
+                funMap["filePath"] = file.path
                 funMap(funMap, func)
                 val classMap = classMap(func, relData)
                 if (classMap == null) {

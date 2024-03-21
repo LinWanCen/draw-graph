@@ -1,6 +1,11 @@
 package com.github.linwancen.plugin.graph.ui.webview;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.jcef.JBCefBrowser;
+import org.cef.browser.CefMessageRouter;
+import org.cef.browser.CefMessageRouter.CefMessageRouterConfig;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,11 +18,18 @@ public class BrowserJcef extends Browser {
 
     private JBCefBrowser jbCefBrowser;
 
+    @Nullable
     @Override
-    String add(JPanel out) {
+    String add(@NotNull JPanel out, Project project) {
         try {
             jbCefBrowser = new JBCefBrowser();
-            JComponent browserComponent = jbCefBrowser.getComponent();
+            @NotNull JComponent browserComponent = jbCefBrowser.getComponent();
+
+            @NotNull CefMessageRouterConfig config = new CefMessageRouterConfig("java", "javaCancel");
+            CefMessageRouter router = CefMessageRouter.create(config);
+            router.addHandler(new JcefNavigateHandler(project, jbCefBrowser), true);
+            jbCefBrowser.getJBCefClient().getCefClient().addMessageRouter(router);
+
             out.add(browserComponent, BorderLayout.CENTER);
             return null;
         } catch (Throwable e) {
