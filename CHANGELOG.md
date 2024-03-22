@@ -4,6 +4,7 @@
 
 ## [1.0.0]
 
+- 1.13 Rel Controller|Service|Mapper
 - 1.12 ★ click to navigate in Mermaid
 - 1.11 doc setting
 - 1.10 support Python, Go, Rust, C/C++/OC, PHP, JS/TS etc.
@@ -21,6 +22,7 @@
 
 # 中文更新日志
 
+- 1.13 关联 Controller|Service|Mapper
 - 1.12 ★ Mermaid 点击跳转
 - 1.11 注释设置
 - 1.10 支持 Python, Go, Rust, C/C++/OC, PHP, JS/TS 等

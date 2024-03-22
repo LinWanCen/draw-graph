@@ -8,6 +8,8 @@ open class AbstractDrawGraphState {
     var skipGetSetIs = true
     var lr = true
     var doc = "en" != Locale.getDefault().language
+    var impl = true
+    var mvc = true
 
     @Transient
     var includePattern = Pattern.compile("")!!

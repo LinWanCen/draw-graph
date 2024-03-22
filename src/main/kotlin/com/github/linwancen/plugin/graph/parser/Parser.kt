@@ -35,10 +35,20 @@ abstract class Parser : RequiredForSmartMode {
         }
     }
 
-    fun regCall(callListMap: Map<String, List<String>>, relData: RelData) {
-        for ((usage, callList) in callListMap) {
+    fun regCall(callSetMap: Map<String, Set<String>>, relData: RelData) {
+        for ((usage, callList) in callSetMap) {
             for (call in callList) {
-                if (callListMap.containsKey(call)) {
+                if (callSetMap.containsKey(call)) {
+                    relData.regCall(usage, call)
+                }
+            }
+        }
+    }
+
+    fun regUsage(callSetMap: Map<String, Set<String>>, usageSetMap: Map<String, Set<String>>, relData: RelData) {
+        for ((call, usageList) in usageSetMap) {
+            for (usage in usageList) {
+                if (callSetMap.containsKey(usage)) {
                     relData.regCall(usage, call)
                 }
             }

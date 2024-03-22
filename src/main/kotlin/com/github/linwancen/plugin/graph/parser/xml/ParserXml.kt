@@ -27,7 +27,7 @@ class ParserXml : Parser() {
     }
 
     override fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>) {
-        val callListMap = mutableMapOf<String, List<String>>()
+        val callSetMap = mutableMapOf<String, MutableSet<String>>()
         val psiFiles = if (files.size == 1 && POM_FILE == files[0].name) {
             FilenameIndex.getFilesByName(project, POM_FILE, GlobalSearchScope.projectScope(project)).toList()
         } else {
@@ -37,8 +37,8 @@ class ParserXml : Parser() {
             if (psiFile !is XmlFile) {
                 continue
             }
-            RelServicePom.parsePom(psiFile, callListMap, relData)
+            RelServicePom.parsePom(psiFile, callSetMap, relData)
         }
-        regCall(callListMap, relData)
+        regCall(callSetMap, relData)
     }
 }

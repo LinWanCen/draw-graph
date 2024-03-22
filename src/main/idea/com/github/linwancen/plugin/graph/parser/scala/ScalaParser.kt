@@ -26,8 +26,9 @@ class ScalaParser : ParserLang<ScFunctionDefinition>() {
         return JavaParserUtils.skipFun(state, func)
     }
 
-    override fun toSign(func: ScFunctionDefinition): String {
-        return "${func.containingClass?.qualifiedName ?: ""}#${func.name}"
+    override fun toSign(func: ScFunctionDefinition): String? {
+        val clazz = func.containingClass ?: return "#${func.name}"
+        return "${clazz.qualifiedName ?: return null}#${func.name}"
     }
 
     override fun funMap(funMap: MutableMap<String, String>, func: ScFunctionDefinition) {

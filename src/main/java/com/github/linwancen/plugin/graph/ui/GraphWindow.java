@@ -60,6 +60,18 @@ public class GraphWindow {
             RelController.reload(project);
         });
 
+        impl.setSelected(appState.getImpl());
+        impl.addActionListener(e -> {
+            appState.setImpl(impl.isSelected());
+            RelController.reload(project);
+        });
+
+        mvc.setSelected(appState.getMvc());
+        mvc.addActionListener(e -> {
+            appState.setMvc(mvc.isSelected());
+            RelController.reload(project);
+        });
+
         UiUtils.onChange(include, projectState.getInclude(), projectState::setInclude);
         UiUtils.onChange(exclude, projectState.getExclude(), projectState::setExclude);
         resetSetting.addActionListener(e -> {
@@ -141,5 +153,7 @@ public class GraphWindow {
     private JCheckBox skipGetSetIs;
     private JCheckBox lr;
     private JCheckBox doc;
+    private JCheckBox impl;
+    private JCheckBox mvc;
     // endregion setting
 }

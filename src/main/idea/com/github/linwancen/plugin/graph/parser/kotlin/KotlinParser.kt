@@ -26,8 +26,9 @@ class KotlinParser : ParserLang<KtNamedFunction>() {
         return false
     }
 
-    override fun toSign(func: KtNamedFunction): String {
-        return "${func.containingClassOrObject?.fqName ?: ""}#${func.name}"
+    override fun toSign(func: KtNamedFunction): String? {
+        val classOrObject = func.containingClassOrObject ?: return "#${func.name}"
+        return "${classOrObject.fqName ?: return null}#${func.name}"
     }
 
     override fun funMap(funMap: MutableMap<String, String>, func: KtNamedFunction) {

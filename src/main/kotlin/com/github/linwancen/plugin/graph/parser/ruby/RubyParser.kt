@@ -28,9 +28,10 @@ class RubyParser : ParserLang<RMethod>() {
         return func.isConstructor && func.arguments.isEmpty()
     }
 
-    override fun toSign(func: RMethod): String {
+    override fun toSign(func: RMethod): String? {
         PsiTreeUtil.getParentOfType(func, RClass::class.java)?.let {
-            return "${it.qualifiedName.toString()}#${func.name}"
+            val qualifiedName = it.qualifiedName ?: return null
+            return "${qualifiedName}#${func.name}"
         }
         return "#${func.name}"
     }

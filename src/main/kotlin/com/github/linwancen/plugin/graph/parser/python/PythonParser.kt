@@ -25,8 +25,9 @@ class PythonParser : ParserLang<PyFunction>() {
         return "__init__" == func.name
     }
 
-    override fun toSign(func: PyFunction): String {
-        return "${func.containingClass?.qualifiedName ?: ""}#${func.name}"
+    override fun toSign(func: PyFunction): String? {
+        val clazz = func.containingClass ?: return "#${func.name}"
+        return "${clazz.qualifiedName ?: return null}#${func.name}"
     }
 
     override fun funMap(funMap: MutableMap<String, String>, func: PyFunction) {

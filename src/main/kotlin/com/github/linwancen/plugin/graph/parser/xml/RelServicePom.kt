@@ -12,7 +12,7 @@ object RelServicePom {
 
     fun parsePom(
         psiFile: XmlFile,
-        callListMap: MutableMap<String, List<String>>,
+        callSetMap: MutableMap<String, MutableSet<String>>,
         relData: RelData,
     ) {
         for (it in psiFile.children) {
@@ -22,12 +22,12 @@ object RelServicePom {
             val root = it.rootTag ?: continue
             val rootInfo = info(root) ?: continue
             val sign = rootInfo["sign"] ?: continue
-            val callList = mutableListOf<String>()
-            callListMap[sign] = callList
+            val callSet = mutableSetOf<String>()
+            callSetMap[sign] = callSet
 
             module(root, relData, rootInfo)
 
-            dependencies(root, callList)
+            dependencies(root, callSet)
         }
     }
 
@@ -53,7 +53,7 @@ object RelServicePom {
         }
     }
 
-    private fun dependencies(root: XmlTag, callList: MutableList<String>) {
+    private fun dependencies(root: XmlTag, callList: MutableSet<String>) {
         root.findFirstSubTag("dependencies")?.let { tag ->
             val items = tag.findSubTags("dependency")
             if (items.isNotEmpty()) {
