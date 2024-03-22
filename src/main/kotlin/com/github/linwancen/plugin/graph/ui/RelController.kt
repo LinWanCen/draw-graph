@@ -61,26 +61,29 @@ object RelController {
             val plantumlSrc = PrinterPlantuml().toSrc(relData)
             runInEdt {
                 window.toolWindow.activate(null)
+                if (plantumlSrc == window.plantumlSrc.text) {
+                    return@runInEdt
+                }
                 window.mermaidSrc.text = mermaidSrc
                 window.graphvizSrc.text = graphvizSrc
                 window.plantumlSrc.text = plantumlSrc
-            }
-            PrinterMermaid.build(mermaidSrc, project) {
-                runInEdt {
-                    window.mermaidHtml.text = it
-                    if (window.mermaidBrowser != null) window.mermaidBrowser.load(it)
+                PrinterMermaid.build(mermaidSrc, project) {
+                    runInEdt {
+                        window.mermaidHtml.text = it
+                        if (window.mermaidBrowser != null) window.mermaidBrowser?.load(it)
+                    }
                 }
-            }
-            PrinterGraphviz.build(graphvizSrc, project) {
-                runInEdt {
-                    window.graphvizHtml.text = it
-                    if (window.graphvizBrowser != null) window.graphvizBrowser.load(it)
+                PrinterGraphviz.build(graphvizSrc, project) {
+                    runInEdt {
+                        window.graphvizHtml.text = it
+                        if (window.graphvizBrowser != null) window.graphvizBrowser?.load(it)
+                    }
                 }
-            }
-            PrinterPlantuml.build(plantumlSrc, project) {
-                runInEdt {
-                    window.plantumlHtml.text = it
-                    if (window.plantumlBrowser != null) window.plantumlBrowser.load(it)
+                PrinterPlantuml.build(plantumlSrc, project) {
+                    runInEdt {
+                        window.plantumlHtml.text = it
+                        if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
+                    }
                 }
             }
         }

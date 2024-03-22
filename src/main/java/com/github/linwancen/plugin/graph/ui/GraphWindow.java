@@ -16,6 +16,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.concurrency.EdtExecutorService;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.FocusEvent;
@@ -28,8 +29,8 @@ public class GraphWindow {
     public GraphWindow(@NotNull Project project, ToolWindow toolWindow) {
         this.project = project;
         this.toolWindow = toolWindow;
-        DrawGraphAppState appState = DrawGraphAppState.of(null);
-        DrawGraphProjectState projectState = DrawGraphProjectState.of(project);
+        @NotNull DrawGraphAppState appState = DrawGraphAppState.of(null);
+        @NotNull DrawGraphProjectState projectState = DrawGraphProjectState.of(project);
 
         openDir.addActionListener(e -> InstallMermaid.openDir(project));
         reload.addActionListener(e -> RelController.reload(project));
@@ -67,9 +68,9 @@ public class GraphWindow {
             projectState.reset();
         });
 
-        FileEditor selectedEditor = FileEditorManager.getInstance(project).getSelectedEditor();
+        @Nullable FileEditor selectedEditor = FileEditorManager.getInstance(project).getSelectedEditor();
         if (selectedEditor != null) {
-            VirtualFile file = selectedEditor.getFile();
+            @Nullable VirtualFile file = selectedEditor.getFile();
             RelController.buildSrc(project, this, new VirtualFile[]{file});
         }
         initOut(project);
@@ -88,9 +89,9 @@ public class GraphWindow {
         initEvent(plantumlSrc, plantumlHtml, plantumlBrowser, PrinterPlantuml::build);
     }
 
-    private void initEvent(JTextArea src, JTextArea html, Browser browser,
-                           TriConsumer<String, Project, Consumer<String>> tri) {
-        Consumer<FocusEvent> htmlAndOut = e -> tri.accept(src.getText(), project,
+    private void initEvent(@NotNull JTextArea src, @NotNull JTextArea html, @Nullable Browser browser,
+                           @NotNull TriConsumer<String, Project, Consumer<String>> tri) {
+        @NotNull Consumer<FocusEvent> htmlAndOut = e -> tri.accept(src.getText(), project,
                         s -> EdtExecutorService.getInstance().submit(() -> {
                             html.setText(s);
                             if (browser != null) browser.load(s);
@@ -114,16 +115,19 @@ public class GraphWindow {
     // region title
 
     // region html
+    @Nullable
     Browser mermaidBrowser;
     JPanel mermaidOut;
     JTextArea mermaidHtml;
     JTextArea mermaidSrc;
 
+    @Nullable
     Browser plantumlBrowser;
     JPanel plantumlOut;
     JTextArea plantumlHtml;
     JTextArea plantumlSrc;
 
+    @Nullable
     Browser graphvizBrowser;
     JPanel graphvizOut;
     JTextArea graphvizHtml;

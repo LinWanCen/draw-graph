@@ -16,6 +16,7 @@ public abstract class Browser implements StartupActivity.RequiredForSmartMode {
     @Override
     public void runActivity(@NotNull Project project) {}
 
+    @NotNull
     static Map<String, Class<? extends Browser>> map = new HashMap<>();
 
     static {
@@ -27,8 +28,8 @@ public abstract class Browser implements StartupActivity.RequiredForSmartMode {
     public static Browser of(@NotNull JPanel out, Project project) {
         out.removeAll();
         out.setLayout(new BorderLayout());
-        StringBuilder errMsg = new StringBuilder();
-        for (Class<? extends Browser> c : map.values()) {
+        @NotNull StringBuilder errMsg = new StringBuilder();
+        for (@NotNull Class<? extends Browser> c : map.values()) {
             try {
                 @NotNull Browser browser = c.getConstructor().newInstance();
                 @Nullable String s = browser.add(out, project);
@@ -41,7 +42,7 @@ public abstract class Browser implements StartupActivity.RequiredForSmartMode {
             }
         }
         errMsg.insert(0, DrawGraphBundle.message("web.load.err.msg"));
-        JBTextArea errTip = new JBTextArea();
+        @NotNull JBTextArea errTip = new JBTextArea();
         errTip.setText(errMsg.toString());
         out.add(errTip);
         return null;
