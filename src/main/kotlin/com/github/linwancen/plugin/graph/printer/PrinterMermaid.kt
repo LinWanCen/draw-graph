@@ -17,12 +17,12 @@ import java.util.function.Consumer
 
 class PrinterMermaid : Printer() {
 
-    val sb = StringBuilder("graph ${if (DrawGraphAppState.of().lr) "LR" else "TD"}\n\n")
+    val sb = StringBuilder("graph ${if (DrawGraphAppState.of().lr) "LR" else "TB"}\n\n")
 
     override fun beforeGroup(groupMap: MutableMap<String, String>) {
         sb.append("subgraph ")
         label(groupMap, false)
-        sb.append("direction  ${if (DrawGraphAppState.of().lr) "LR" else "TD"}\n")
+        sb.append("direction  ${if (DrawGraphAppState.of().lr) "LR" else "TB"}\n")
     }
 
     override fun afterGroup(groupMap: MutableMap<String, String>) {
