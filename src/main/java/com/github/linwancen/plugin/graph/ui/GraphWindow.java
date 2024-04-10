@@ -2,6 +2,7 @@ package com.github.linwancen.plugin.graph.ui;
 
 import com.github.linwancen.plugin.common.ui.UiUtils;
 import com.github.linwancen.plugin.graph.printer.InstallMermaid;
+import com.github.linwancen.plugin.graph.printer.PrinterData;
 import com.github.linwancen.plugin.graph.printer.PrinterGraphviz;
 import com.github.linwancen.plugin.graph.printer.PrinterMermaid;
 import com.github.linwancen.plugin.graph.printer.PrinterPlantuml;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.FocusEvent;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class GraphWindow {
@@ -102,8 +104,8 @@ public class GraphWindow {
     }
 
     private void initEvent(@NotNull JTextArea src, @NotNull JTextArea html, @Nullable Browser browser,
-                           @NotNull TriConsumer<String, Project, Consumer<String>> tri) {
-        @NotNull Consumer<FocusEvent> htmlAndOut = e -> tri.accept(src.getText(), project,
+                           @NotNull BiConsumer<PrinterData, Consumer<String>> fun) {
+        @NotNull Consumer<FocusEvent> htmlAndOut = e -> fun.accept(new PrinterData(src.getText(), null, project),
                         s -> EdtExecutorService.getInstance().submit(() -> {
                             html.setText(s);
                             if (browser != null) browser.load(s);

@@ -37,8 +37,9 @@ public class BrowserJcef extends Browser {
         }
     }
 
+    @Nullable
     @Override
-    public String load(String html) {
+    public String load(@Nullable String html) {
         try {
             if (jbCefBrowser != null && html != null) {
                 jbCefBrowser.loadHTML(html);

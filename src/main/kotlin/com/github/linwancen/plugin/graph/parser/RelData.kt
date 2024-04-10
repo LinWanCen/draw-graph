@@ -2,6 +2,7 @@ package com.github.linwancen.plugin.graph.parser
 
 class RelData {
     val parentChildMap = mutableMapOf<String, MutableList<String>>()
+    /** child print in parentChildMap root, so filter */
     val childSet = mutableSetOf<String>()
     val itemMap = mutableMapOf<String, MutableMap<String, String>>()
     val callList = mutableListOf<Pair<String, String>>()

@@ -58,12 +58,14 @@ abstract class ParserLang<F : PsiElement> : Parser() {
                 }
                 val funMap = mutableMapOf<String, String>()
                 funMap["sign"] = sign
-                funMap["filePath"] = file.path
                 funMap(funMap, func)
+                val name = funMap["name"]
+                funMap["link"] = "${file.path}#${name?.substring(name.lastIndexOf(' ') + 1) ?: ""}"
                 val classMap = classMap(func, relData)
                 if (classMap == null) {
                     relData.regParentChild(funMap)
                 } else {
+                    classMap["link"] = "${file.path}#"
                     relData.regParentChild(classMap, funMap)
                 }
                 // overload fun

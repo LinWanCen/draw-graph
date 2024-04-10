@@ -2,8 +2,6 @@ package com.github.linwancen.plugin.graph.printer
 
 import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
-import com.intellij.openapi.project.Project
-import java.util.function.Consumer
 
 abstract class Printer {
     protected open fun beforeGroup(groupMap: MutableMap<String, String>) {
@@ -42,15 +40,15 @@ abstract class Printer {
         sb.append(docLine)
     }
 
-    abstract fun toSrc(relData: RelData): String
-
-    abstract fun toHtml(src: String, project: Project, func: Consumer<String>)
+    abstract fun toSrc(relData: RelData): Pair<String, String>
 
     protected fun printerData(relData: RelData) {
-        relData.parentChildMap.filter { !relData.childSet.contains(it.key) }
+        relData.parentChildMap
+            .filter { !relData.childSet.contains(it.key) }
             .forEach { printerChildren(relData, it.key, it.value) }
         // PlantUML can not re def
-        relData.itemMap.filter { !relData.parentChildMap.containsKey(it.key) }
+        relData.itemMap
+            .filter { !relData.parentChildMap.containsKey(it.key) }
             .filter { !relData.childSet.contains(it.key) }
             .forEach { item(it.value) }
         // PlantUML must def before

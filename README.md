@@ -19,11 +19,11 @@ Method call usage graph and maven dependency graph, click to navigate
 
 ##### How to Use
 
-One java call graph or all pom.xml dep graph:
+One file call graph or all pom.xml dep graph:
 1. Open <kbd>Graph</kbd> ToolWindow at Right
 2. Open pom.xml/.java/.py... file
 
-Multi java call graph or partial pom.xml dep graph:
+Multi file call graph or partial pom.xml dep graph:
 1. Select multi files in the same language
 2. Open Right Click Menu
 3. Select <kbd>Call Graph</kbd>
@@ -48,11 +48,11 @@ Only support 2020.2+ because mermaid.js only use in jcef(chrome),
 
 ##### 用法
 
-单个 java 文件调用图 或 所有 pom.xml 依赖图：
+单个文件调用图 或 所有 pom.xml 依赖图：
 1. 打开右边的<kbd>图</kbd>工具栏
 2. 打开 pom.xml/.java/.py 等文件
 
-多个 java 文件调用图 或 部分 pom.xml 依赖图：
+多个文件调用图 或 部分 pom.xml 依赖图：
 1. 选择多个同语言的文件
 2. 打开右键菜单
 3. 选择<kbd>调用图</kbd>

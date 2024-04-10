@@ -9,7 +9,6 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.ScriptRunnerUtil
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
-import com.intellij.openapi.project.Project
 import com.intellij.util.ExceptionUtil
 import org.apache.commons.lang3.StringUtils
 import java.io.File
@@ -31,6 +30,9 @@ graph [compound=true]
 
 """
     )
+    val js = StringBuilder()
+    var nodeId = 1
+    var clusterId = 1
 
     override fun beforeGroup(groupMap: MutableMap<String, String>) {
         sb.append(
@@ -53,42 +55,40 @@ graph [compound=true]
     }
 
     private fun label(map: Map<String, String>, isItem: Boolean) {
-        if (map["name"] != null) {
-            if (isItem) {
-                sb.append('[')
-            }
-            sb.append("label =\" ")
-            addLine(map["@1"], sb, true)
-            addLine(map["@2"], sb, true)
-            addLine(map["@3"], sb, true)
-            sb.append("${map["name"]}\"")
-            if (isItem) {
-                sb.append(']')
-            }
+        map["name"] ?: return
+        if (isItem) {
+            sb.append('[')
         }
+        sb.append("label =\" ")
+        addLine(map["@1"], sb, true)
+        addLine(map["@2"], sb, true)
+        addLine(map["@3"], sb, true)
+        sb.append("${map["name"]}\"")
+        if (isItem) {
+            sb.append(']')
+        }
+        val id = if (isItem) "node${nodeId++}" else "clust${clusterId++}"
+        js.append("document.getElementById(\"$id\").onclick = function(){ navigate(\"${map["link"]}\") }\n")
     }
 
     override fun call(usageSign: String, callSign: String) {
         sb.append("\"cluster_${sign(usageSign)}\" -> \"cluster_${sign(callSign)}\"\n")
     }
 
-    override fun toSrc(relData: RelData): String {
+    override fun toSrc(relData: RelData): Pair<String, String> {
         printerData(relData)
         sb.append("\n}")
-        return sb.toString()
-    }
-
-    override fun toHtml(src: String, project: Project, func: Consumer<String>) {
-        build(src, project, func)
+        return Pair(sb.toString(), js.toString())
     }
 
     companion object {
 
         @JvmStatic
-        fun build(src: String?, project: Project, func: Consumer<String>) {
-            object : Task.Backgroundable(project, "draw Graphviz") {
+        fun build(data: PrinterData, func: Consumer<String>) {
+            object : Task.Backgroundable(data.project, "draw Graphviz") {
                 override fun run(indicator: ProgressIndicator) {
-                    if (StringUtils.isBlank(src ?: return)) {
+                    val src = data.src ?: return
+                    if (StringUtils.isBlank(src)) {
                         return
                     }
                     val paths = SysPath.lib() ?: return
@@ -106,9 +106,37 @@ graph [compound=true]
                             generalCommandLine.charset = StandardCharsets.UTF_8
                             generalCommandLine.setWorkDirectory(path)
                             val commandLineOutputStr = ScriptRunnerUtil.getProcessOutput(generalCommandLine)
+                            val svgFile = "${path}draw-graph/graphviz.dot.svg"
+                            val svg = Files.readString(Path.of(svgFile), StandardCharsets.UTF_8)
                             func.accept(
+                                //language="html"
                                 """
-<embed src="file:///${path}draw-graph/graphviz.dot.svg" type="image/svg+xml" />
+<!-- <embed src="file:///${path}draw-graph/graphviz.dot.svg" type="image/svg+xml" /> -->
+$svg
+<br>
+<script>
+  function navigate(link) {
+    callJava('navigate:' + link)
+  }
+  function openDevtools() {
+    callJava('openDevtools')
+  }
+  function callJava(cmd) {
+    window.java({
+      request: cmd,
+      onSuccess(response){
+        console.log(response);
+      },
+      onFailure(error_code,error_message){
+        console.log(error_code,error_message);
+      }
+    });
+  }
+  window.onload = function addEvent() {
+${data.js}
+  }
+</script>
+<button onclick='openDevtools()'>openDevtools</button>
 <br>
 ${DrawGraphBundle.message("graphviz.msg")}
 <br>
@@ -119,6 +147,7 @@ $commandLineOutputStr
                         } catch (e: Exception) {
 
                             func.accept(
+                                //language="html"
                                 """
 <embed src="file:///${path}draw-graph/graphviz.dot.svg" type="image/svg+xml" />
 <br>

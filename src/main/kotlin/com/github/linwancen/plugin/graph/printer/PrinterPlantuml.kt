@@ -6,7 +6,6 @@ import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
-import com.intellij.openapi.project.Project
 import com.intellij.util.ExceptionUtil
 import net.sourceforge.plantuml.FileFormat
 import net.sourceforge.plantuml.FileFormatOption
@@ -22,7 +21,8 @@ import java.util.function.Consumer
 
 class PrinterPlantuml : Printer() {
 
-    val sb = StringBuilder("""@startuml
+    val sb = StringBuilder(
+        """@startuml
 hide empty circle
 hide empty members
 ${if (DrawGraphAppState.of().lr) "left to right direction" else ""}
@@ -30,10 +30,12 @@ skinparam shadowing false
 skinparam componentStyle rectangle
 skinparam defaultTextAlignment center
 
-""")
+"""
+    )
+    val js = StringBuilder()
 
     override fun beforeGroup(groupMap: MutableMap<String, String>) {
-        label(groupMap)
+        label(groupMap, false)
         sb.append(" {\n")
     }
 
@@ -42,12 +44,13 @@ skinparam defaultTextAlignment center
     }
 
     override fun item(itemMap: MutableMap<String, String>) {
-        label(itemMap)
+        label(itemMap, true)
         sb.append("\n")
     }
 
-    private fun label(map: MutableMap<String, String>) {
-        sb.append("component ${sign(map["sign"] ?: return)}")
+    private fun label(map: MutableMap<String, String>, isItem: Boolean) {
+        val sign = sign(map["sign"] ?: return)
+        sb.append("component $sign")
         if (map["name"] != null) {
             sb.append(" as \" ")
             addLine(map["@1"], sb, true)
@@ -55,28 +58,27 @@ skinparam defaultTextAlignment center
             addLine(map["@3"], sb, true)
             sb.append("${map["name"]}\"")
         }
+        val id = "${if (isItem) "elem" else "cluster"}_$sign"
+        js.append("document.getElementById(\"$id\").onclick = function(){ navigate(\"${map["link"]}\") }\n")
     }
 
     override fun call(usageSign: String, callSign: String) {
         sb.append("${sign(usageSign)} --> ${sign(callSign)}\n")
     }
 
-    override fun toSrc(relData: RelData): String {
+    override fun toSrc(relData: RelData): Pair<String, String> {
         printerData(relData)
         sb.append("\n@enduml")
-        return sb.toString()
-    }
-
-    override fun toHtml(src: String, project: Project, func: Consumer<String>) {
-        PrinterGraphviz.build(src, project, func)
+        return Pair(sb.toString(), js.toString())
     }
 
     companion object {
         @JvmStatic
-        fun build(src: String?, project: Project, func: Consumer<String>) {
-            object : Task.Backgroundable(project, "draw PlantUML") {
+        fun build(data: PrinterData, func: Consumer<String>) {
+            object : Task.Backgroundable(data.project, "draw PlantUML") {
                 override fun run(indicator: ProgressIndicator) {
-                    if (StringUtils.isBlank(src ?: return)) {
+                    val src = data.src ?: return
+                    if (StringUtils.isBlank(src)) {
                         return
                     }
                     val paths = SysPath.lib() ?: return
@@ -86,20 +88,49 @@ skinparam defaultTextAlignment center
                         }
                         try {
                             val plantumlPath = "${path}draw-graph/plantuml.puml"
-                            val svgOut = FileOutputStream("${path}draw-graph/plantuml.svg")
-                            val pngOut = FileOutputStream("${path}draw-graph/plantuml.png")
+                            val svgFile = "${path}draw-graph/plantuml.svg"
+                            val pngFile = "${path}draw-graph/plantuml.png"
+                            val svgOut = FileOutputStream(svgFile)
+                            val pngOut = FileOutputStream(pngFile)
                             File(plantumlPath).parentFile.mkdirs()
                             Files.write(Path.of(plantumlPath), src.toByteArray(StandardCharsets.UTF_8))
                             val reader = SourceStringReader(src)
                             val svgDesc = reader.outputImage(svgOut, FileFormatOption(FileFormat.SVG))
                             val pngDesc = reader.outputImage(pngOut, FileFormatOption(FileFormat.PNG))
+                            val svg = Files.readString(Path.of(svgFile), StandardCharsets.UTF_8)
                             func.accept(
+                                //language="html"
                                 """
-<embed src="file:///${path}draw-graph/plantuml.svg" type="image/svg+xml" />
+<!-- <embed src="file:///${path}draw-graph/plantuml.svg" type="image/svg+xml" /> -->
+$svg
 <br>
 $svgDesc
 <br>
 $pngDesc
+<br>
+<script>
+  function navigate(link) {
+    callJava('navigate:' + link)
+  }
+  function openDevtools() {
+    callJava('openDevtools')
+  }
+  function callJava(cmd) {
+    window.java({
+      request: cmd,
+      onSuccess(response){
+        console.log(response);
+      },
+      onFailure(error_code,error_message){
+        console.log(error_code,error_message);
+      }
+    });
+  }
+  window.onload = function addEvent() {
+${data.js}
+  }
+</script>
+<button onclick='openDevtools()'>openDevtools</button>
 <br>
 ${DrawGraphBundle.message("graphviz.msg")}
 <br>
@@ -108,6 +139,7 @@ ${DrawGraphBundle.message("graphviz.msg")}
                             return
                         } catch (e: Exception) {
                             func.accept(
+                                //language="html"
                                 """
 <embed src="file:///${path}draw-graph/plantuml.svg" type="image/svg+xml" />
 <br>

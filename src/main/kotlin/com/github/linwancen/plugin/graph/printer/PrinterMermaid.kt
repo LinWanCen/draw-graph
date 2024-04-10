@@ -6,7 +6,6 @@ import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
-import com.intellij.openapi.project.Project
 import com.intellij.util.ExceptionUtil
 import org.apache.commons.lang3.StringUtils
 import java.io.File
@@ -51,13 +50,7 @@ class PrinterMermaid : Printer() {
             sb.append(if (isItem) ")" else "]")
         }
         sb.append("\n")
-         val name = if (isItem) {
-            val onlyName = itemMap["name"]
-            onlyName?.substring(onlyName.lastIndexOf(' ') + 1) ?: ""
-        } else {
-            ""
-        }
-        sb.append("click '${sign(itemMap["sign"] ?: return)}' call navigate(\"${itemMap["filePath"]}#${name}\")")
+        sb.append("click '${sign(itemMap["sign"] ?: return)}' call navigate(\"${itemMap["link"]}\")")
         sb.append("\n\n")
     }
 
@@ -65,21 +58,18 @@ class PrinterMermaid : Printer() {
         sb.append("'${sign(usageSign)}' --> '${sign(callSign)}'\n")
     }
 
-    override fun toSrc(relData: RelData): String {
+    override fun toSrc(relData: RelData): Pair<String, String> {
         printerData(relData)
-        return sb.toString()
-    }
-
-    override fun toHtml(src: String, project: Project, func: Consumer<String>) {
-        PrinterGraphviz.build(src, project, func)
+        return Pair(sb.toString(), "")
     }
 
     companion object {
         @JvmStatic
-        fun build(src: String?, project: Project, func: Consumer<String>) {
-            object : Task.Backgroundable(project, "draw Mermaid") {
+        fun build(data: PrinterData, func: Consumer<String>) {
+            object : Task.Backgroundable(data.project, "draw Mermaid") {
                 override fun run(indicator: ProgressIndicator) {
-                    if (StringUtils.isBlank(src ?: return)) {
+                    val src = data.src ?: return
+                    if (StringUtils.isBlank(src)) {
                         return
                     }
                     //language="html"
@@ -150,7 +140,8 @@ $mermaidLink
   };
   mermaid.initialize(config);
 </script>
-<button onclick='openDevtools()'>openDevtools</button><br>
+<button onclick='openDevtools()'>openDevtools</button>
+<br>
 ${DrawGraphBundle.message("mermaid.msg")}
 """
             return online

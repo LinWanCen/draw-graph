@@ -2,6 +2,7 @@ package com.github.linwancen.plugin.graph.ui
 
 import com.github.linwancen.plugin.graph.parser.Parser
 import com.github.linwancen.plugin.graph.parser.RelData
+import com.github.linwancen.plugin.graph.printer.PrinterData
 import com.github.linwancen.plugin.graph.printer.PrinterGraphviz
 import com.github.linwancen.plugin.graph.printer.PrinterMermaid
 import com.github.linwancen.plugin.graph.printer.PrinterPlantuml
@@ -56,9 +57,9 @@ object RelController {
             if (relData.itemMap.isEmpty()) {
                 return@executeOnPooledThread
             }
-            val mermaidSrc = PrinterMermaid().toSrc(relData)
-            val graphvizSrc = PrinterGraphviz().toSrc(relData)
-            val plantumlSrc = PrinterPlantuml().toSrc(relData)
+            val (mermaidSrc, _) = PrinterMermaid().toSrc(relData)
+            val (graphvizSrc, graphvizJs) = PrinterGraphviz().toSrc(relData)
+            val (plantumlSrc, plantumlJs) = PrinterPlantuml().toSrc(relData)
             runInEdt {
                 window.toolWindow.activate(null)
                 if (plantumlSrc == window.plantumlSrc.text) {
@@ -67,19 +68,19 @@ object RelController {
                 window.mermaidSrc.text = mermaidSrc
                 window.graphvizSrc.text = graphvizSrc
                 window.plantumlSrc.text = plantumlSrc
-                PrinterMermaid.build(mermaidSrc, project) {
+                PrinterMermaid.build(PrinterData(mermaidSrc, null, project)) {
                     runInEdt {
                         window.mermaidHtml.text = it
                         if (window.mermaidBrowser != null) window.mermaidBrowser?.load(it)
                     }
                 }
-                PrinterGraphviz.build(graphvizSrc, project) {
+                PrinterGraphviz.build(PrinterData(graphvizSrc, graphvizJs, project)) {
                     runInEdt {
                         window.graphvizHtml.text = it
                         if (window.graphvizBrowser != null) window.graphvizBrowser?.load(it)
                     }
                 }
-                PrinterPlantuml.build(plantumlSrc, project) {
+                PrinterPlantuml.build(PrinterData(plantumlSrc, plantumlJs, project)) {
                     runInEdt {
                         window.plantumlHtml.text = it
                         if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
