@@ -76,9 +76,13 @@ public class GraphWindow {
 
         UiUtils.onChange(include, projectState.getInclude(), projectState::setInclude);
         UiUtils.onChange(exclude, projectState.getExclude(), projectState::setExclude);
+        UiUtils.onChange(otherInclude, projectState.getOtherInclude(), projectState::setOtherInclude);
+        UiUtils.onChange(otherExclude, projectState.getOtherExclude(), projectState::setOtherExclude);
         resetSetting.addActionListener(e -> {
             include.setText(DrawGraphProjectState.getDefault().getInclude());
             exclude.setText(DrawGraphProjectState.getDefault().getExclude());
+            otherInclude.setText(DrawGraphProjectState.getDefault().getOtherInclude());
+            otherExclude.setText(DrawGraphProjectState.getDefault().getOtherExclude());
             projectState.reset();
         });
 
@@ -150,12 +154,14 @@ public class GraphWindow {
 
     // region setting
     private JButton resetSetting;
-    private JTextField include;
-    private JTextField exclude;
     private JCheckBox skipGetSetIs;
     private JCheckBox lr;
     private JCheckBox doc;
     private JCheckBox impl;
     private JCheckBox mvc;
+    private JTextField include;
+    private JTextField exclude;
+    private JTextField otherInclude;
+    private JTextField otherExclude;
     // endregion setting
 }

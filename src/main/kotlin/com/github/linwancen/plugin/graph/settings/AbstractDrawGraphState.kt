@@ -19,6 +19,14 @@ open class AbstractDrawGraphState {
     var excludePattern = Pattern.compile("")!!
         private set
 
+    @Transient
+    var otherIncludePattern = Pattern.compile("")!!
+        private set
+
+    @Transient
+    var otherExcludePattern = Pattern.compile("")!!
+        private set
+
     fun getInclude(): String {
         return includePattern.pattern()
     }
@@ -35,8 +43,26 @@ open class AbstractDrawGraphState {
         this.excludePattern = Pattern.compile(exclude)
     }
 
+    fun getOtherInclude(): String {
+        return otherIncludePattern.pattern()
+    }
+
+    fun setOtherInclude(include: String) {
+        this.otherIncludePattern = Pattern.compile(include)
+    }
+
+    fun getOtherExclude(): String {
+        return otherExcludePattern.pattern()
+    }
+
+    fun setOtherExclude(exclude: String) {
+        this.otherExcludePattern = Pattern.compile(exclude)
+    }
+
     fun resetAbstract(default: AbstractDrawGraphState) {
         setInclude(default.getInclude())
         setExclude(default.getExclude())
+        setOtherInclude(default.getOtherInclude())
+        setOtherExclude(default.getOtherExclude())
     }
 }

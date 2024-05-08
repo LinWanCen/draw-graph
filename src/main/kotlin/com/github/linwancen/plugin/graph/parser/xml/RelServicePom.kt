@@ -1,6 +1,8 @@
 package com.github.linwancen.plugin.graph.parser.xml
 
+import com.github.linwancen.plugin.common.text.Skip
 import com.github.linwancen.plugin.graph.parser.RelData
+import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.intellij.psi.xml.XmlDocument
 import com.intellij.psi.xml.XmlFile
 import com.intellij.psi.xml.XmlTag
@@ -69,8 +71,12 @@ object RelServicePom {
     var regex = Regex("\\$\\{project.artifactId} ? \\|? ?")
 
     private fun info(xmlTag: XmlTag): MutableMap<String, String>? {
-        val info = mutableMapOf<String, String>()
         val artifactId = xmlTag.findFirstSubTag("artifactId")?.value?.text ?: return null
+        val state = DrawGraphProjectState.of(xmlTag.project)
+        if (Skip.skip(artifactId, state.otherIncludePattern, state.otherExcludePattern)) {
+            return null
+        }
+        val info = mutableMapOf<String, String>()
         info["sign"] = artifactId
         info["name"] = artifactId
         info["link"] = xmlTag.containingFile.virtualFile.path
