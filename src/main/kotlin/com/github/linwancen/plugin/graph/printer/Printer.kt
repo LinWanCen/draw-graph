@@ -82,6 +82,6 @@ abstract class Printer {
          * "-" should in first
          */
         @JvmStatic
-        private val canNotUseSymbol = Regex("[-#,。？！，、；：“”‘’（）《》【】~@()|'\"<>{}\\[\\]\\\\ ]")
+        private val canNotUseSymbol = Regex("[-#,。？！，、；：“”‘’（）《》【】~@()|'\"<>{}\\[\\]\\\\/ ]")
     }
 }
