@@ -1,5 +1,6 @@
 package com.github.linwancen.plugin.graph.ui.webview;
 
+import com.github.linwancen.plugin.graph.parser.Parser;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
@@ -32,8 +33,8 @@ public class JcefNavigateHandler extends CefMessageRouterHandlerAdapter {
     }
 
     @Override
-    public boolean onQuery(CefBrowser browser, CefFrame frame, long queryId, @NotNull String request, boolean persistent,
-                           @NotNull CefQueryCallback callback) {
+    public boolean onQuery(CefBrowser browser, CefFrame frame, long queryId, @NotNull String request,
+                           boolean persistent, @NotNull CefQueryCallback callback) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> open(request, callback));
         return true;
     }
@@ -48,51 +49,70 @@ public class JcefNavigateHandler extends CefMessageRouterHandlerAdapter {
             callback.failure(40, "not support: " + request);
             return;
         }
-        request = request.substring("navigate:".length());
-        @NotNull String filePath = request.substring(0, request.indexOf("#"));
-        @NotNull String elementName = request.substring(request.indexOf("#") + 1);
-        @Nullable VirtualFile file = VirtualFileManager.getInstance().findFileByNioPath(Path.of(filePath));
-        if (file == null) {
-            callback.failure(41, "file not found: " + filePath);
-            return;
-        }
         DumbService.getInstance(project).runReadActionInSmartMode(() -> {
+            String link = request.substring("navigate:".length());
+            @NotNull String filePath = link;
+            @NotNull String childName = "";
+            int i = link.indexOf("#");
+            if (i > 0) {
+                filePath = link.substring(0, i);
+                childName = link.substring(i + 1);
+            }
+            // className to Element
+            if (!filePath.contains("/")) {
+                PsiElement psiElement = Parser.nameToElement(project, filePath);
+                if (psiElement instanceof NavigatablePsiElement) {
+                    navigateSelect(callback, (NavigatablePsiElement) psiElement, childName);
+                    return;
+                }
+            }
+            @Nullable VirtualFile file = VirtualFileManager.getInstance().findFileByNioPath(Path.of(filePath));
+            if (file == null) {
+                callback.failure(41, "file not found: " + filePath);
+                return;
+            }
             @Nullable PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
             if (psiFile == null) {
                 callback.failure(42, "psiFile not found: " + filePath);
                 return;
             }
-            if (elementName.isBlank()) {
-                navigate(callback, psiFile);
-            }
-            if (find(callback, psiFile, elementName)) {
-                return;
-            }
-            navigate(callback, psiFile);
+            navigateSelect(callback, psiFile, childName);
         });
     }
 
-    private static boolean find(@NotNull CefQueryCallback callback, PsiElement element, @NotNull String elementName) {
+    private static void navigateSelect(@NotNull CefQueryCallback callback,
+                                       @NotNull NavigatablePsiElement element, @NotNull String childName) {
+        if (childName.isBlank()) {
+            navigate(callback, element);
+        }
+        if (navigateChild(callback, element, childName)) {
+            return;
+        }
+        navigate(callback, element);
+    }
+
+    private static boolean navigateChild(@NotNull CefQueryCallback callback,
+                                         @NotNull NavigatablePsiElement element, @NotNull String childName) {
         // findChildrenOfType() slow, so getChildrenOfType() Recursive return when found
         @NotNull List<NavigatablePsiElement> children = PsiTreeUtil.getChildrenOfTypeAsList(element, NavigatablePsiElement.class);
         for (@NotNull NavigatablePsiElement child : children) {
-            if (elementName.equals(child.getName())) {
+            if (childName.equals(child.getName())) {
                 navigate(callback, child);
                 return true;
             }
-            if (find(callback, child, elementName)) {
+            if (navigateChild(callback, child, childName)) {
                 return true;
             }
         }
         return false;
     }
 
-    private static void navigate(@NotNull CefQueryCallback callback, @NotNull NavigatablePsiElement child) {
+    private static void navigate(@NotNull CefQueryCallback callback, @NotNull NavigatablePsiElement element) {
         EdtExecutorService.getInstance().submit(
                 () -> ApplicationManager.getApplication().invokeLater(
                         () -> {
-                            child.navigate(true);
-                            callback.success("navigate: " + child.getName());
+                            element.navigate(true);
+                            callback.success("navigate: " + element.getName());
                         }
                 )
         );

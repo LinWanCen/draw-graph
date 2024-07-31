@@ -3,6 +3,7 @@ package com.github.linwancen.plugin.graph.parser
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity.RequiredForSmartMode
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 
 abstract class Parser : RequiredForSmartMode {
@@ -11,6 +12,10 @@ abstract class Parser : RequiredForSmartMode {
     }
 
     protected abstract fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>)
+
+    open fun nameToElementImpl(project: Project, name: String): PsiElement? {
+        return null
+    }
 
     companion object {
         @JvmStatic
@@ -32,6 +37,20 @@ abstract class Parser : RequiredForSmartMode {
                 // only one lang srcImpl all and return
                 return
             }
+        }
+
+        /**
+         * need DumbService.getInstance(project).runReadActionInSmartMo
+         */
+        @JvmStatic
+        fun nameToElement(project: Project, name: String): PsiElement? {
+            for (it in SERVICES.values) {
+                val element = it.nameToElementImpl(project, name)
+                if (element != null) {
+                    return element
+                }
+            }
+            return null
         }
     }
 

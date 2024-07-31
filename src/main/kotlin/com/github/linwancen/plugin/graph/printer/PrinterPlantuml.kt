@@ -127,7 +127,22 @@ $pngDesc
     });
   }
   window.onload = function addEvent() {
-${data.js}
+${data.js ?:
+//language="js"
+"""
+    let elements = document.getElementsByTagName("g");
+    for (let g of elements) {
+      const id = g.getAttribute("id");
+      if(id == null) {
+        continue;
+      }
+      if (id.startsWith("elem_")){
+        g.onclick = function() { navigate(id.substring(5).replace('_', '#'))};
+      } else if (id.startsWith("cluster_")) {
+        g.onclick = function() { navigate(id.substring(8).replace('_', '#'))};
+      }
+    }
+"""}
   }
 </script>
 <button onclick='openDevtools()'>openDevtools</button>

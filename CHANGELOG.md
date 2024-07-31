@@ -4,6 +4,7 @@
 
 ## [1.0.0]
 
+- 1.15 Support .puml and navigate to class_method
 - 1.14 Maven dependencies graph include/exclude
 - 1.13 Rel Controller|Service|Mapper
 - 1.12 ★ click to navigate
@@ -23,6 +24,7 @@
 
 # 中文更新日志
 
+- 1.15 支持 .puml 文件和跳转 class_method
 - 1.14 Maven 关系图 包含排除
 - 1.13 关联 Controller|Service|Mapper
 - 1.12 ★ 点击跳转

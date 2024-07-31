@@ -133,7 +133,7 @@ $svg
     });
   }
   window.onload = function addEvent() {
-${data.js}
+${data.js ?: ""}
   }
 </script>
 <button onclick='openDevtools()'>openDevtools</button>

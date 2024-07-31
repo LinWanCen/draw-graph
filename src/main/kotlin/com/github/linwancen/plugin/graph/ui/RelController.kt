@@ -12,6 +12,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.psi.PsiManager
 import org.slf4j.LoggerFactory
 
 object RelController {
@@ -55,6 +56,7 @@ object RelController {
                 Parser.src(project, relData, files)
             }
             if (relData.itemMap.isEmpty()) {
+                plantUml(files, project, window)
                 return@executeOnPooledThread
             }
             val (mermaidSrc, _) = PrinterMermaid().toSrc(relData)
@@ -84,6 +86,30 @@ object RelController {
                     runInEdt {
                         window.plantumlHtml.text = it
                         if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
+                    }
+                }
+            }
+        }
+    }
+
+    @JvmStatic
+    private fun plantUml(files: Array<VirtualFile>, project: Project, window: GraphWindow) {
+        if (files.size == 1 && files[0].name.endsWith(".puml")) {
+            DumbService.getInstance(project).runReadActionInSmartMode {
+                val psiFile = PsiManager.getInstance(project).findFile(files[0])
+                    ?: return@runReadActionInSmartMode
+                runInEdt {
+                    val plantumlSrc = psiFile.text
+                    window.toolWindow.activate(null)
+                    if (plantumlSrc == window.plantumlSrc.text) {
+                        return@runInEdt
+                    }
+                    window.plantumlSrc.text = plantumlSrc
+                    PrinterPlantuml.build(PrinterData(plantumlSrc, null, project)) {
+                        runInEdt {
+                            window.plantumlHtml.text = it
+                            if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
+                        }
                     }
                 }
             }

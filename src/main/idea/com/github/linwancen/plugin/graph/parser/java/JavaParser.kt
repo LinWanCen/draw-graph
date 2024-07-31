@@ -6,12 +6,13 @@ import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.intellij.lang.java.JavaLanguage
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiJavaCodeReferenceElement
-import com.intellij.psi.PsiMethod
+import com.intellij.openapi.project.Project
+import com.intellij.psi.*
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.PsiShortNamesCache
 import com.intellij.psi.util.PsiTreeUtil
 import org.slf4j.LoggerFactory
+
 
 open class JavaParser : ParserLang<PsiMethod>() {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -19,6 +20,18 @@ open class JavaParser : ParserLang<PsiMethod>() {
     init {
         log.info("load JavaParser")
         SERVICES[JavaLanguage.INSTANCE.id] = this
+    }
+
+    override fun nameToElementImpl(project: Project, name: String): PsiElement? {
+        val scope = GlobalSearchScope.projectScope(project)
+        if (name.contains('.')) {
+            return JavaPsiFacade.getInstance(project).findClass(name, scope)
+        }
+        val classes = PsiShortNamesCache.getInstance(project).getClassesByName(name, scope)
+        if (classes.isNotEmpty()) {
+            return classes[0]
+        }
+        return null
     }
 
     override fun funClass(): Class<PsiMethod> {
@@ -49,7 +62,7 @@ open class JavaParser : ParserLang<PsiMethod>() {
     override fun fileCall(
         callSetMap: MutableMap<String, MutableSet<String>>,
         usageSetMap: MutableMap<String, MutableSet<String>>,
-        psiFile: PsiFile
+        psiFile: PsiFile,
     ) {
         if (!DrawGraphAppState.of().impl) {
             return
