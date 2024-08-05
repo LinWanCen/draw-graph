@@ -3,7 +3,6 @@ package com.github.linwancen.plugin.graph.printer
 import com.github.linwancen.plugin.common.file.SysPath
 import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
-import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.util.ExceptionUtil
@@ -127,13 +126,15 @@ $pngDesc
     });
   }
   window.onload = function addEvent() {
-${data.js ?:
-//language="js"
-"""
-    let elements = document.getElementsByTagName("g");
+// keep it for the same name class/method
+${data.js ?: ""}
+   let elements = document.getElementsByTagName("g");
     for (let g of elements) {
       const id = g.getAttribute("id");
       if(id == null) {
+        continue;
+      }
+      if(g.onclick != null) {
         continue;
       }
       if (id.startsWith("elem_")){
@@ -142,12 +143,9 @@ ${data.js ?:
         g.onclick = function() { navigate(id.substring(8).replace('_', '#'))};
       }
     }
-"""}
   }
 </script>
 <button onclick='openDevtools()'>openDevtools</button>
-<br>
-${DrawGraphBundle.message("graphviz.msg")}
 <br>
 """
                             )
@@ -157,8 +155,6 @@ ${DrawGraphBundle.message("graphviz.msg")}
                                 //language="html"
                                 """
 <embed src="file:///${path}draw-graph/plantuml.svg" type="image/svg+xml" />
-<br>
-${DrawGraphBundle.message("graphviz.msg")}
 <br>
 ${ExceptionUtil.getThrowableText(e)}
 """

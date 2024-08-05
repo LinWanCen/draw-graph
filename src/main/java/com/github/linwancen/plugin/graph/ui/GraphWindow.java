@@ -9,9 +9,14 @@ import com.github.linwancen.plugin.graph.printer.PrinterPlantuml;
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState;
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState;
 import com.github.linwancen.plugin.graph.ui.webview.Browser;
+import com.intellij.ide.FileEditorSelectInContext;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileEditor.EditorDataProvider;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.impl.CurrentEditorProvider;
+import com.intellij.openapi.fileEditor.impl.EditorComposite;
+import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -20,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultTreeCellEditor;
 import java.awt.event.FocusEvent;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -27,20 +33,33 @@ import java.util.function.Consumer;
 public class GraphWindow {
     Project project;
     ToolWindow toolWindow;
+    @NotNull
+    DrawGraphAppState appState;
+    @NotNull
+    DrawGraphProjectState projectState;
 
     public GraphWindow(@NotNull Project project, ToolWindow toolWindow) {
         this.project = project;
         this.toolWindow = toolWindow;
-        @NotNull DrawGraphAppState appState = DrawGraphAppState.of(null);
-        @NotNull DrawGraphProjectState projectState = DrawGraphProjectState.of(project);
+        appState = DrawGraphAppState.of(null);
+        projectState = DrawGraphProjectState.of(project);
 
         openDir.addActionListener(e -> InstallMermaid.openDir(project));
         reload.addActionListener(e -> RelController.reload(project));
         reset.addActionListener(e -> initOut(project));
 
-        autoLoad.setSelected(projectState.getAutoLoad());
+        autoLoad.setSelected(true);
+        projectState.setAutoLoad(true);
         autoLoad.addActionListener(e -> {
             projectState.setAutoLoad(autoLoad.isSelected());
+            if (autoLoad.isSelected()) {
+                RelController.forFile(project, FileEditorManager.getInstance(project).getSelectedFiles(), false);
+            }
+        });
+
+        skipJar.setSelected(projectState.getSkipJar());
+        skipJar.addActionListener(e -> {
+            projectState.setSkipJar(skipJar.isSelected());
             RelController.reload(project);
         });
 
@@ -110,10 +129,10 @@ public class GraphWindow {
     private void initEvent(@NotNull JTextArea src, @NotNull JTextArea html, @Nullable Browser browser,
                            @NotNull BiConsumer<PrinterData, Consumer<String>> fun) {
         @NotNull Consumer<FocusEvent> htmlAndOut = e -> fun.accept(new PrinterData(src.getText(), null, project),
-                        s -> EdtExecutorService.getInstance().submit(() -> {
-                            html.setText(s);
-                            if (browser != null) browser.load(s);
-                        }));
+                s -> EdtExecutorService.getInstance().submit(() -> {
+                    html.setText(s);
+                    if (browser != null) browser.load(s);
+                }));
         // reset browser load
         ApplicationManager.getApplication().executeOnPooledThread(() -> htmlAndOut.accept(null));
 
@@ -123,6 +142,13 @@ public class GraphWindow {
         }));
     }
 
+    public void closeAutoLoad() {
+        EdtExecutorService.getInstance().submit(() -> {
+            autoLoad.setSelected(false);
+            projectState.setAutoLoad(false);
+        });
+    }
+
     JPanel mainPanel;
 
     // region title
@@ -130,6 +156,7 @@ public class GraphWindow {
     private JButton reload;
     private JButton reset;
     private JCheckBox autoLoad;
+    private JCheckBox skipJar;
     // region title
 
     // region html

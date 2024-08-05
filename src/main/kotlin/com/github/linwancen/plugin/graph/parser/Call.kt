@@ -21,7 +21,9 @@ object Call {
         .flatMap { it.references.toList() }
         .map {
             try {
-                it.resolve() // Call.kt:24
+                it.resolve()
+                // byte to src, not used here, because class calls are many, very slow
+                // resolve?.navigationElement ?: resolve
             } catch (_: Throwable) {
                 // ignore
             }

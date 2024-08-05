@@ -20,7 +20,6 @@ import org.cef.handler.CefMessageRouterHandlerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
 import java.util.List;
 
 public class JcefNavigateHandler extends CefMessageRouterHandlerAdapter {
@@ -35,7 +34,13 @@ public class JcefNavigateHandler extends CefMessageRouterHandlerAdapter {
     @Override
     public boolean onQuery(CefBrowser browser, CefFrame frame, long queryId, @NotNull String request,
                            boolean persistent, @NotNull CefQueryCallback callback) {
-        ApplicationManager.getApplication().executeOnPooledThread(() -> open(request, callback));
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            try {
+                open(request, callback);
+            } catch (Throwable e) {
+                callback.failure(50, e.toString());
+            }
+        });
         return true;
     }
 
@@ -66,7 +71,8 @@ public class JcefNavigateHandler extends CefMessageRouterHandlerAdapter {
                     return;
                 }
             }
-            @Nullable VirtualFile file = VirtualFileManager.getInstance().findFileByNioPath(Path.of(filePath));
+            // findFileByNioPath() not support 2020.1
+            @Nullable VirtualFile file = VirtualFileManager.getInstance().findFileByUrl("file:///" + filePath);
             if (file == null) {
                 callback.failure(41, "file not found: " + filePath);
                 return;
@@ -94,7 +100,8 @@ public class JcefNavigateHandler extends CefMessageRouterHandlerAdapter {
     private static boolean navigateChild(@NotNull CefQueryCallback callback,
                                          @NotNull NavigatablePsiElement element, @NotNull String childName) {
         // findChildrenOfType() slow, so getChildrenOfType() Recursive return when found
-        @NotNull List<NavigatablePsiElement> children = PsiTreeUtil.getChildrenOfTypeAsList(element, NavigatablePsiElement.class);
+        @NotNull List<NavigatablePsiElement> children = PsiTreeUtil.getChildrenOfTypeAsList(element,
+                NavigatablePsiElement.class);
         for (@NotNull NavigatablePsiElement child : children) {
             if (childName.equals(child.getName())) {
                 navigate(callback, child);

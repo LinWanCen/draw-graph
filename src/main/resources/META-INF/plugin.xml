@@ -39,11 +39,18 @@
 
     <actions>
         <action
-            id="com.github.linwancen.plugin.graph.action.TreeAction"
-            class="com.github.linwancen.plugin.graph.action.TreeAction"
-            icon="AllIcons.Graph.Layout"
-            text="Call Graph">
+            id="com.github.linwancen.plugin.graph.action.FileMethodCallAction"
+            class="com.github.linwancen.plugin.graph.action.FileMethodCallAction"
+            icon="AllIcons.Hierarchy.Subtypes"
+            text="File Method Call Graph">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+        <action
+            id="com.github.linwancen.plugin.graph.action.MethodCallAction"
+            class="com.github.linwancen.plugin.graph.action.MethodCallAction"
+            icon="AllIcons.Hierarchy.Subtypes"
+            text="Method Call Graph">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>
 </idea-plugin>

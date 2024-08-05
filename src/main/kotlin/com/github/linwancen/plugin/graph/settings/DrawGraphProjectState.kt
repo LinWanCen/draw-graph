@@ -13,7 +13,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 )
 class DrawGraphProjectState : PersistentStateComponent<DrawGraphProjectState?>, AbstractDrawGraphState() {
 
-    var autoLoad : Boolean = true
+    var autoLoad = true
 
     override fun getState(): DrawGraphProjectState {
         return this

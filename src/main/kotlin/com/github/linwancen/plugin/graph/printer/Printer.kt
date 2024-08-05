@@ -21,8 +21,7 @@ abstract class Printer {
     }
 
     protected open fun sign(input: String): String {
-        val deleteKeyword = keyword.replace(input, "$1_")
-        return canNotUseSymbol.replace(deleteKeyword, "_")
+        return canNotUseSymbol.replace(input, "_")
     }
 
     protected open fun addLine(s: String?, sb: StringBuilder, newLineEscape: Boolean = false) {
@@ -52,10 +51,10 @@ abstract class Printer {
             .filter { !relData.childSet.contains(it.key) }
             .forEach { item(it.value) }
         // PlantUML must def before
-        relData.callList.forEach { call(it.first, it.second) }
+        relData.callSet.forEach { call(it.first, it.second) }
     }
 
-    private fun printerChildren(relData: RelData, parent: String, children: List<String>) {
+    private fun printerChildren(relData: RelData, parent: String, children: Set<String>) {
         val parentMap = relData.itemMap[parent] ?: return
         beforeGroup(parentMap)
         for (child in children) {
@@ -70,11 +69,6 @@ abstract class Printer {
     }
 
     companion object {
-        /**
-         * [parse error with word graph #4079](https://github.com/mermaid-js/mermaid/issues/4079)
-         */
-        @JvmStatic
-        private val keyword = Regex("\\b(graph|end|parent)\\b")
 
         /**
          * [not support english symbol #4138](https://github.com/mermaid-js/mermaid/issues/4138)
@@ -82,6 +76,6 @@ abstract class Printer {
          * "-" should in first
          */
         @JvmStatic
-        private val canNotUseSymbol = Regex("[-#,。？！，、；：“”‘’（）《》【】~@()|'\"<>{}\\[\\]\\\\/ ]")
+        val canNotUseSymbol = Regex("[-#,。？！，、；：“”‘’（）《》【】~@()|'\"<>{}\\[\\]\\\\/ ]")
     }
 }

@@ -6,6 +6,7 @@ import java.util.regex.Pattern
 open class AbstractDrawGraphState {
 
     var skipGetSetIs = true
+    var skipJar = true
     var lr = true
     var doc = "en" != Locale.getDefault().language
     var impl = true
@@ -16,7 +17,7 @@ open class AbstractDrawGraphState {
         private set
 
     @Transient
-    var excludePattern = Pattern.compile("")!!
+    var excludePattern = Pattern.compile("^(java)\\.")!!
         private set
 
     @Transient

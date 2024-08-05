@@ -13,6 +13,8 @@ abstract class Parser : RequiredForSmartMode {
 
     protected abstract fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>)
 
+    open fun callImpl(project: Project, relData: RelData, psiElement: PsiElement) {}
+
     open fun nameToElementImpl(project: Project, name: String): PsiElement? {
         return null
     }
@@ -43,6 +45,17 @@ abstract class Parser : RequiredForSmartMode {
          * need DumbService.getInstance(project).runReadActionInSmartMo
          */
         @JvmStatic
+        fun call(project: Project, relData: RelData, psiElement: PsiElement) {
+            var language = psiElement.language
+            language.baseLanguage?.let { language = it }
+            val usageService = SERVICES[language.id] ?: return
+            usageService.callImpl(project, relData, psiElement)
+        }
+
+        /**
+         * need DumbService.getInstance(project).runReadActionInSmartMo
+         */
+        @JvmStatic
         fun nameToElement(project: Project, name: String): PsiElement? {
             for (it in SERVICES.values) {
                 val element = it.nameToElementImpl(project, name)
@@ -54,20 +67,29 @@ abstract class Parser : RequiredForSmartMode {
         }
     }
 
-    fun regCall(callSetMap: Map<String, Set<String>>, relData: RelData) {
+    fun regCall(
+        callSetMap: Map<String, Set<String>>,
+        relData: RelData,
+        all: Boolean = false,
+    ) {
         for ((usage, callList) in callSetMap) {
             for (call in callList) {
-                if (callSetMap.containsKey(call)) {
+                if (all || callSetMap.containsKey(call)) {
                     relData.regCall(usage, call)
                 }
             }
         }
     }
 
-    fun regUsage(callSetMap: Map<String, Set<String>>, usageSetMap: Map<String, Set<String>>, relData: RelData) {
+    fun regUsage(
+        callSetMap: Map<String, Set<String>>,
+        usageSetMap: Map<String, Set<String>>,
+        relData: RelData,
+        all: Boolean = false,
+    ) {
         for ((call, usageList) in usageSetMap) {
             for (usage in usageList) {
-                if (callSetMap.containsKey(usage)) {
+                if (all || callSetMap.containsKey(usage)) {
                     relData.regCall(usage, call)
                 }
             }

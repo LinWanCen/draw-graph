@@ -58,12 +58,23 @@ class PrinterMermaid : Printer() {
         sb.append("'${sign(usageSign)}' --> '${sign(callSign)}'\n")
     }
 
+    override fun sign(input: String): String {
+        val deleteKeyword = keyword.replace(input, "$1_")
+        return canNotUseSymbol.replace(deleteKeyword, "_")
+    }
+
     override fun toSrc(relData: RelData): Pair<String, String> {
         printerData(relData)
         return Pair(sb.toString(), "")
     }
 
     companion object {
+        /**
+         * [parse error with word graph #4079](https://github.com/mermaid-js/mermaid/issues/4079)
+         */
+        @JvmStatic
+        val keyword = Regex("\\b(graph|end|parent)\\b")
+
         @JvmStatic
         fun build(data: PrinterData, func: Consumer<String>) {
             object : Task.Backgroundable(data.project, "draw Mermaid") {

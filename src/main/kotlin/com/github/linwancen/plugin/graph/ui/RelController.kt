@@ -2,17 +2,14 @@ package com.github.linwancen.plugin.graph.ui
 
 import com.github.linwancen.plugin.graph.parser.Parser
 import com.github.linwancen.plugin.graph.parser.RelData
-import com.github.linwancen.plugin.graph.printer.PrinterData
-import com.github.linwancen.plugin.graph.printer.PrinterGraphviz
-import com.github.linwancen.plugin.graph.printer.PrinterMermaid
-import com.github.linwancen.plugin.graph.printer.PrinterPlantuml
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.runInEdt
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ToolWindowManager
-import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiElement
 import org.slf4j.LoggerFactory
 
 object RelController {
@@ -20,18 +17,23 @@ object RelController {
 
     @JvmStatic
     val lastFilesMap = mutableMapOf<Project, Array<VirtualFile>>()
+    val lastElementMap = mutableMapOf<Project, PsiElement>()
+    val lastCallUsageMap = mutableMapOf<Project, Boolean>()
 
     @JvmStatic
     fun reload(project: Project) {
-        forFile(project, lastFilesMap[project] ?: return, false)
+        lastFilesMap[project]?.let { forFile(project, it, false) }
+        lastElementMap[project]?.let { forElement(project, it, lastCallUsageMap[project] ?: return) }
     }
 
     /**
-     * call by Action and Listener
+     * call by Action and Listener and reload()
      */
     @JvmStatic
     fun forFile(project: Project, files: Array<VirtualFile>, fromAction: Boolean) {
         try {
+            lastElementMap.remove(project)
+            lastCallUsageMap.remove(project)
             lastFilesMap[project] = files
             if (fromAction) {
                 // let it init
@@ -44,75 +46,64 @@ object RelController {
             // for before 201.6668.113
             buildSrc(project, window, files)
         } catch (e: Throwable) {
-            LOG.info("RelController catch Throwable but log to record.", e)
+            LOG.info("RelController.forFile() catch Throwable but log to record.", e)
         }
     }
 
+    /**
+     *
+     */
     @JvmStatic
     fun buildSrc(project: Project, window: GraphWindow, files: Array<VirtualFile>) {
         ApplicationManager.getApplication().executeOnPooledThread {
-            val relData = RelData()
-            DumbService.getInstance(project).runReadActionInSmartMode {
-                Parser.src(project, relData, files)
-            }
-            if (relData.itemMap.isEmpty()) {
-                plantUml(files, project, window)
-                return@executeOnPooledThread
-            }
-            val (mermaidSrc, _) = PrinterMermaid().toSrc(relData)
-            val (graphvizSrc, graphvizJs) = PrinterGraphviz().toSrc(relData)
-            val (plantumlSrc, plantumlJs) = PrinterPlantuml().toSrc(relData)
-            runInEdt {
-                window.toolWindow.activate(null)
-                if (plantumlSrc == window.plantumlSrc.text) {
-                    return@runInEdt
+            try {
+                if (files.size > 1) {
+                    window.closeAutoLoad()
                 }
-                window.mermaidSrc.text = mermaidSrc
-                window.graphvizSrc.text = graphvizSrc
-                window.plantumlSrc.text = plantumlSrc
-                PrinterMermaid.build(PrinterData(mermaidSrc, null, project)) {
-                    runInEdt {
-                        window.mermaidHtml.text = it
-                        if (window.mermaidBrowser != null) window.mermaidBrowser?.load(it)
-                    }
+                val relData = RelData()
+                DumbService.getInstance(project).runReadActionInSmartMode {
+                    Parser.src(project, relData, files)
                 }
-                PrinterGraphviz.build(PrinterData(graphvizSrc, graphvizJs, project)) {
-                    runInEdt {
-                        window.graphvizHtml.text = it
-                        if (window.graphvizBrowser != null) window.graphvizBrowser?.load(it)
-                    }
+                if (relData.itemMap.isEmpty()) {
+                    PlantUmlFileController.plantUml(project, window, files)
+                    return@executeOnPooledThread
                 }
-                PrinterPlantuml.build(PrinterData(plantumlSrc, plantumlJs, project)) {
-                    runInEdt {
-                        window.plantumlHtml.text = it
-                        if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
-                    }
-                }
+                RelDataController.dataToWindow(project, window, relData)
+            } catch (e: Throwable) {
+                LOG.info("RelController.buildSrc() catch Throwable but log to record.", e)
             }
         }
     }
 
+    /**
+     * call by Action and Listener and reload()
+     */
     @JvmStatic
-    private fun plantUml(files: Array<VirtualFile>, project: Project, window: GraphWindow) {
-        if (files.size == 1 && files[0].name.endsWith(".puml")) {
-            DumbService.getInstance(project).runReadActionInSmartMode {
-                val psiFile = PsiManager.getInstance(project).findFile(files[0])
-                    ?: return@runReadActionInSmartMode
-                runInEdt {
-                    val plantumlSrc = psiFile.text
-                    window.toolWindow.activate(null)
-                    if (plantumlSrc == window.plantumlSrc.text) {
-                        return@runInEdt
-                    }
-                    window.plantumlSrc.text = plantumlSrc
-                    PrinterPlantuml.build(PrinterData(plantumlSrc, null, project)) {
-                        runInEdt {
-                            window.plantumlHtml.text = it
-                            if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
+    fun forElement(project: Project, psiElement: PsiElement, call: Boolean) {
+        try {
+            lastFilesMap.remove(project)
+            lastElementMap[project] = psiElement
+            lastCallUsageMap[project] = call
+            ToolWindowManager.getInstance(project).getToolWindow("Graph")?.activate(null)
+            val window = GraphWindowFactory.winMap[project] ?: return
+            object : Task.Backgroundable(project, "draw ${if (call) "call" else "usage"}") {
+                override fun run(indicator: ProgressIndicator) {
+                    try {
+                        window.closeAutoLoad()
+                        val relData = RelData()
+                        DumbService.getInstance(project).runReadActionInSmartMode {
+                            if (call) {
+                                Parser.call(project, relData, psiElement)
+                            }
                         }
+                        RelDataController.dataToWindow(project, window, relData)
+                    } catch (e: Throwable) {
+                        LOG.info("RelController.forElement() Thread catch Throwable but log to record.", e)
                     }
                 }
-            }
+            }.queue()
+        } catch (e: Throwable) {
+            LOG.info("RelController.forElement() catch Throwable but log to record.", e)
         }
     }
 }

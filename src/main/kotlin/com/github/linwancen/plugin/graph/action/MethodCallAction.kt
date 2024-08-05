@@ -6,14 +6,15 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.project.DumbAwareAction
 
-object TreeAction : DumbAwareAction() {
+object MethodCallAction : DumbAwareAction() {
 
     override fun update(e: AnActionEvent) {
-        e.presentation.text = DrawGraphBundle.message("call.graph")
+        e.presentation.text = DrawGraphBundle.message("method.call.graph")
     }
+
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
-        val files = event.getData(CommonDataKeys.VIRTUAL_FILE_ARRAY) ?: return
-        RelController.forFile(project, files, true)
+        val psiElement = event.getData(CommonDataKeys.PSI_ELEMENT) ?: return
+        RelController.forElement(project, psiElement, true)
     }
 }

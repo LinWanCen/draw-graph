@@ -7,6 +7,18 @@ import java.util.regex.Pattern
 
 object CommentUtils {
 
+    @JvmStatic
+    fun <F : PsiElement> byteToSrc(func: F): F {
+        val navElement = func.navigationElement ?: return func
+        try {
+            @Suppress("UNCHECKED_CAST")
+            return navElement as F
+        } catch (e: Throwable) {
+            // ignore e
+            return func
+        }
+    }
+
     /**
      * use in C/C++/OC
      */

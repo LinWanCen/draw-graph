@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.PsiShortNamesCache
+import com.intellij.psi.search.searches.OverridingMethodsSearch
 import com.intellij.psi.util.PsiTreeUtil
 import org.slf4j.LoggerFactory
 
@@ -23,7 +24,7 @@ open class JavaParser : ParserLang<PsiMethod>() {
     }
 
     override fun nameToElementImpl(project: Project, name: String): PsiElement? {
-        val scope = GlobalSearchScope.projectScope(project)
+        val scope = GlobalSearchScope.allScope(project)
         if (name.contains('.')) {
             return JavaPsiFacade.getInstance(project).findClass(name, scope)
         }
@@ -56,7 +57,21 @@ open class JavaParser : ParserLang<PsiMethod>() {
     }
 
     override fun callList(func: PsiMethod): List<PsiMethod> {
-        return Call.find(func, PsiJavaCodeReferenceElement::class.java)
+        val find = Call.find(func, PsiJavaCodeReferenceElement::class.java)
+        val path = func.containingFile?.virtualFile?.path ?: return find
+        if (path.contains('!')) {
+            // not project fun
+            return find
+        }
+        val scope = GlobalSearchScope.projectScope(func.project)
+        val override = OverridingMethodsSearch.search(func, scope, true).filterNotNull()
+        if (override.isEmpty()) {
+            return find
+        }
+        val list = mutableListOf<PsiMethod>()
+        list.addAll(find)
+        list.addAll(override)
+        return list
     }
 
     override fun fileCall(
