@@ -4,6 +4,7 @@
 
 ## [1.0.0]
 
+- 1.17 Preview HTML File
 - 1.16 ★ method call graph
 - 1.15 Support .puml and navigate to class_method
 - 1.14 Maven dependencies graph include/exclude
@@ -25,6 +26,7 @@
 
 # 中文更新日志
 
+- 1.17 预览 HTML 文件
 - 1.16 ★ 方法调用图
 - 1.15 支持 .puml 文件和跳转 class_method
 - 1.14 Maven 关系图 包含排除

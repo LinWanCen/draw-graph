@@ -66,6 +66,7 @@ object RelController {
                 }
                 if (relData.itemMap.isEmpty()) {
                     PlantUmlFileController.plantUml(project, window, files)
+                    HtmlFileController.html(project, window, files)
                     return@executeOnPooledThread
                 }
                 RelDataController.dataToWindow(project, window, relData)
