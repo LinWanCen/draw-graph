@@ -2,11 +2,11 @@ package com.github.linwancen.plugin.graph.action
 
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.github.linwancen.plugin.graph.ui.RelController
+import com.intellij.ide.actions.CopyReferenceAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.project.DumbAwareAction
 
-object FileMethodCallAction : DumbAwareAction() {
+object FileMethodCallAction : CopyReferenceAction() {
 
     override fun update(e: AnActionEvent) {
         e.presentation.text = DrawGraphBundle.message("file.method.call.graph")
