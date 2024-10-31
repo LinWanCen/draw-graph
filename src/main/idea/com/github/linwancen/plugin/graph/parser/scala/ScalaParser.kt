@@ -8,14 +8,11 @@ import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import org.jetbrains.plugins.scala.ScalaLanguage
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
-import org.slf4j.LoggerFactory
 
 class ScalaParser : ParserLang<ScFunctionDefinition>() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("load ScalaParser")
-        SERVICES[ScalaLanguage.INSTANCE.id] = this
+    override fun id(): String {
+        return ScalaLanguage.INSTANCE.id
     }
 
     override fun funClass(): Class<ScFunctionDefinition> {

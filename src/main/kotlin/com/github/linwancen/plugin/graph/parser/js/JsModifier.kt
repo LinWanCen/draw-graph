@@ -13,22 +13,22 @@ object JsModifier {
      */
     fun symbol(func: JSFunction): String {
         val sb = StringBuilder()
-        if (func.hasModifier(JSAttributeList.ModifierType.STATIC)) {
+        if (func.attributeList?.hasModifier(JSAttributeList.ModifierType.STATIC) == true) {
             sb.append("S")
         }
-        if (func.hasModifier(JSAttributeList.ModifierType.OVERRIDE)) {
+        if (func.attributeList?.hasModifier(JSAttributeList.ModifierType.OVERRIDE) == true) {
             sb.append("O")
         }
-        if (func.hasModifier(JSAttributeList.ModifierType.ABSTRACT)) {
+        if (func.attributeList?.hasModifier(JSAttributeList.ModifierType.ABSTRACT) == true) {
             sb.append("A")
         }
         if (func.isConstructor) {
             sb.append("C")
         }
-        if (func.hasModifier(JSAttributeList.ModifierType.FINAL)) {
+        if (func.attributeList?.hasModifier(JSAttributeList.ModifierType.FINAL) == true) {
             sb.append("F")
         }
-        if (func.hasModifier(JSAttributeList.ModifierType.DYNAMIC)) {
+        if (func.attributeList?.hasModifier(JSAttributeList.ModifierType.DYNAMIC) == true) {
             sb.append("D")
         }
         return sb.toString()

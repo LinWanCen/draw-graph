@@ -5,10 +5,8 @@ import com.github.linwancen.plugin.graph.parser.java.JavaComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.util.elementType
-import org.jetbrains.kotlin.psi.psiUtil.allChildren
 import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocInlinedTag
-import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocParagraph
 
 class ScalaComment : JavaComment() {
     companion object {
@@ -23,15 +21,7 @@ class ScalaComment : JavaComment() {
         if (docComment == null) {
             return
         }
-        for (element in docComment.descriptionElements) {
-            if (element is ScDocParagraph) {
-                val first = docComment.allChildren.first
-                if (first != null) {
-                    addDescription(first.allChildren.asSequence(), map)
-                }
-                break
-            }
-        }
+        addDescription(docComment.children.asSequence(), map)
         addTag(docComment, map)
     }
 

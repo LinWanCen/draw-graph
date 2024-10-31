@@ -1,15 +1,15 @@
 package com.github.linwancen.plugin.graph.parser
 
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity.RequiredForSmartMode
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
+import org.slf4j.LoggerFactory
 
-abstract class Parser : RequiredForSmartMode {
-    override fun runActivity(project: Project) {
-        // only load
-    }
+abstract class Parser {
+
+    protected abstract fun id(): String
 
     protected abstract fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>)
 
@@ -20,8 +20,20 @@ abstract class Parser : RequiredForSmartMode {
     }
 
     companion object {
+        private val log = LoggerFactory.getLogger(this::class.java)
+
         @JvmStatic
         val SERVICES = mutableMapOf<String, Parser>()
+
+        init {
+            val epn: ExtensionPointName<Parser> = ExtensionPointName.create("com.github.linwancen.drawgraph.parser")
+            val extensionList = epn.extensionList
+            log.info("load graph parser epn {}", extensionList)
+            extensionList.forEach {
+                log.info("load graph parser {} -> {}", it.id(), it)
+                SERVICES[it.id()] = it
+            }
+        }
 
         /**
          * need DumbService.getInstance(project).runReadActionInSmartMo

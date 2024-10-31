@@ -1,5 +1,5 @@
 <idea-plugin>
-  <extensions defaultExtensionNs="com.intellij">
-    <requiredForSmartModeStartupActivity implementation="com.github.linwancen.plugin.graph.parser.xml.ParserXml"/>
+  <extensions defaultExtensionNs="com.github.linwancen.drawgraph">
+    <parser implementation="com.github.linwancen.plugin.graph.parser.xml.ParserXml"/>
   </extensions>
 </idea-plugin>

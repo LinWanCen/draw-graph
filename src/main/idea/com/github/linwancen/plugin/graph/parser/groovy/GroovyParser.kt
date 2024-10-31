@@ -8,14 +8,11 @@ import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import org.jetbrains.plugins.groovy.GroovyLanguage
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.expressions.GrReferenceExpression
 import org.jetbrains.plugins.groovy.lang.psi.api.statements.typedef.members.GrMethod
-import org.slf4j.LoggerFactory
 
 class GroovyParser : ParserLang<GrMethod>() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("load GroovyParser")
-        SERVICES[GroovyLanguage.id] = this
+    override fun id(): String {
+        return GroovyLanguage.id
     }
 
     override fun funClass(): Class<GrMethod> {

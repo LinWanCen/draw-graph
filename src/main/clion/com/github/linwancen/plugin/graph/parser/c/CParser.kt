@@ -10,14 +10,11 @@ import com.jetbrains.cidr.lang.OCLanguage
 import com.jetbrains.cidr.lang.psi.OCDeclarator
 import com.jetbrains.cidr.lang.psi.OCFunctionDefinition
 import com.jetbrains.cidr.lang.psi.OCReferenceElement
-import org.slf4j.LoggerFactory
 
 class CParser : ParserLang<OCFunctionDefinition>() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("load CParser")
-        SERVICES[OCLanguage.getInstance().id] = this
+    override fun id(): String {
+        return OCLanguage.getInstance().id
     }
 
     override fun funClass(): Class<OCFunctionDefinition> {

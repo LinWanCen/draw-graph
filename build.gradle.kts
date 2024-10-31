@@ -1,4 +1,3 @@
-import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -32,17 +31,35 @@ kotlin {
         JavaLanguageVersion.of(11)
     }
 }
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
 val ideTypeStr = properties("platformType")
 
 // Configure Gradle IntelliJ Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
     pluginName.set(properties("pluginName"))
-    version.set(properties("platformVersion"))
+    val platformVersion = properties("platformVersion")
+    version.set(platformVersion)
     type.set(ideTypeStr)
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
+    val platformPlugins = if("2020.1" == platformVersion) "platformPlugins_2020_1" else "platformPlugins"
+    plugins.set(properties(platformPlugins).split(',').map(String::trim).filter(String::isNotEmpty))
+    if ("RD" == ideTypeStr || "CL" == ideTypeStr) {
+        plugins.set(plugins.get().filter {
+            val id = it.toString()
+            val jvm = id.contains("java") || id.contains("kotlin") || id.contains("groovy") || id.contains("PsiViewer")
+            !jvm
+        })
+    }
 }
 
 sourceSets {

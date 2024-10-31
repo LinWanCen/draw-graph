@@ -12,15 +12,11 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.PsiShortNamesCache
 import com.intellij.psi.search.searches.OverridingMethodsSearch
 import com.intellij.psi.util.PsiTreeUtil
-import org.slf4j.LoggerFactory
-
 
 open class JavaParser : ParserLang<PsiMethod>() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("load JavaParser")
-        SERVICES[JavaLanguage.INSTANCE.id] = this
+    override fun id(): String {
+        return JavaLanguage.INSTANCE.id
     }
 
     override fun nameToElementImpl(project: Project, name: String): PsiElement? {

@@ -9,21 +9,18 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.xml.XmlFile
-import org.slf4j.LoggerFactory
 
 /**
  * for pom.xml
  */
 class ParserXml : Parser() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
     companion object {
         private const val POM_FILE = "pom.xml"
     }
 
-    init {
-        log.info("RelService load {}", this.javaClass.simpleName)
-        SERVICES[XMLLanguage.INSTANCE.id] = this
+    override fun id(): String {
+       return XMLLanguage.INSTANCE.id
     }
 
     override fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>) {

@@ -7,14 +7,11 @@ import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.goide.GoLanguage
 import com.goide.psi.GoFunctionDeclaration
 import com.goide.psi.GoReferenceExpression
-import org.slf4j.LoggerFactory
 
 class GoParser : ParserLang<GoFunctionDeclaration>() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("load GoParser")
-        SERVICES[GoLanguage.INSTANCE.id] = this
+    override fun id(): String {
+        return GoLanguage.INSTANCE.id
     }
 
     override fun funClass(): Class<GoFunctionDeclaration> {

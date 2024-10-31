@@ -1,55 +1,28 @@
 package com.github.linwancen.plugin.graph.ui.webview;
 
-import com.github.linwancen.plugin.graph.ui.DrawGraphBundle;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.startup.StartupActivity;
-import com.intellij.ui.components.JBTextArea;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Method;
 
-public abstract class Browser implements StartupActivity.RequiredForSmartMode {
-    @Override
-    public void runActivity(@NotNull Project project) {}
+public abstract class Browser {
 
-    @NotNull
-    static Map<String, Class<? extends Browser>> map = new HashMap<>();
+    public Class<?> clazz;
 
-    static {
-        // ensure load
-        map.put(BrowserJcef.class.getName(), BrowserJcef.class);
-    }
+    public abstract void addImpl(@NotNull JPanel out, Project project);
 
-    @Nullable
-    public static Browser of(@NotNull JPanel out, Project project) {
-        out.removeAll();
-        out.setLayout(new BorderLayout());
-        @NotNull StringBuilder errMsg = new StringBuilder();
-        for (@NotNull Class<? extends Browser> c : map.values()) {
-            try {
-                @NotNull Browser browser = c.getConstructor().newInstance();
-                @Nullable String s = browser.add(out, project);
-                if (s == null) {
-                    return browser;
-                }
-                errMsg.append(s).append("\n");
-            } catch (Exception e) {
-                errMsg.append(e).append("\n");
+    public abstract void loadImpl(String html);
+
+    public String load(String html) {
+        try {
+            if (html != null) {
+                Method method = clazz.getDeclaredMethod("loadImpl", String.class);
+                method.invoke(this, html);
             }
+            return null;
+        } catch (Throwable e) {
+            return e.toString();
         }
-        errMsg.insert(0, DrawGraphBundle.message("web.load.err.msg"));
-        @NotNull JBTextArea errTip = new JBTextArea();
-        errTip.setText(errMsg.toString());
-        out.add(errTip);
-        return null;
     }
-
-    @Nullable
-    abstract String add(JPanel out, Project project);
-
-    public abstract String load(String html);
 }

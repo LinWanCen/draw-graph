@@ -10,14 +10,11 @@ import org.jetbrains.plugins.ruby.ruby.lang.psi.controlStructures.classes.RClass
 import org.jetbrains.plugins.ruby.ruby.lang.psi.controlStructures.methods.RMethod
 import org.jetbrains.plugins.ruby.ruby.lang.psi.references.RDotReference
 import org.jetbrains.plugins.ruby.ruby.lang.psi.variables.RIdentifier
-import org.slf4j.LoggerFactory
 
 class RubyParser : ParserLang<RMethod>() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("load RubyParser")
-        SERVICES[RubyLanguage.INSTANCE.id] = this
+    override fun id(): String {
+        return RubyLanguage.INSTANCE.id
     }
 
     override fun funClass(): Class<RMethod> {

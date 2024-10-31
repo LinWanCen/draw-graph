@@ -7,14 +7,11 @@ import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.jetbrains.python.PythonLanguage
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyReferenceExpression
-import org.slf4j.LoggerFactory
 
 class PythonParser : ParserLang<PyFunction>() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("load PythonParser")
-        SERVICES[PythonLanguage.INSTANCE.id] = this
+    override fun id(): String {
+        return PythonLanguage.INSTANCE.id
     }
 
     override fun funClass(): Class<PyFunction> {

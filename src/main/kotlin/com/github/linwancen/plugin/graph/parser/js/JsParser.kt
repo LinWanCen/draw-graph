@@ -7,15 +7,11 @@ import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.intellij.lang.javascript.JavascriptLanguage
 import com.intellij.lang.javascript.psi.JSFunction
 import com.intellij.lang.javascript.psi.JSReferenceExpression
-import com.intellij.lang.javascript.psi.ecmal4.JSAttributeList
-import org.slf4j.LoggerFactory
 
 class JsParser : ParserLang<JSFunction>() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("load JsParser")
-        SERVICES[JavascriptLanguage.INSTANCE.id] = this
+    override fun id(): String {
+        return JavascriptLanguage.INSTANCE.id
     }
 
     override fun funClass(): Class<JSFunction> {
@@ -29,8 +25,8 @@ class JsParser : ParserLang<JSFunction>() {
         if (!state.skipGetSetIs) {
             return false
         }
-        return func.hasModifier(JSAttributeList.ModifierType.GET)
-                || func.hasModifier(JSAttributeList.ModifierType.SET)
+        val name = func.name ?: return false
+        return name.startsWith("get") || name.startsWith("get")
     }
 
     override fun toSign(func: JSFunction): String {

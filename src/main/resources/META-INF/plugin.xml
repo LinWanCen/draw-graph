@@ -29,12 +29,21 @@
     </projectListeners>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!--<requiredForSmartModeStartupActivity implementation="com.github.linwancen.plugin.graph.ui.webview.BrowserJcef"/>-->
         <applicationService serviceImplementation="com.github.linwancen.plugin.graph.settings.DrawGraphAppState"/>
         <projectService serviceImplementation="com.github.linwancen.plugin.graph.settings.DrawGraphProjectState"/>
         <!-- https://jetbrains.design/intellij/resources/icons_list/ -->
         <toolWindow id="Graph" secondary="false" icon="/META-INF/pluginIcon.svg" anchor="right"
                     factoryClass="com.github.linwancen.plugin.graph.ui.GraphWindowFactory"/>
+    </extensions>
+
+    <extensionPoints>
+        <extensionPoint name="browser" dynamic="true" interface="com.github.linwancen.plugin.graph.ui.webview.extension.BrowserExtensionPoint"/>
+        <extensionPoint name="parser" dynamic="true" interface="com.github.linwancen.plugin.graph.parser.Parser"/>
+    </extensionPoints>
+
+    <extensions defaultExtensionNs="com.github.linwancen.drawgraph">
+        <browser implementation="com.github.linwancen.plugin.graph.ui.webview.extension.BrowserExtensionPointJcef"/>
+        <browser implementation="com.github.linwancen.plugin.graph.ui.webview.extension.BrowserExtensionPointJavaFx"/>
     </extensions>
 
     <actions>

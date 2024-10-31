@@ -8,14 +8,11 @@ import com.jetbrains.php.lang.PhpLanguage
 import com.jetbrains.php.lang.psi.elements.Function
 import com.jetbrains.php.lang.psi.elements.Method
 import com.jetbrains.php.lang.psi.elements.PhpReference
-import org.slf4j.LoggerFactory
 
 class PhpParser : ParserLang<Function>() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("load PhpParser")
-        SERVICES[PhpLanguage.INSTANCE.id] = this
+    override fun id(): String {
+        return PhpLanguage.INSTANCE.id
     }
 
     override fun funClass(): Class<Function> {

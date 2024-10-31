@@ -9,14 +9,10 @@ import com.github.linwancen.plugin.graph.printer.PrinterPlantuml;
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState;
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState;
 import com.github.linwancen.plugin.graph.ui.webview.Browser;
-import com.intellij.ide.FileEditorSelectInContext;
+import com.github.linwancen.plugin.graph.ui.webview.BrowserFactory;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileEditor.EditorDataProvider;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.impl.CurrentEditorProvider;
-import com.intellij.openapi.fileEditor.impl.EditorComposite;
-import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -25,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultTreeCellEditor;
 import java.awt.event.FocusEvent;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -114,9 +109,9 @@ public class GraphWindow {
     }
 
     private void initOut(Project project) {
-        mermaidBrowser = Browser.of(mermaidOut, project);
-        graphvizBrowser = Browser.of(graphvizOut, project);
-        plantumlBrowser = Browser.of(plantumlOut, project);
+        mermaidBrowser = BrowserFactory.of(mermaidOut, project);
+        graphvizBrowser = BrowserFactory.of(graphvizOut, project);
+        plantumlBrowser = BrowserFactory.of(plantumlOut, project);
         initSrc();
     }
 

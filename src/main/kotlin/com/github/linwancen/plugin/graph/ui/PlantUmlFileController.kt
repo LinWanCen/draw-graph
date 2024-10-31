@@ -12,21 +12,24 @@ object PlantUmlFileController {
 
     @JvmStatic
     fun plantUml(project: Project, window: GraphWindow, files: Array<VirtualFile>) {
-        if (files.size == 1 && files[0].name.endsWith(".puml")) {
-            DumbService.getInstance(project).runReadActionInSmartMode {
-                val psiFile = PsiManager.getInstance(project).findFile(files[0])
-                    ?: return@runReadActionInSmartMode
-                runInEdt {
-                    val plantumlSrc = psiFile.text
-                    window.toolWindow.activate(null)
-                    if (plantumlSrc == window.plantumlSrc.text) {
-                        return@runInEdt
-                    }
-                    window.plantumlSrc.text = plantumlSrc
-                    PrinterPlantuml.build(PrinterData(plantumlSrc, null, project)) {
-                        runInEdt {
-                            window.plantumlHtml.text = it
-                            if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
+        if (files.size == 1) {
+            val name = files[0].name
+            if (name.endsWith(".puml") || name.endsWith(".plantuml")) {
+                DumbService.getInstance(project).runReadActionInSmartMode {
+                    val psiFile = PsiManager.getInstance(project).findFile(files[0])
+                        ?: return@runReadActionInSmartMode
+                    runInEdt {
+                        val plantumlSrc = psiFile.text
+                        window.toolWindow.activate(null)
+                        if (plantumlSrc == window.plantumlSrc.text) {
+                            return@runInEdt
+                        }
+                        window.plantumlSrc.text = plantumlSrc
+                        PrinterPlantuml.build(PrinterData(plantumlSrc, null, project)) {
+                            runInEdt {
+                                window.plantumlHtml.text = it
+                                if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
+                            }
                         }
                     }
                 }

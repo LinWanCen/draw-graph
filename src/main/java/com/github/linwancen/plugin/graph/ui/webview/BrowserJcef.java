@@ -12,41 +12,25 @@ import java.awt.*;
 
 public class BrowserJcef extends Browser {
 
-    static {
-        // load move to Browser
-    }
-
     private JBCefBrowser jbCefBrowser;
 
-    @Nullable
     @Override
-    String add(@NotNull JPanel out, Project project) {
-        try {
-            jbCefBrowser = new JBCefBrowser();
-            @NotNull JComponent browserComponent = jbCefBrowser.getComponent();
+    public void addImpl(@NotNull JPanel out, Project project) {
+        jbCefBrowser = new JBCefBrowser();
+        @NotNull JComponent browserComponent = jbCefBrowser.getComponent();
 
-            @NotNull CefMessageRouterConfig config = new CefMessageRouterConfig("java", "javaCancel");
-            CefMessageRouter router = CefMessageRouter.create(config);
-            router.addHandler(new JcefNavigateHandler(project, jbCefBrowser), true);
-            jbCefBrowser.getJBCefClient().getCefClient().addMessageRouter(router);
+        @NotNull CefMessageRouterConfig config = new CefMessageRouterConfig("java", "javaCancel");
+        CefMessageRouter router = CefMessageRouter.create(config);
+        router.addHandler(new JcefNavigateHandler(project, jbCefBrowser), true);
+        jbCefBrowser.getJBCefClient().getCefClient().addMessageRouter(router);
 
-            out.add(browserComponent, BorderLayout.CENTER);
-            return null;
-        } catch (Throwable e) {
-            return e.toString();
-        }
+        out.add(browserComponent, BorderLayout.CENTER);
     }
 
-    @Nullable
     @Override
-    public String load(@Nullable String html) {
-        try {
-            if (jbCefBrowser != null && html != null) {
-                jbCefBrowser.loadHTML(html);
-            }
-            return null;
-        } catch (Throwable e) {
-            return e.toString();
+    public void loadImpl(@Nullable String html) {
+        if (jbCefBrowser != null && html != null) {
+            jbCefBrowser.loadHTML(html);
         }
     }
 }

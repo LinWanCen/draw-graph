@@ -11,9 +11,6 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
 
 abstract class ParserLang<F : PsiElement> : Parser() {
-    override fun runActivity(project: Project) {
-        // only load
-    }
 
     protected abstract fun funClass(): Class<F>
 

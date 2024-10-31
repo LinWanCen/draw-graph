@@ -8,14 +8,11 @@ import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
-import org.slf4j.LoggerFactory
 
 class KotlinParser : ParserLang<KtNamedFunction>() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("load KotlinParser")
-        SERVICES[KotlinLanguage.INSTANCE.id] = this
+    override fun id(): String {
+        return KotlinLanguage.INSTANCE.id
     }
 
     override fun funClass(): Class<KtNamedFunction> {

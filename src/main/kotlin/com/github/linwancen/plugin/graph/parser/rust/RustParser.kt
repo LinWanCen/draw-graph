@@ -8,14 +8,11 @@ import com.intellij.psi.PsiComment
 import com.intellij.psi.util.PsiTreeUtil
 import org.rust.lang.RsLanguage
 import org.rust.lang.core.psi.*
-import org.slf4j.LoggerFactory
 
 class RustParser : ParserLang<RsFunction>() {
-    private val log = LoggerFactory.getLogger(this::class.java)
 
-    init {
-        log.info("load RustParser")
-        SERVICES[RsLanguage.id] = this
+    override fun id(): String {
+        return RsLanguage.id
     }
 
     override fun funClass(): Class<RsFunction> {
