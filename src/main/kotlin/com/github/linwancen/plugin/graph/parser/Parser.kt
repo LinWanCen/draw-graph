@@ -22,17 +22,16 @@ abstract class Parser {
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
 
-        @JvmStatic
-        val SERVICES = mutableMapOf<String, Parser>()
-
-        init {
+        fun parserMutableMap(): MutableMap<String, Parser> {
             val epn: ExtensionPointName<Parser> = ExtensionPointName.create("com.github.linwancen.drawgraph.parser")
-            val extensionList = epn.extensionList
-            log.info("load graph parser epn {}", extensionList)
-            extensionList.forEach {
+            val parserList = epn.extensionList
+            log.info("load graph parser epn {}", parserList)
+            val parserMap = mutableMapOf<String, Parser>()
+            parserList.forEach {
                 log.info("load graph parser {} -> {}", it.id(), it)
-                SERVICES[it.id()] = it
+                parserMap[it.id()] = it
             }
+            return parserMap
         }
 
         /**
@@ -40,12 +39,13 @@ abstract class Parser {
          */
         @JvmStatic
         fun src(project: Project, relData: RelData, files: Array<out VirtualFile>) {
+            val parserMap = parserMutableMap()
             // not get child dir easy select by shift skip dir
             for (file in files) {
                 val psiFile = PsiManager.getInstance(project).findFile(file) ?: continue
                 var language = psiFile.language
                 language.baseLanguage?.let { language = it }
-                val usageService = SERVICES[language.id] ?: continue
+                val usageService = parserMap[language.id] ?: continue
                 // not one by one because pom.xml find all files
                 usageService.srcImpl(project, relData, files)
                 // only one lang srcImpl all and return
@@ -58,9 +58,10 @@ abstract class Parser {
          */
         @JvmStatic
         fun call(project: Project, relData: RelData, psiElement: PsiElement) {
+            val parserMap = parserMutableMap()
             var language = psiElement.language
             language.baseLanguage?.let { language = it }
-            val usageService = SERVICES[language.id] ?: return
+            val usageService = parserMap[language.id] ?: return
             usageService.callImpl(project, relData, psiElement)
         }
 
@@ -69,7 +70,9 @@ abstract class Parser {
          */
         @JvmStatic
         fun nameToElement(project: Project, name: String): PsiElement? {
-            for (it in SERVICES.values) {
+            val epn: ExtensionPointName<Parser> = ExtensionPointName.create("com.github.linwancen.drawgraph.parser")
+            val parserList = epn.extensionList
+            for (it in parserList) {
                 val element = it.nameToElementImpl(project, name)
                 if (element != null) {
                     return element
