@@ -6,6 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import org.slf4j.LoggerFactory
+import kotlin.reflect.full.createInstance
 
 abstract class Parser {
 
@@ -22,7 +23,7 @@ abstract class Parser {
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
 
-        fun parserMutableMap(): MutableMap<String, Parser> {
+        private fun parserMap(): MutableMap<String, Parser> {
             val epn: ExtensionPointName<Parser> = ExtensionPointName.create("com.github.linwancen.drawgraph.parser")
             val parserList = epn.extensionList
             log.info("load graph parser epn {}", parserList)
@@ -30,6 +31,15 @@ abstract class Parser {
             parserList.forEach {
                 log.info("load graph parser {} -> {}", it.id(), it)
                 parserMap[it.id()] = it
+            }
+            // for 2024.2
+            if (parserMap["kotlin"] == null) {
+                try {
+                    val kotlin = Class.forName("com.github.linwancen.plugin.graph.parser.kotlin.KotlinParser").kotlin
+                    val parser = kotlin.createInstance() as Parser
+                    parserMap["kotlin"] = parser
+                    log.info("add load graph parser kotlin -> {}", parser)
+                } catch (_: Exception) {}
             }
             return parserMap
         }
@@ -39,7 +49,7 @@ abstract class Parser {
          */
         @JvmStatic
         fun src(project: Project, relData: RelData, files: Array<out VirtualFile>) {
-            val parserMap = parserMutableMap()
+            val parserMap = parserMap()
             // not get child dir easy select by shift skip dir
             for (file in files) {
                 val psiFile = PsiManager.getInstance(project).findFile(file) ?: continue
@@ -58,7 +68,7 @@ abstract class Parser {
          */
         @JvmStatic
         fun call(project: Project, relData: RelData, psiElement: PsiElement) {
-            val parserMap = parserMutableMap()
+            val parserMap = parserMap()
             var language = psiElement.language
             language.baseLanguage?.let { language = it }
             val usageService = parserMap[language.id] ?: return

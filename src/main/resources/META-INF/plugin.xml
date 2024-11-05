@@ -22,6 +22,8 @@
     <depends optional="true" config-file="ruby.xml">com.intellij.modules.ruby</depends>
     <!--suppress PluginXmlValidity -->
     <depends optional="true" config-file="c.xml">com.intellij.modules.clion</depends>
+    <!--suppress PluginXmlValidity -->
+    <depends optional="true" config-file="javafx.xml">com.intellij.javafx</depends>
 
     <projectListeners>
         <listener class="com.github.linwancen.plugin.graph.listeners.TabListener"
@@ -32,6 +34,7 @@
         <applicationService serviceImplementation="com.github.linwancen.plugin.graph.settings.DrawGraphAppState"/>
         <projectService serviceImplementation="com.github.linwancen.plugin.graph.settings.DrawGraphProjectState"/>
         <!-- https://jetbrains.design/intellij/resources/icons_list/ -->
+        <!--suppress PluginXmlValidity -->
         <toolWindow id="Graph" secondary="false" icon="/META-INF/pluginIcon.svg" anchor="right"
                     factoryClass="com.github.linwancen.plugin.graph.ui.GraphWindowFactory"/>
     </extensions>
