@@ -4,6 +4,7 @@
 
 ## [1.0.0]
 
+- 1.20 PlantUML support json yaml regexp file
 - 1.19 linux path use ~ and setting DrawGraphSetting.properties
 - 1.18 Support 2020.1 set JBR with JCEF
 - 1.17 Preview HTML File
@@ -28,6 +29,7 @@
 
 # 中文更新日志
 
+- 1.20 PlantUML 支持 json yaml regexp 文件
 - 1.19 linux 目录用 ~ 和设置 DrawGraphSetting.properties
 - 1.18 支持 2020.1 设置 JCEF 的 JBR
 - 1.17 预览 HTML 文件

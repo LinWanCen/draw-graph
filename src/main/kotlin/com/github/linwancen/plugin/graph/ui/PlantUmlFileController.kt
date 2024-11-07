@@ -12,25 +12,33 @@ object PlantUmlFileController {
 
     @JvmStatic
     fun plantUml(project: Project, window: GraphWindow, files: Array<VirtualFile>) {
-        if (files.size == 1) {
-            val name = files[0].name
-            if (name.endsWith(".puml") || name.endsWith(".plantuml")) {
-                DumbService.getInstance(project).runReadActionInSmartMode {
-                    val psiFile = PsiManager.getInstance(project).findFile(files[0])
-                        ?: return@runReadActionInSmartMode
+        if (files.size != 1) return
+        val name = files[0].name
+        DumbService.getInstance(project).runReadActionInSmartMode {
+            val psiFile = PsiManager.getInstance(project).findFile(files[0])
+                ?: return@runReadActionInSmartMode
+            var plantumlSrc = psiFile.text
+            var support = name.endsWith(".puml") || name.endsWith(".plantuml")
+            val language = psiFile.language
+            val languageId = (language.baseLanguage ?: language).id
+            val languages = arrayOf("json", "yaml", "regexp")
+            if (languages.contains(languageId.toLowerCase())) {
+                support = true
+                plantumlSrc = "@start$languageId\n$plantumlSrc\n@end$languageId"
+            }
+            if (!support) {
+                return@runReadActionInSmartMode
+            }
+            runInEdt {
+                window.toolWindow.activate(null)
+                if (plantumlSrc == window.plantumlSrc.text) {
+                    return@runInEdt
+                }
+                window.plantumlSrc.text = plantumlSrc
+                PrinterPlantuml.build(PrinterData(plantumlSrc, null, project)) {
                     runInEdt {
-                        val plantumlSrc = psiFile.text
-                        window.toolWindow.activate(null)
-                        if (plantumlSrc == window.plantumlSrc.text) {
-                            return@runInEdt
-                        }
-                        window.plantumlSrc.text = plantumlSrc
-                        PrinterPlantuml.build(PrinterData(plantumlSrc, null, project)) {
-                            runInEdt {
-                                window.plantumlHtml.text = it
-                                if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
-                            }
-                        }
+                        window.plantumlHtml.text = it
+                        if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
                     }
                 }
             }
