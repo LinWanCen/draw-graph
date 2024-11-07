@@ -12,6 +12,12 @@ import com.intellij.util.xmlb.XmlSerializerUtil
     storages = [Storage("draw-graph-settings/DrawGraphAppState.xml")]
 )
 class DrawGraphAppState : PersistentStateComponent<DrawGraphAppState?>, AbstractDrawGraphState() {
+
+    var online = Setting.message("online") == "true"
+    var path = PathInit.path
+    var mermaidLink = if (path != null) "file:///$path/draw-graph/mermaid.js" else Setting.message("mermaid_js_link")
+    var tempPath = if (path != null) "$path/draw-graph" else "draw-graph"
+
     override fun getState(): DrawGraphAppState {
         return this
     }

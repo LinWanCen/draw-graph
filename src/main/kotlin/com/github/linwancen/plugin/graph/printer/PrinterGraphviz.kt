@@ -1,6 +1,5 @@
 package com.github.linwancen.plugin.graph.printer
 
-import com.github.linwancen.plugin.common.file.SysPath
 import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
@@ -91,27 +90,23 @@ graph [compound=true]
                     if (StringUtils.isBlank(src)) {
                         return
                     }
-                    val paths = SysPath.lib() ?: return
-                    for (path in paths) {
-                        if (!File(path).exists()) {
-                            continue
-                        }
-                        try {
-                            val dotPath = "${path}draw-graph/graphviz.dot"
-                            File(dotPath).parentFile.mkdirs()
-                            Files.write(Path.of(dotPath), src.toByteArray(StandardCharsets.UTF_8))
-                            val commandLine =
-                                CommandLineUtil.toCommandLine("dot", arrayListOf("-Tsvg", "-Tpng", "-O", dotPath))
-                            val generalCommandLine = GeneralCommandLine(commandLine)
-                            generalCommandLine.charset = StandardCharsets.UTF_8
-                            generalCommandLine.setWorkDirectory(path)
-                            val commandLineOutputStr = ScriptRunnerUtil.getProcessOutput(generalCommandLine)
-                            val svgFile = "${path}draw-graph/graphviz.dot.svg"
-                            val svg = Files.readString(Path.of(svgFile), StandardCharsets.UTF_8)
-                            func.accept(
-                                //language="html"
-                                """
-<!-- <embed src="file:///${path}draw-graph/graphviz.dot.svg" type="image/svg+xml" /> -->
+                    val path = DrawGraphAppState.of().tempPath
+                    try {
+                        val dotPath = "$path/graphviz.dot"
+                        File(dotPath).parentFile.mkdirs()
+                        Files.write(Path.of(dotPath), src.toByteArray(StandardCharsets.UTF_8))
+                        val commandLine =
+                            CommandLineUtil.toCommandLine("dot", arrayListOf("-Tsvg", "-Tpng", "-O", dotPath))
+                        val generalCommandLine = GeneralCommandLine(commandLine)
+                        generalCommandLine.charset = StandardCharsets.UTF_8
+                        generalCommandLine.setWorkDirectory(path)
+                        val commandLineOutputStr = ScriptRunnerUtil.getProcessOutput(generalCommandLine)
+                        val svgFile = "$path/graphviz.dot.svg"
+                        val svg = Files.readString(Path.of(svgFile), StandardCharsets.UTF_8)
+                        func.accept(
+                            // language="html"
+                            """
+<!-- <embed src="file:///$path/graphviz.dot.svg" type="image/svg+xml" /> -->
 $svg
 <br>
 <script>
@@ -142,21 +137,20 @@ ${DrawGraphBundle.message("graphviz.msg")}
 <br>
 $commandLineOutputStr
 """
-                            )
-                            return
-                        } catch (e: Exception) {
+                        )
+                        return
+                    } catch (e: Exception) {
 
-                            func.accept(
-                                //language="html"
-                                """
-<embed src="file:///${path}draw-graph/graphviz.dot.svg" type="image/svg+xml" />
+                        func.accept(
+                            // language="html"
+                            """
+<embed src="file:///$path/graphviz.dot.svg" type="image/svg+xml" />
 <br>
 ${DrawGraphBundle.message("graphviz.msg")}
 <br>
 ${ExceptionUtil.getThrowableText(e)}
 """
-                            )
-                        }
+                        )
                     }
                 }
             }.queue()

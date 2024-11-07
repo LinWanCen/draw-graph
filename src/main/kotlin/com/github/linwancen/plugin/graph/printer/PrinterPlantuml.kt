@@ -1,6 +1,5 @@
 package com.github.linwancen.plugin.graph.printer
 
-import com.github.linwancen.plugin.common.file.SysPath
 import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.intellij.openapi.progress.ProgressIndicator
@@ -80,32 +79,26 @@ skinparam defaultTextAlignment center
                     if (StringUtils.isBlank(src)) {
                         return
                     }
-                    val paths = SysPath.lib() ?: return
-                    for (path in paths) {
-                        if (!File(path).exists()) {
-                            continue
-                        }
-                        try {
-                            val plantumlPath = "${path}draw-graph/plantuml.puml"
-                            val svgFile = "${path}draw-graph/plantuml.svg"
-                            val pngFile = "${path}draw-graph/plantuml.png"
-                            val svgOut = FileOutputStream(svgFile)
-                            val pngOut = FileOutputStream(pngFile)
-                            File(plantumlPath).parentFile.mkdirs()
-                            Files.write(Path.of(plantumlPath), src.toByteArray(StandardCharsets.UTF_8))
-                            val reader = SourceStringReader(src)
-                            val svgDesc = reader.outputImage(svgOut, FileFormatOption(FileFormat.SVG))
-                            val pngDesc = reader.outputImage(pngOut, FileFormatOption(FileFormat.PNG))
-                            val svg = Files.readString(Path.of(svgFile), StandardCharsets.UTF_8)
-                            func.accept(
-                                //language="html"
-                                """
-<!-- <embed src="file:///${path}draw-graph/plantuml.svg" type="image/svg+xml" /> -->
+                    val path = DrawGraphAppState.of().tempPath
+                    try {
+                        val plantumlPath = "$path/plantuml.puml"
+                        val svgFile = "$path/plantuml.svg"
+                        val pngFile = "$path/plantuml.png"
+                        val svgOut = FileOutputStream(svgFile)
+                        val pngOut = FileOutputStream(pngFile)
+                        File(plantumlPath).parentFile.mkdirs()
+                        Files.write(Path.of(plantumlPath), src.toByteArray(StandardCharsets.UTF_8))
+                        val reader = SourceStringReader(src)
+                        val svgDesc = reader.outputImage(svgOut, FileFormatOption(FileFormat.SVG))
+                        reader.outputImage(pngOut, FileFormatOption(FileFormat.PNG))
+                        val svg = Files.readString(Path.of(svgFile), StandardCharsets.UTF_8)
+                        func.accept(
+                            // language="html"
+                            """
+<!-- <embed src="file:///${path}/plantuml.svg" type="image/svg+xml" /> -->
 $svg
 <br>
 $svgDesc
-<br>
-$pngDesc
 <br>
 <script>
   function navigate(link) {
@@ -148,18 +141,17 @@ ${data.js ?: ""}
 <button onclick='openDevtools()'>openDevtools</button>
 <br>
 """
-                            )
-                            return
-                        } catch (e: Exception) {
-                            func.accept(
-                                //language="html"
-                                """
-<embed src="file:///${path}draw-graph/plantuml.svg" type="image/svg+xml" />
+                        )
+                        return
+                    } catch (e: Exception) {
+                        func.accept(
+                            // language="html"
+                            """
+<embed src="file:///${path}/plantuml.svg" type="image/svg+xml" />
 <br>
 ${ExceptionUtil.getThrowableText(e)}
 """
-                            )
-                        }
+                        )
                     }
                 }
             }.queue()

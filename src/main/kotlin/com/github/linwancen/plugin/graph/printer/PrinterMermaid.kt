@@ -1,8 +1,8 @@
 package com.github.linwancen.plugin.graph.printer
 
-import com.github.linwancen.plugin.common.file.SysPath
 import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
+import com.github.linwancen.plugin.graph.settings.Setting
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -83,43 +83,39 @@ class PrinterMermaid : Printer() {
                     if (StringUtils.isBlank(src)) {
                         return
                     }
-                    //language="html"
-                    val offline = temp(src,"""
+                    // language="html"
+                    val offline = temp(
+                        src, """
 <!-- https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.js -->
-<script src="file:///D:/draw-graph/mermaid.js"></script>
-<script src="file:///C:/Users/Public/draw-graph/mermaid.js"></script>
-<script src="file:///Applications/draw-graph/mermaid.js"></script>
-<script src="file:///var/lib/draw-graph/mermaid.js"></script>
-<script src="file:///usr/lib/draw-graph/mermaid.js"></script>
-""")
-                    //language="html"
-                    val online = temp(src, """
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.js"></script>
-""")
-                    val paths = SysPath.lib() ?: return
-                    for (path in paths) {
-                        if (!File(path).exists()) {
-                            continue
-                        }
-                        try {
-                            val onlinePath = path + "draw-graph/mermaid-online.html"
-                            File(onlinePath).parentFile.mkdirs()
-                            Files.write(Path.of(onlinePath), online.toByteArray(StandardCharsets.UTF_8))
-                            val offlinePath = path + "draw-graph/mermaid-offline.html"
-                            File(offlinePath).parentFile.mkdirs()
-                            Files.write(Path.of(offlinePath), offline.toByteArray(StandardCharsets.UTF_8))
-                            func.accept(offline)
-                            return
-                        } catch (e: Exception) {
-                            func.accept("${offline}\n${ExceptionUtil.getThrowableText(e)}")
-                        }
+<!-- change it in DrawGraphSetting.properties -->
+<script src="${if (DrawGraphAppState.of().online) Setting.message("mermaid_js_link") else DrawGraphAppState.of().mermaidLink}"></script>
+"""
+                    )
+                    // language="html"
+                    val online = temp(
+                        src, """
+<script src="${Setting.message("mermaid_js_link")}"></script>
+"""
+                    )
+                    val path = DrawGraphAppState.of().tempPath
+                    try {
+                        val onlinePath = "$path/mermaid-online.html"
+                        File(onlinePath).parentFile.mkdirs()
+                        Files.write(Path.of(onlinePath), online.toByteArray(StandardCharsets.UTF_8))
+                        val offlinePath = "$path/mermaid-offline.html"
+                        File(offlinePath).parentFile.mkdirs()
+                        Files.write(Path.of(offlinePath), offline.toByteArray(StandardCharsets.UTF_8))
+                        func.accept(offline)
+                        return
+                    } catch (e: Exception) {
+                        func.accept("${offline}\n${ExceptionUtil.getThrowableText(e)}")
                     }
                 }
             }.queue()
         }
 
         private fun temp(src: String?, mermaidLink: String?): String {
-            //language="html"
+            // language="html"
             val online = """<pre class="mermaid">
 
 $src
