@@ -64,5 +64,12 @@
             text="Method Call Graph">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
+        <action
+            id="com.github.linwancen.plugin.graph.action.ElementAction"
+            class="com.github.linwancen.plugin.graph.action.ElementAction"
+            icon="AllIcons.FileTypes.Regexp"
+            text="Element Graph">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
     </actions>
 </idea-plugin>

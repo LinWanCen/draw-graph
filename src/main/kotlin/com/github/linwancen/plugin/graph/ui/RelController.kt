@@ -1,5 +1,6 @@
 package com.github.linwancen.plugin.graph.ui
 
+import com.github.linwancen.plugin.common.psi.LangUtils
 import com.github.linwancen.plugin.graph.parser.Parser
 import com.github.linwancen.plugin.graph.parser.RelData
 import com.intellij.openapi.application.ApplicationManager
@@ -18,12 +19,19 @@ object RelController {
     @JvmStatic
     val lastFilesMap = mutableMapOf<Project, Array<VirtualFile>>()
     val lastElementMap = mutableMapOf<Project, PsiElement>()
-    val lastCallUsageMap = mutableMapOf<Project, Boolean>()
+    val lastCallUsageMap = mutableMapOf<Project, Boolean?>()
 
     @JvmStatic
     fun reload(project: Project) {
         lastFilesMap[project]?.let { forFile(project, it, false) }
-        lastElementMap[project]?.let { forElement(project, it, lastCallUsageMap[project] ?: return) }
+        lastElementMap[project]?.let {
+            val call = lastCallUsageMap[project]
+            if (call != null) {
+                forElement(project, it, lastCallUsageMap[project] ?: return)
+            } else {
+                forInjectedElement(project, it)
+            }
+        }
     }
 
     /**
@@ -65,8 +73,8 @@ object RelController {
                     Parser.src(project, relData, files)
                 }
                 if (relData.itemMap.isEmpty()) {
-                    PlantUmlFileController.plantUml(project, window, files)
-                    HtmlFileController.html(project, window, files)
+                    PlantUmlFileController.forPlantUMLFiles(project, window, files)
+                    HtmlFileController.forHtmlFiles(project, window, files)
                     return@executeOnPooledThread
                 }
                 RelDataController.dataToWindow(project, window, relData)
@@ -77,7 +85,7 @@ object RelController {
     }
 
     /**
-     * call by Action and Listener and reload()
+     * call by Action and reload()
      */
     @JvmStatic
     fun forElement(project: Project, psiElement: PsiElement, call: Boolean) {
@@ -105,6 +113,29 @@ object RelController {
             }.queue()
         } catch (e: Throwable) {
             LOG.info("RelController.forElement() catch Throwable but log to record.", e)
+        }
+    }
+
+    /**
+     * call by Action and reload()
+     */
+    @JvmStatic
+    fun forInjectedElement(project: Project, psiFile: PsiElement) {
+        try {
+            lastFilesMap.remove(project)
+            lastElementMap[project] = psiFile
+            lastCallUsageMap.remove(project)
+            val window = GraphWindowFactory.winMap[project] ?: return
+            DumbService.getInstance(project).runReadActionInSmartMode {
+                val src = psiFile.text
+                if (LangUtils.matchBaseLanguageId(psiFile, "HTML") != null) {
+                    HtmlFileController.forHtmlSrc(window, src)
+                    return@runReadActionInSmartMode
+                }
+                PlantUmlFileController.forPlantUMLSupportFile(psiFile, project, window, src)
+            }
+        } catch (e: Throwable) {
+            LOG.info("RelController.forInjectedElement() catch Throwable but log to record.", e)
         }
     }
 }
