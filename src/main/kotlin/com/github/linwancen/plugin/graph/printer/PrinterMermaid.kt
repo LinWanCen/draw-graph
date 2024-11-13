@@ -99,14 +99,15 @@ class PrinterMermaid : Printer() {
                     )
                     val path = DrawGraphAppState.of().tempPath
                     try {
+                        File(path).mkdirs()
+
+                        val offlinePath = "$path/mermaid-offline.html"
+                        Files.write(Path.of(offlinePath), offline.toByteArray(StandardCharsets.UTF_8))
+                        func.accept(offline)
+
                         val onlinePath = "$path/mermaid-online.html"
                         File(onlinePath).parentFile.mkdirs()
                         Files.write(Path.of(onlinePath), online.toByteArray(StandardCharsets.UTF_8))
-                        val offlinePath = "$path/mermaid-offline.html"
-                        File(offlinePath).parentFile.mkdirs()
-                        Files.write(Path.of(offlinePath), offline.toByteArray(StandardCharsets.UTF_8))
-                        func.accept(offline)
-                        return
                     } catch (e: Exception) {
                         func.accept("${offline}\n${ExceptionUtil.getThrowableText(e)}")
                     }

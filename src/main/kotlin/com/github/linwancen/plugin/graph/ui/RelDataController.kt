@@ -16,15 +16,23 @@ object RelDataController {
         window: GraphWindow,
         relData: RelData,
     ) {
+        val (plantumlSrc, plantumlJs) = PrinterPlantuml().toSrc(relData)
         val (mermaidSrc, _) = PrinterMermaid().toSrc(relData)
         val (graphvizSrc, graphvizJs) = PrinterGraphviz().toSrc(relData)
-        val (plantumlSrc, plantumlJs) = PrinterPlantuml().toSrc(relData)
         runInEdt {
             window.toolWindow.activate(null)
             // don't stop when src does not change, update file when open multi project
             window.mermaidSrc.text = mermaidSrc
-            window.graphvizSrc.text = graphvizSrc
             window.plantumlSrc.text = plantumlSrc
+            window.graphvizSrc.text = graphvizSrc
+            PrinterPlantuml.build(PrinterData(plantumlSrc, plantumlJs, project)) {
+                runInEdt {
+                    if (window.plantumlHtml.text != it) {
+                        window.plantumlHtml.text = it
+                        if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
+                    }
+                }
+            }
             PrinterMermaid.build(PrinterData(mermaidSrc, null, project)) {
                 runInEdt {
                     if (window.mermaidHtml.text != it) {
@@ -38,14 +46,6 @@ object RelDataController {
                     if (window.graphvizHtml.text != it) {
                         window.graphvizHtml.text = it
                         if (window.graphvizBrowser != null) window.graphvizBrowser?.load(it)
-                    }
-                }
-            }
-            PrinterPlantuml.build(PrinterData(plantumlSrc, plantumlJs, project)) {
-                runInEdt {
-                    if (window.plantumlHtml.text != it) {
-                        window.plantumlHtml.text = it
-                        if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
                     }
                 }
             }

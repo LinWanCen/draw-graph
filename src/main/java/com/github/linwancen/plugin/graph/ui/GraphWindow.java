@@ -117,16 +117,16 @@ public class GraphWindow {
     }
 
     private void initOut(Project project) {
+        plantumlBrowser = BrowserFactory.of(plantumlOut, project);
         mermaidBrowser = BrowserFactory.of(mermaidOut, project);
         graphvizBrowser = BrowserFactory.of(graphvizOut, project);
-        plantumlBrowser = BrowserFactory.of(plantumlOut, project);
         initSrc();
     }
 
     private void initSrc() {
+        initEvent(plantumlSrc, plantumlHtml, plantumlBrowser, PrinterPlantuml::build);
         initEvent(mermaidSrc, mermaidHtml, mermaidBrowser, PrinterMermaid::build);
         initEvent(graphvizSrc, graphvizHtml, graphvizBrowser, PrinterGraphviz::build);
-        initEvent(plantumlSrc, plantumlHtml, plantumlBrowser, PrinterPlantuml::build);
     }
 
     private void initEvent(@NotNull JTextArea src, @NotNull JTextArea html, @Nullable Browser browser,

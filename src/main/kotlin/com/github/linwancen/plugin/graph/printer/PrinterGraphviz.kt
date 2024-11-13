@@ -92,8 +92,8 @@ graph [compound=true]
                     }
                     val path = DrawGraphAppState.of().tempPath
                     try {
+                        File(path).mkdirs()
                         val dotPath = "$path/graphviz.dot"
-                        File(dotPath).parentFile.mkdirs()
                         Files.write(Path.of(dotPath), src.toByteArray(StandardCharsets.UTF_8))
                         val commandLine =
                             CommandLineUtil.toCommandLine("dot", arrayListOf("-Tsvg", "-Tpng", "-O", dotPath))

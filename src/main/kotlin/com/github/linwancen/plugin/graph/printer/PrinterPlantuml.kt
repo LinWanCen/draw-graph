@@ -81,16 +81,12 @@ skinparam defaultTextAlignment center
                     }
                     val path = DrawGraphAppState.of().tempPath
                     try {
-                        val plantumlPath = "$path/plantuml.puml"
+                        File(path).mkdirs()
+
                         val svgFile = "$path/plantuml.svg"
-                        val pngFile = "$path/plantuml.png"
                         val svgOut = FileOutputStream(svgFile)
-                        val pngOut = FileOutputStream(pngFile)
-                        File(plantumlPath).parentFile.mkdirs()
-                        Files.write(Path.of(plantumlPath), src.toByteArray(StandardCharsets.UTF_8))
                         val reader = SourceStringReader(src)
                         val svgDesc = reader.outputImage(svgOut, FileFormatOption(FileFormat.SVG))
-                        reader.outputImage(pngOut, FileFormatOption(FileFormat.PNG))
                         val svg = Files.readString(Path.of(svgFile), StandardCharsets.UTF_8)
                         func.accept(
                             // language="html"
@@ -142,7 +138,13 @@ ${data.js ?: ""}
 <br>
 """
                         )
-                        return
+
+                        val plantumlPath = "$path/plantuml.puml"
+                        Files.write(Path.of(plantumlPath), src.toByteArray(StandardCharsets.UTF_8))
+
+                        val pngFile = "$path/plantuml.png"
+                        val pngOut = FileOutputStream(pngFile)
+                        reader.outputImage(pngOut, FileFormatOption(FileFormat.PNG))
                     } catch (e: Exception) {
                         func.accept(
                             // language="html"
