@@ -84,11 +84,12 @@ class PrinterMermaid : Printer() {
                         return
                     }
                     // language="html"
+                    val appState = DrawGraphAppState.of()
                     val offline = temp(
                         src, """
 <!-- https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.js -->
 <!-- change it in DrawGraphSetting.properties -->
-<script src="${if (DrawGraphAppState.of().online) Setting.message("mermaid_js_link") else DrawGraphAppState.of().mermaidLink}"></script>
+<script src="${if (appState.online) appState.mermaidJsLink else appState.mermaidLink}"></script>
 """
                     )
                     // language="html"
@@ -97,7 +98,7 @@ class PrinterMermaid : Printer() {
 <script src="${Setting.message("mermaid_js_link")}"></script>
 """
                     )
-                    val path = DrawGraphAppState.of().tempPath
+                    val path = appState.tempPath
                     try {
                         File(path).mkdirs()
 

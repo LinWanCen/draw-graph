@@ -1,7 +1,6 @@
 package com.github.linwancen.plugin.graph.printer
 
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
-import com.github.linwancen.plugin.graph.settings.Setting
 import com.intellij.execution.CommandLineUtil
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.ScriptRunnerUtil
@@ -23,11 +22,11 @@ object InstallMermaid {
     @JvmStatic
     fun checkAndInstall() {
         val src = InstallMermaid.javaClass.getResourceAsStream("/jcef/mermaid.js") ?: return
-        val file = File(DrawGraphAppState.of().mermaidLink)
+        val file = File(DrawGraphAppState.of().tempPath, "mermaid.js")
         try {
             Files.copy(src, file.toPath())
         } catch (e: Exception) {
-            DrawGraphAppState.of().mermaidLink = Setting.message("mermaid_js_link")
+            DrawGraphAppState.of().online = true
             LOG.warn(
                 "can not copy mermaid.js to {} {} {}",
                 SystemUtils.OS_NAME, SystemUtils.OS_VERSION, file.absolutePath, e

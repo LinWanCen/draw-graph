@@ -1,11 +1,7 @@
 package com.github.linwancen.plugin.graph.ui;
 
 import com.github.linwancen.plugin.common.ui.UiUtils;
-import com.github.linwancen.plugin.graph.printer.InstallMermaid;
-import com.github.linwancen.plugin.graph.printer.PrinterData;
-import com.github.linwancen.plugin.graph.printer.PrinterGraphviz;
-import com.github.linwancen.plugin.graph.printer.PrinterMermaid;
-import com.github.linwancen.plugin.graph.printer.PrinterPlantuml;
+import com.github.linwancen.plugin.graph.printer.*;
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState;
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState;
 import com.github.linwancen.plugin.graph.ui.webview.Browser;
@@ -98,7 +94,7 @@ public class GraphWindow {
         UiUtils.onChange(exclude, projectState.getExclude(), projectState::setExclude);
         UiUtils.onChange(otherInclude, projectState.getOtherInclude(), projectState::setOtherInclude);
         UiUtils.onChange(otherExclude, projectState.getOtherExclude(), projectState::setOtherExclude);
-        UiUtils.onChange(mermaidJsLink, appState.getMermaidLink(), appState::setMermaidLink);
+        UiUtils.onChange(mermaidJsLink, appState.getMermaidJsLink(), appState::setMermaidJsLink);
         UiUtils.onChange(tempPath, appState.getTempPath(), appState::setTempPath);
         resetSetting.addActionListener(e -> {
             include.setText(DrawGraphProjectState.getDefault().getInclude());

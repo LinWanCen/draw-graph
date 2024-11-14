@@ -15,8 +15,10 @@ class DrawGraphAppState : PersistentStateComponent<DrawGraphAppState?>, Abstract
 
     var online = Setting.message("online") == "true"
     var path = PathInit.path
-    var mermaidLink = if (path != null) "file:///$path/draw-graph/mermaid.js" else Setting.message("mermaid_js_link")
     var tempPath = if (path != null) "$path/draw-graph" else "draw-graph"
+    var mermaidJsLink = Setting.message("mermaid_js_link")
+    val mermaidLink
+        get() = "file:///$tempPath/draw-graph/mermaid.js"
 
     override fun getState(): DrawGraphAppState {
         return this
