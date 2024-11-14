@@ -52,8 +52,8 @@ open class JavaParser : ParserLang<PsiMethod>() {
         return JavaParserUtils.classMap(func)
     }
 
-    override fun callList(func: PsiMethod): List<PsiMethod> {
-        val find = Call.find(func, PsiJavaCodeReferenceElement::class.java)
+    override fun callList(func: PsiMethod, call: Boolean): List<PsiMethod> {
+        val find = Call.find(func, call, PsiJavaCodeReferenceElement::class.java)
         val path = func.containingFile?.virtualFile?.path ?: return find
         if (path.contains('!')) {
             // not project fun

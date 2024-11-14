@@ -39,7 +39,7 @@ class ScalaParser : ParserLang<ScFunctionDefinition>() {
         return classMap
     }
 
-    override fun callList(func: ScFunctionDefinition): List<ScFunctionDefinition> {
-        return Call.find(func, ScReferenceExpression::class.java)
+    override fun callList(func: ScFunctionDefinition, call: Boolean): List<ScFunctionDefinition> {
+        return Call.find(func, call, ScReferenceExpression::class.java)
     }
 }

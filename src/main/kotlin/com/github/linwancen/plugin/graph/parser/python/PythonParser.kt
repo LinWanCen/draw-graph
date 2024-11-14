@@ -41,7 +41,7 @@ class PythonParser : ParserLang<PyFunction>() {
         return classMap
     }
 
-    override fun callList(func: PyFunction): List<PyFunction> {
-        return Call.find(func, PyReferenceExpression::class.java)
+    override fun callList(func: PyFunction, call: Boolean): List<PyFunction> {
+        return Call.find(func, call, PyReferenceExpression::class.java)
     }
 }

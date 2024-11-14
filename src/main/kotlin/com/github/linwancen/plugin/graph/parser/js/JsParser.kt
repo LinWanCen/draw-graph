@@ -47,8 +47,8 @@ class JsParser : ParserLang<JSFunction>() {
         return classMap
     }
 
-    override fun callList(func: JSFunction): List<JSFunction> {
+    override fun callList(func: JSFunction, call: Boolean): List<JSFunction> {
         // not support JSProperty fun yet
-        return Call.find(func, JSReferenceExpression::class.java)
+        return Call.find(func, call, JSReferenceExpression::class.java)
     }
 }

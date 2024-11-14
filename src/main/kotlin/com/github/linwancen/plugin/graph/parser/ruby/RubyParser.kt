@@ -46,7 +46,7 @@ class RubyParser : ParserLang<RMethod>() {
         return classMap
     }
 
-    override fun callList(func: RMethod): List<RMethod> {
-        return Call.find(func, RDotReference::class.java, RIdentifier::class.java)
+    override fun callList(func: RMethod, call: Boolean): List<RMethod> {
+        return Call.find(func, call, RDotReference::class.java, RIdentifier::class.java)
     }
 }

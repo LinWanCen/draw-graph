@@ -14,7 +14,7 @@ abstract class Parser {
 
     protected abstract fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>)
 
-    open fun callImpl(project: Project, relData: RelData, psiElement: PsiElement) {}
+    open fun callImpl(project: Project, relData: RelData, psiElement: PsiElement, isCall: Boolean) {}
 
     open fun nameToElementImpl(project: Project, name: String): PsiElement? {
         return null
@@ -67,12 +67,12 @@ abstract class Parser {
          * need DumbService.getInstance(project).runReadActionInSmartMo
          */
         @JvmStatic
-        fun call(project: Project, relData: RelData, psiElement: PsiElement) {
+        fun call(project: Project, relData: RelData, psiElement: PsiElement, call: Boolean) {
             val parserMap = parserMap()
             var language = psiElement.language
             language.baseLanguage?.let { language = it }
             val usageService = parserMap[language.id] ?: return
-            usageService.callImpl(project, relData, psiElement)
+            usageService.callImpl(project, relData, psiElement, call)
         }
 
         /**

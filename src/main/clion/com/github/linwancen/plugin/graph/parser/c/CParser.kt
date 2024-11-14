@@ -43,10 +43,11 @@ class CParser : ParserLang<OCFunctionDefinition>() {
         return classMap
     }
 
-    override fun callList(func: OCFunctionDefinition): List<OCFunctionDefinition> {
-        return Call.findRefs(PsiTreeUtil.findChildrenOfAnyType(func, OCReferenceElement::class.java))
+    override fun callList(func: OCFunctionDefinition, call: Boolean): List<OCFunctionDefinition> {
+        return if (call) Call.findRefs(PsiTreeUtil.findChildrenOfAnyType(func, OCReferenceElement::class.java))
             .filterIsInstance<OCDeclarator>()
             .map { it.parent }
             .filterIsInstance<OCFunctionDefinition>()
+              else Call.find(func, false, funClass())
     }
 }

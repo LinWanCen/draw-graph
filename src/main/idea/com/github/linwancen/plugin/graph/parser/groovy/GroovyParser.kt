@@ -36,7 +36,7 @@ class GroovyParser : ParserLang<GrMethod>() {
         return JavaParserUtils.classMap(func)
     }
 
-    override fun callList(func: GrMethod): List<GrMethod> {
-        return Call.find(func, GrReferenceExpression::class.java)
+    override fun callList(func: GrMethod, call: Boolean): List<GrMethod> {
+        return Call.find(func, call, GrReferenceExpression::class.java)
     }
 }

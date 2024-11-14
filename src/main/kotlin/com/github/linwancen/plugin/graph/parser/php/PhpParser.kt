@@ -51,7 +51,7 @@ class PhpParser : ParserLang<Function>() {
         return classMap
     }
 
-    override fun callList(func: Function): List<Function> {
-        return Call.find(func, PhpReference::class.java)
+    override fun callList(func: Function, call: Boolean): List<Function> {
+        return Call.find(func, call, PhpReference::class.java)
     }
 }

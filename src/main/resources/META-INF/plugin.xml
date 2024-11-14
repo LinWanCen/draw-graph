@@ -65,6 +65,13 @@
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
         <action
+            id="com.github.linwancen.plugin.graph.action.MethodUsageAction"
+            class="com.github.linwancen.plugin.graph.action.MethodUsageAction"
+            icon="AllIcons.Hierarchy.Supertypes"
+            text="Method Usage Graph">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action
             id="com.github.linwancen.plugin.graph.action.ElementAction"
             class="com.github.linwancen.plugin.graph.action.ElementAction"
             icon="AllIcons.FileTypes.Regexp"

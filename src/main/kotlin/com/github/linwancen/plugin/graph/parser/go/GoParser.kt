@@ -41,7 +41,7 @@ class GoParser : ParserLang<GoFunctionDeclaration>() {
         return classMap
     }
 
-    override fun callList(func: GoFunctionDeclaration): List<GoFunctionDeclaration> {
-        return Call.find(func, GoReferenceExpression::class.java)
+    override fun callList(func: GoFunctionDeclaration, call: Boolean): List<GoFunctionDeclaration> {
+        return Call.find(func, call, GoReferenceExpression::class.java)
     }
 }

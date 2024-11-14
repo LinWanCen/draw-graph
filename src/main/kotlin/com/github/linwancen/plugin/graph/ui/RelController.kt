@@ -101,9 +101,7 @@ object RelController {
                         window.closeAutoLoad()
                         val relData = RelData()
                         DumbService.getInstance(project).runReadActionInSmartMode {
-                            if (call) {
-                                Parser.call(project, relData, psiElement)
-                            }
+                            Parser.call(project, relData, psiElement, call)
                         }
                         RelDataController.dataToWindow(project, window, relData)
                     } catch (e: Throwable) {

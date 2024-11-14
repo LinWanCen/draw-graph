@@ -6,10 +6,10 @@ import com.intellij.ide.actions.CopyReferenceAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 
-object MethodCallAction : CopyReferenceAction() {
+object MethodUsageAction : CopyReferenceAction() {
 
     override fun update(e: AnActionEvent) {
-        e.presentation.text = DrawGraphBundle.message("method.call.graph")
+        e.presentation.text = DrawGraphBundle.message("method.usage.graph")
     }
 
     override fun actionPerformed(event: AnActionEvent) {
@@ -18,5 +18,5 @@ object MethodCallAction : CopyReferenceAction() {
         RelController.forElement(project, psiElement, call())
     }
 
-    private fun call() = true
+    private fun call() = false
 }

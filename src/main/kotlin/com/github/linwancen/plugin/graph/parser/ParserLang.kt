@@ -25,7 +25,7 @@ abstract class ParserLang<F : PsiElement> : Parser() {
 
     protected abstract fun classMap(func: F, relData: RelData): MutableMap<String, String>?
 
-    protected abstract fun callList(func: F): List<F>
+    protected abstract fun callList(func: F, call: Boolean): List<F>
 
     /** interface impl */
     protected open fun fileCall(
@@ -47,7 +47,7 @@ abstract class ParserLang<F : PsiElement> : Parser() {
                 val sign = funcSign(state, func, file, relData) ?: continue
                 // overload fun
                 val callSet = callSetMap.computeIfAbsent(sign) { mutableSetOf() }
-                callSet.addAll(callList(func)
+                callSet.addAll(callList(func, true)
                     .filter { !skipFun(state, it) }
                     .mapNotNull { toSign(it) }
                     .filter { !Skip.skip(it, state.includePattern, state.excludePattern) })
@@ -88,15 +88,15 @@ abstract class ParserLang<F : PsiElement> : Parser() {
         return sign
     }
 
-    override fun callImpl(project: Project, relData: RelData, psiElement: PsiElement) {
+    override fun callImpl(project: Project, relData: RelData, psiElement: PsiElement, isCall: Boolean) {
         val state = DrawGraphProjectState.of(project)
         val callSetMap = mutableMapOf<String, MutableSet<String>>()
         val func = PsiTreeUtil.getParentOfType(psiElement, funClass(), false) ?: return
-        recursiveCall(1, func, mutableSetOf()) { _, usage, call ->
+        recursiveCall(1, func, isCall, mutableSetOf()) { _, usage, call ->
             val usageSign = funcSign(state, usage, usage.containingFile?.virtualFile, relData) ?: return@recursiveCall
             val callSign = funcSign(state, call, call.containingFile?.virtualFile, relData) ?: return@recursiveCall
-            val callSet = callSetMap.computeIfAbsent(usageSign) { mutableSetOf() }
-            callSet.add(callSign)
+            val callSet = callSetMap.computeIfAbsent(if (isCall) usageSign else callSign) { mutableSetOf() }
+            callSet.add(if (isCall) callSign else usageSign)
         }
         regCall(callSetMap, relData, true)
     }
@@ -104,16 +104,17 @@ abstract class ParserLang<F : PsiElement> : Parser() {
     open fun recursiveCall(
         level: Int,
         usage: F,
+        isCall: Boolean,
         set: MutableSet<F>,
         callBack: (level: Int, usage: F, call: F) -> Unit,
     ) {
         if (!set.add(usage)) {
             return
         }
-        val callList = callList(usage)
+        val callList = callList(usage, isCall)
         for (call in callList) {
             callBack.invoke(level, usage, call)
-            recursiveCall(level + 1, call, set, callBack)
+            recursiveCall(level + 1, call, isCall, set, callBack)
         }
     }
 }

@@ -56,7 +56,10 @@ class RustParser : ParserLang<RsFunction>() {
         return classMap
     }
 
-    override fun callList(func: RsFunction): List<RsFunction> {
+    override fun callList(func: RsFunction, call: Boolean): List<RsFunction> {
+        if (!call) {
+            return Call.find(func, false, funClass())
+        }
         val refs = PsiTreeUtil
             .findChildrenOfAnyType(func, RsPath::class.java, RsMethodCall::class.java)
             .filter { PsiTreeUtil.getNonStrictParentOfType(it, PsiComment::class.java) == null }

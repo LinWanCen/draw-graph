@@ -4,6 +4,7 @@
 
 ## [1.0.0]
 
+- 1.22 ★ method usage graph
 - 1.21 PlantUML support RegExp, JSON, yaml, HTML injected
 - 1.20 PlantUML support RegExp, JSON, yaml file
 - 1.19 linux path use ~ and setting DrawGraphSetting.properties
@@ -30,6 +31,7 @@
 
 # 中文更新日志
 
+- 1.22 ★ 方法被调用图
 - 1.21 PlantUML 支持 RegExp, JSON, yaml, HTML 注入
 - 1.20 PlantUML 支持 RegExp, JSON, yaml 文件
 - 1.19 linux 目录用 ~ 和设置 DrawGraphSetting.properties

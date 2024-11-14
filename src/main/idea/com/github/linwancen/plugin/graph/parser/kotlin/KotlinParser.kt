@@ -43,7 +43,7 @@ class KotlinParser : ParserLang<KtNamedFunction>() {
         return classMap
     }
 
-    override fun callList(func: KtNamedFunction): List<KtNamedFunction> {
-        return Call.find(func, KtNameReferenceExpression::class.java)
+    override fun callList(func: KtNamedFunction, call: Boolean): List<KtNamedFunction> {
+        return Call.find(func, call, KtNameReferenceExpression::class.java)
     }
 }

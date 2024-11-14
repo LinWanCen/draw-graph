@@ -13,7 +13,7 @@ Method call usage graph and maven dependency graph, click to navigate
 
 - Java, Kotlin, Groovy, Scala
 - C/C++/OC, Python, Go, Rust, Ruby
-- JS/TS, PHP
+- JS/TS, PHP, Regexp, JSON, Yaml
 
 #### English Desc
 
@@ -26,14 +26,18 @@ One file call graph or all pom.xml dep graph:
 Multi file call graph or partial pom.xml dep graph:
 1. Select multi files in the same language
 2. Open Right Click Menu
-3. Select <kbd>Call Graph</kbd>
+3. Select <kbd>Method Call/Usage Graph</kbd>
+
+RegExp string graph:
+1. Open Right Click Menu at RegExp string
+2. Select <kbd>Regexp, JSON, yaml Graph or HTML</kbd>
 
 Install [Graphviz] and set xx/bin to env Path for PlantUML and Graphviz.
 
 ##### About
 
-Only support 2020.2+ because mermaid.js only use in jcef(chrome),  
-2020.1- is JavaFx WebView.
+2020.2+ is jcef(chrome) to support outline mermaid.js,  
+2020.1- is JavaFx WebView, is need set jcef-jbr and use online to see Mermaid.
 
 ##### My Plugin
 - Show doc comment in the Project view Tree, line End, json etc.: [Show Comment]
@@ -53,16 +57,19 @@ Only support 2020.2+ because mermaid.js only use in jcef(chrome),
 2. 打开 pom.xml/.java/.py 等文件
 
 多个文件调用图 或 部分 pom.xml 依赖图：
-1. 选择多个同语言的文件
-2. 打开右键菜单
-3. 选择<kbd>调用图</kbd>
+1. 在文件树选择多个同语言的文件打开右键菜单
+2. 选择<kbd>方法(被)调用图</kbd>
+
+字符串正则表达式图
+1. 在正则表达式文本上打开右键菜单
+2. 选择<kbd>正则, JSON, yaml 图或 HTML</kbd>
 
 安装 [Graphviz] 并设置 bin 目录为环境变量以便使用 PlantUML 和 Graphviz。
 
 ##### 关于
 
-只支持 2020.2 以上因为 mermaid.js 只能在 jcef(chrome) 中使用，  
-2020.1 以下用的是 JavaFx WebView。
+2020.2 默认 jcef(chrome) 且支持离线 mermaid.js，  
+2020.1 默认 JavaFx WebView，需更换设置 jcef-jbr 且用在线模式才能看到 Mermaid 图。
 
 ##### 我的项目
 - 在文件树、行末、JSON 显示注释：[Show Comment]
