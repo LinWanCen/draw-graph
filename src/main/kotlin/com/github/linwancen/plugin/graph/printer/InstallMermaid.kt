@@ -22,7 +22,7 @@ object InstallMermaid {
     @JvmStatic
     fun checkAndInstall() {
         val src = InstallMermaid.javaClass.getResourceAsStream("/jcef/mermaid.js") ?: return
-        val file = File(DrawGraphAppState.of().tempPath, "mermaid.js")
+        val file = File(DrawGraphAppState.of().mermaidLink)
         try {
             Files.copy(src, file.toPath())
         } catch (e: Exception) {
@@ -47,7 +47,7 @@ object InstallMermaid {
                     generalCommandLine.setWorkDirectory(tempPath)
                     ScriptRunnerUtil.getProcessOutput(generalCommandLine)
                     return
-                } catch (ignore: Exception) {
+                } catch (_: Exception) {
                     // ignore
                 }
             }
