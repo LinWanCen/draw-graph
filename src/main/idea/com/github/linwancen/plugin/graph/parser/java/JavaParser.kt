@@ -60,7 +60,11 @@ open class JavaParser : ParserLang<PsiMethod>() {
             return find
         }
         val scope = GlobalSearchScope.projectScope(func.project)
-        val override = OverridingMethodsSearch.search(func, scope, true).filterNotNull()
+        val override = if (call) {
+            OverridingMethodsSearch.search(func, scope, true).filterNotNull()
+        } else {
+            func.findSuperMethods().toList()
+        }
         if (override.isEmpty()) {
             return find
         }
