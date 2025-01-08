@@ -32,7 +32,7 @@ abstract class Printer {
         if (docLine.length > 20) {
             docLine = docLine.substring(0, 20)
         }
-        docLine = "${docLine.trim()}\n"
+        docLine = "${docLine.trim()}\n "
         if (newLineEscape) {
             docLine = docLine.replace("\n", "\\n")
         }

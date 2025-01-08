@@ -19,13 +19,13 @@ class PrinterMermaid : Printer() {
     val sb = StringBuilder("graph ${if (DrawGraphAppState.of().lr) "LR" else "TB"}\n\n")
 
     override fun beforeGroup(groupMap: MutableMap<String, String>) {
-        sb.append("subgraph ")
+        sb.append("\nsubgraph ")
         label(groupMap, false)
-        sb.append("direction  ${if (DrawGraphAppState.of().lr) "LR" else "TB"}\n")
+        sb.append("  direction  ${if (DrawGraphAppState.of().lr) "LR" else "TB"}\n")
     }
 
     override fun afterGroup(groupMap: MutableMap<String, String>) {
-        sb.append("end\n\n")
+        sb.append("end\n")
     }
 
     override fun item(itemMap: MutableMap<String, String>) {
@@ -33,7 +33,7 @@ class PrinterMermaid : Printer() {
     }
 
     private fun label(itemMap: MutableMap<String, String>, isItem: Boolean) {
-        sb.append("'${sign(itemMap["sign"] ?: return)}'")
+        sb.append("  '${sign(itemMap["sign"] ?: return)}'")
         if (itemMap["name"] != null) {
             sb.append(if (isItem) "(" else "[")
             sb.append("\"")
@@ -50,7 +50,7 @@ class PrinterMermaid : Printer() {
             sb.append(if (isItem) ")" else "]")
         }
         sb.append("\n")
-        sb.append("click '${sign(itemMap["sign"] ?: return)}' call navigate(\"${itemMap["link"]}\")")
+        sb.append("  click '${sign(itemMap["sign"] ?: return)}' call navigate(\"${itemMap["link"]}\")")
         sb.append("\n\n")
     }
 

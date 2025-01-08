@@ -36,8 +36,8 @@ graph [compound=true]
     override fun beforeGroup(groupMap: MutableMap<String, String>) {
         sb.append(
             "subgraph \"cluster_${sign(groupMap["sign"] ?: return)}\" {\n" +
-                    "edge [\"dir\"=\"none\"]\n"
-                    + "graph [style=\"rounded\"]\n"
+                    "  edge [\"dir\"=\"none\"]\n"
+                    + "  graph [style=\"rounded\"]\n"
         )
         label(groupMap, false)
         sb.append("\n")
@@ -48,7 +48,7 @@ graph [compound=true]
     }
 
     override fun item(itemMap: MutableMap<String, String>) {
-        sb.append("\"cluster_${sign(itemMap["sign"] ?: return)}\"")
+        sb.append("  \"cluster_${sign(itemMap["sign"] ?: return)}\"")
         label(itemMap, true)
         sb.append("\n")
     }
@@ -57,6 +57,8 @@ graph [compound=true]
         map["name"] ?: return
         if (isItem) {
             sb.append('[')
+        } else {
+            sb.append("  ")
         }
         sb.append("label =\" ")
         addLine(map["@1"], sb, true)
@@ -67,7 +69,7 @@ graph [compound=true]
             sb.append(']')
         }
         val id = if (isItem) "node${nodeId++}" else "clust${clusterId++}"
-        js.append("document.getElementById(\"$id\").onclick = function(){ navigate(\"${map["link"]}\") }\n")
+        js.append("  document.getElementById(\"$id\").onclick = function(){ navigate(\"${map["link"]}\") }\n")
     }
 
     override fun call(usageSign: String, callSign: String) {
@@ -128,6 +130,7 @@ $svg
     });
   }
   window.onload = function addEvent() {
+
 ${data.js ?: ""}
   }
 </script>

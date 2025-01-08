@@ -48,6 +48,7 @@ skinparam defaultTextAlignment center
 
     private fun label(map: MutableMap<String, String>, isItem: Boolean) {
         val sign = sign(map["sign"] ?: return)
+        if (isItem) sb.append("  ")
         sb.append("component $sign")
         if (map["name"] != null) {
             sb.append(" as \" ")
@@ -57,7 +58,7 @@ skinparam defaultTextAlignment center
             sb.append("${map["name"]}\"")
         }
         val id = "${if (isItem) "elem" else "cluster"}_$sign"
-        js.append("document.getElementById(\"$id\").onclick = function(){ navigate(\"${map["link"]}\") }\n")
+        js.append("  document.getElementById(\"$id\").onclick = function(){ navigate(\"${map["link"]}\") }\n")
     }
 
     override fun call(usageSign: String, callSign: String) {
@@ -115,8 +116,10 @@ $svgDesc
     });
   }
   window.onload = function addEvent() {
-// keep it for the same name class/method
+
+  // keep it for the same name class/method
 ${data.js ?: ""}
+
    let elements = document.getElementsByTagName("g");
     for (let g of elements) {
       const id = g.getAttribute("id");
