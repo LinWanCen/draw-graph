@@ -22,9 +22,11 @@ object InstallMermaid {
     @JvmStatic
     fun checkAndInstall() {
         val src = InstallMermaid.javaClass.getResourceAsStream("/jcef/mermaid.js") ?: return
-        val file = File(DrawGraphAppState.of().mermaidLink)
+        val file = File(DrawGraphAppState.of().tempPath, "mermaid.js")
         try {
-            Files.copy(src, file.toPath())
+            if (!file.exists()) {
+                Files.copy(src, file.toPath())
+            }
         } catch (e: Exception) {
             DrawGraphAppState.of().online = true
             LOG.warn(
