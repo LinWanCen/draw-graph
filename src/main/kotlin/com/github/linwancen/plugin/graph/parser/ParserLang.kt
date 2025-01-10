@@ -47,7 +47,8 @@ abstract class ParserLang<F : PsiElement> : Parser() {
                 val sign = funcSign(state, func, file, relData) ?: continue
                 // overload fun
                 val callSet = callSetMap.computeIfAbsent(sign) { mutableSetOf() }
-                callSet.addAll(callList(func, true)
+                callSet.addAll(
+                    callList(func, true)
                     .filter { !skipFun(state, it) }
                     .mapNotNull { toSign(it) }
                     .filter { !Skip.skip(it, state.includePattern, state.excludePattern) })
@@ -92,8 +93,9 @@ abstract class ParserLang<F : PsiElement> : Parser() {
         val state = DrawGraphProjectState.of(project)
         val callSetMap = mutableMapOf<String, MutableSet<String>>()
         val func = PsiTreeUtil.getParentOfType(psiElement, funClass(), false) ?: return
+        funcSign(state, func, func.containingFile?.virtualFile, relData) ?: return
         recursiveCall(1, func, isCall, mutableSetOf()) { _, usage, call ->
-            val usageSign = funcSign(state, usage, usage.containingFile?.virtualFile, relData) ?: return@recursiveCall
+            val usageSign = toSign(usage) ?: return@recursiveCall
             val callSign = funcSign(state, call, call.containingFile?.virtualFile, relData) ?: return@recursiveCall
             val callSet = callSetMap.computeIfAbsent(if (isCall) usageSign else callSign) { mutableSetOf() }
             callSet.add(if (isCall) callSign else usageSign)
