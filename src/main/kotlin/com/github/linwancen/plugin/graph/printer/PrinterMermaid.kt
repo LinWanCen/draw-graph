@@ -2,7 +2,6 @@ package com.github.linwancen.plugin.graph.printer
 
 import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
-import com.github.linwancen.plugin.graph.settings.Setting
 import com.github.linwancen.plugin.graph.ui.DrawGraphBundle
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -89,25 +88,27 @@ class PrinterMermaid : Printer() {
                         src, """
 <!-- https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.js -->
 <!-- change it in DrawGraphSetting.properties -->
-<script src="${if (appState.online) appState.mermaidJsLink else appState.mermaidLink}"></script>
+<script src="${appState.mermaidOffline}"></script>
 """
                     )
                     // language="html"
                     val online = temp(
                         src, """
-<script src="${Setting.message("mermaid_js_link")}"></script>
+<script src="${appState.mermaidOnline}"></script>
 """
                     )
                     val path = appState.tempPath
                     try {
+                        if (appState.online) {
+                            func.accept(online)
+                        } else {
+                            func.accept(offline)
+                        }
+
                         File(path).mkdirs()
-
                         val offlinePath = "$path/mermaid-offline.html"
-                        Files.write(Path.of(offlinePath), offline.toByteArray(StandardCharsets.UTF_8))
-                        func.accept(offline)
-
                         val onlinePath = "$path/mermaid-online.html"
-                        File(onlinePath).parentFile.mkdirs()
+                        Files.write(Path.of(offlinePath), offline.toByteArray(StandardCharsets.UTF_8))
                         Files.write(Path.of(onlinePath), online.toByteArray(StandardCharsets.UTF_8))
                     } catch (e: Exception) {
                         func.accept("${offline}\n${ExceptionUtil.getThrowableText(e)}")

@@ -94,7 +94,7 @@ public class GraphWindow {
         UiUtils.onChange(exclude, projectState.getExclude(), projectState::setExclude);
         UiUtils.onChange(otherInclude, projectState.getOtherInclude(), projectState::setOtherInclude);
         UiUtils.onChange(otherExclude, projectState.getOtherExclude(), projectState::setOtherExclude);
-        UiUtils.onChange(mermaidJsLink, appState.getMermaidJsLink(), appState::setMermaidJsLink);
+        UiUtils.onChange(mermaidOnline, appState.getMermaidOnline(), appState::setMermaidOnline);
         UiUtils.onChange(tempPath, appState.getTempPath(), appState::setTempPath);
         resetSetting.addActionListener(e -> {
             include.setText(DrawGraphProjectState.getDefault().getInclude());
@@ -190,7 +190,7 @@ public class GraphWindow {
     private JTextField otherInclude;
     private JTextField otherExclude;
     private JCheckBox online;
-    private JTextField mermaidJsLink;
+    private JTextField mermaidOnline;
     private JTextField tempPath;
     // endregion setting
 }

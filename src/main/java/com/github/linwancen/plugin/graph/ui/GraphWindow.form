@@ -546,7 +546,7 @@
                   <grid row="10" column="3" row-span="1" col-span="2" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
               </hspacer>
-              <component id="73a1a" class="javax.swing.JTextField" binding="mermaidJsLink">
+              <component id="73a1a" class="javax.swing.JTextField" binding="mermaidOnline">
                 <constraints>
                   <grid row="11" column="0" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -569,7 +569,9 @@
                     <preferred-size width="150" height="-1"/>
                   </grid>
                 </constraints>
-                <properties/>
+                <properties>
+                  <text value=""/>
+                </properties>
               </component>
               <vspacer id="5f29f">
                 <constraints>
