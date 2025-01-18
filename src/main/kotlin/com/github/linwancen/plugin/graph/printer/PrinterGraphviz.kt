@@ -73,7 +73,7 @@ graph [compound=true]
     }
 
     override fun call(usageSign: String, callSign: String) {
-        sb.append("\"cluster_${sign(usageSign)}\" -> \"cluster_${sign(callSign)}\"\n")
+        sb.append("\n\"cluster_${sign(usageSign)}\" -> \"cluster_${sign(callSign)}\"")
     }
 
     override fun toSrc(relData: RelData): Pair<String, String> {

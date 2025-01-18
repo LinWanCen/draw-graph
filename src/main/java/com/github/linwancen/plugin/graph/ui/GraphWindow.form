@@ -630,13 +630,13 @@
           <text resource-bundle="messages/DrawGraphBundle" key="LR"/>
         </properties>
       </component>
-      <component id="9505e" class="javax.swing.JCheckBox" binding="skipJar">
+      <component id="9505e" class="javax.swing.JCheckBox" binding="skipLib">
         <constraints>
           <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <selected value="true"/>
-          <text resource-bundle="messages/DrawGraphBundle" key="skip.jar"/>
+          <text resource-bundle="messages/DrawGraphBundle" key="skip.lib"/>
         </properties>
       </component>
     </children>

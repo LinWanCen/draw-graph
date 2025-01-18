@@ -49,9 +49,9 @@ abstract class ParserLang<F : PsiElement> : Parser() {
                 val callSet = callSetMap.computeIfAbsent(sign) { mutableSetOf() }
                 callSet.addAll(
                     callList(func, true)
-                    .filter { !skipFun(state, it) }
-                    .mapNotNull { toSign(it) }
-                    .filter { !Skip.skip(it, state.includePattern, state.excludePattern) })
+                        .filter { !skipFun(state, it) }
+                        .mapNotNull { toSign(it) }
+                        .filter { !Skip.skip(it, state.includePattern, state.excludePattern) })
             }
         }
         regCall(callSetMap, relData)
@@ -63,7 +63,7 @@ abstract class ParserLang<F : PsiElement> : Parser() {
         }
         var path = file?.path
         val inJar = path == null || path.contains('!')
-        if (inJar && state.skipJar && !state.autoLoad) {
+        if (inJar && state.skipLib && !state.autoLoad) {
             return null
         }
         val sign = toSign(func) ?: return null
@@ -91,12 +91,17 @@ abstract class ParserLang<F : PsiElement> : Parser() {
 
     override fun callImpl(project: Project, relData: RelData, psiElement: PsiElement, isCall: Boolean) {
         val state = DrawGraphProjectState.of(project)
+        val basePath = project.basePath
         val callSetMap = mutableMapOf<String, MutableSet<String>>()
         val func = PsiTreeUtil.getParentOfType(psiElement, funClass(), false) ?: return
         funcSign(state, func, func.containingFile?.virtualFile, relData) ?: return
         recursiveCall(1, func, isCall, mutableSetOf()) { _, usage, call ->
+            val callFile = call.containingFile?.virtualFile
+            if (state.skipLib && callFile?.path?.startsWith(basePath ?: "") == false) {
+                return@recursiveCall
+            }
             val usageSign = toSign(usage) ?: return@recursiveCall
-            val callSign = funcSign(state, call, call.containingFile?.virtualFile, relData) ?: return@recursiveCall
+            val callSign = funcSign(state, call, callFile, relData) ?: return@recursiveCall
             val callSet = callSetMap.computeIfAbsent(if (isCall) usageSign else callSign) { mutableSetOf() }
             callSet.add(if (isCall) callSign else usageSign)
         }

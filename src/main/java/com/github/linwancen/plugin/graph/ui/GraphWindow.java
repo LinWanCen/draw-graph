@@ -48,9 +48,9 @@ public class GraphWindow {
             }
         });
 
-        skipJar.setSelected(projectState.getSkipJar());
-        skipJar.addActionListener(e -> {
-            projectState.setSkipJar(skipJar.isSelected());
+        skipLib.setSelected(projectState.getSkipLib());
+        skipLib.addActionListener(e -> {
+            projectState.setSkipLib(skipLib.isSelected());
             RelController.reload(project);
         });
 
@@ -155,7 +155,7 @@ public class GraphWindow {
     private JButton reload;
     private JButton reset;
     private JCheckBox autoLoad;
-    private JCheckBox skipJar;
+    private JCheckBox skipLib;
     // region title
 
     // region html

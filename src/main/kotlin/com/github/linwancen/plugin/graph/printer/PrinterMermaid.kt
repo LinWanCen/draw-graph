@@ -54,7 +54,7 @@ class PrinterMermaid : Printer() {
     }
 
     override fun call(usageSign: String, callSign: String) {
-        sb.append("'${sign(usageSign)}' --> '${sign(callSign)}'\n")
+        sb.append("\n'${sign(usageSign)}' --> '${sign(callSign)}'")
     }
 
     override fun sign(input: String): String {

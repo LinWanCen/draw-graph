@@ -62,7 +62,7 @@ skinparam defaultTextAlignment center
     }
 
     override fun call(usageSign: String, callSign: String) {
-        sb.append("${sign(usageSign)} --> ${sign(callSign)}\n")
+        sb.append("\n${sign(usageSign)} --> ${sign(callSign)}")
     }
 
     override fun toSrc(relData: RelData): Pair<String, String> {

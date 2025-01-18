@@ -6,7 +6,7 @@ import java.util.regex.Pattern
 open class AbstractDrawGraphState {
 
     var skipGetSetIs = true
-    var skipJar = true
+    var skipLib = true
     var lr = true
     var doc = "en" != Locale.getDefault().language
     var impl = true
