@@ -6,7 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile
 class RelFile {
     companion object{
         @JvmStatic
-        fun relFileOf(project: Project, files: Array<out VirtualFile>): Array<out VirtualFile> {
+        fun relFileOf(project: Project, files: List<VirtualFile>): List<VirtualFile> {
             return RelFileMvc.relFileOf(project, files)
         }
     }

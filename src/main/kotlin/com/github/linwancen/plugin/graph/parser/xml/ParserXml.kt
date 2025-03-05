@@ -3,6 +3,7 @@ package com.github.linwancen.plugin.graph.parser.xml
 import com.github.linwancen.plugin.graph.parser.Parser
 import com.github.linwancen.plugin.graph.parser.RelData
 import com.intellij.lang.xml.XMLLanguage
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
@@ -23,7 +24,7 @@ class ParserXml : Parser() {
        return XMLLanguage.INSTANCE.id
     }
 
-    override fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>) {
+    override fun srcImpl(project: Project, relData: RelData, files: List<VirtualFile>, indicator: ProgressIndicator?) {
         val callSetMap = mutableMapOf<String, MutableSet<String>>()
         val psiFiles = if (files.size == 1 && POM_FILE == files[0].name) {
             FilenameIndex.getFilesByName(project, POM_FILE, GlobalSearchScope.projectScope(project)).toList()

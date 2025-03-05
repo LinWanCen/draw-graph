@@ -75,7 +75,7 @@ class PrinterMermaid : Printer() {
         val keyword = Regex("\\b(graph|end|parent)\\b")
 
         @JvmStatic
-        fun build(data: PrinterData, func: Consumer<String>) {
+        fun build(data: PrinterData, func: Consumer<String>?) {
             object : Task.Backgroundable(data.project, "draw Mermaid") {
                 override fun run(indicator: ProgressIndicator) {
                     val src = data.src ?: return
@@ -100,9 +100,9 @@ class PrinterMermaid : Printer() {
                     val path = appState.tempPath
                     try {
                         if (appState.online) {
-                            func.accept(online)
+                            func?.accept(online)
                         } else {
-                            func.accept(offline)
+                            func?.accept(offline)
                         }
 
                         File(path).mkdirs()
@@ -111,7 +111,7 @@ class PrinterMermaid : Printer() {
                         Files.write(Path.of(offlinePath), offline.toByteArray(StandardCharsets.UTF_8))
                         Files.write(Path.of(onlinePath), online.toByteArray(StandardCharsets.UTF_8))
                     } catch (e: Exception) {
-                        func.accept("${offline}\n${ExceptionUtil.getThrowableText(e)}")
+                        func?.accept("${offline}\n${ExceptionUtil.getThrowableText(e)}")
                     }
                 }
             }.queue()

@@ -1,5 +1,6 @@
 <idea-plugin>
   <extensions defaultExtensionNs="com.github.linwancen.drawgraph">
     <parser implementation="com.github.linwancen.plugin.graph.parser.js.JsParser"/>
+    <parser implementation="com.github.linwancen.plugin.graph.parser.js.HtmlParser"/>
   </extensions>
 </idea-plugin>

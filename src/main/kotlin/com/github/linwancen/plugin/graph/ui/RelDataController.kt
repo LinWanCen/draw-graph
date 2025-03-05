@@ -1,12 +1,12 @@
 package com.github.linwancen.plugin.graph.ui
 
 import com.github.linwancen.plugin.graph.parser.RelData
-import com.github.linwancen.plugin.graph.printer.PrinterData
-import com.github.linwancen.plugin.graph.printer.PrinterGraphviz
-import com.github.linwancen.plugin.graph.printer.PrinterMermaid
-import com.github.linwancen.plugin.graph.printer.PrinterPlantuml
+import com.github.linwancen.plugin.graph.printer.*
+import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
+import com.github.linwancen.plugin.graph.ui.webview.Browser
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.project.Project
+import javax.swing.JTextArea
 
 object RelDataController {
 
@@ -19,35 +19,51 @@ object RelDataController {
         val (plantumlSrc, plantumlJs) = PrinterPlantuml().toSrc(relData)
         val (mermaidSrc, _) = PrinterMermaid().toSrc(relData)
         val (graphvizSrc, graphvizJs) = PrinterGraphviz().toSrc(relData)
+        RelData2SQLite().save(project, relData)
+        val limit = DrawGraphAppState.of().limit
+        if (relData.itemMap.size > limit) {
+            val it = "itemMap.size: ${relData.itemMap.size} > limit: $limit\n<br>" +
+                    "callSet.size: ${relData.callSet.size}\n<br>" +
+                    "parentChildMap.size: ${relData.parentChildMap.size}\n<br>" +
+                    "childSet.size: ${relData.childSet.size}"
+            runInEdt {
+                window.toolWindow.activate(null)
+                // don't stop when src does not change, update file when open multi project
+                window.mermaidSrc.text = it
+                window.plantumlSrc.text = it
+                window.graphvizSrc.text = it
+            }
+            update(it, window.plantumlHtml, window.plantumlBrowser)
+            update(it, window.mermaidHtml, window.mermaidBrowser)
+            update(it, window.graphvizHtml, window.graphvizBrowser)
+            PrinterPlantuml.build(PrinterData(plantumlSrc, plantumlJs, project), null)
+            PrinterMermaid.build(PrinterData(mermaidSrc, null, project), null)
+            PrinterGraphviz.build(PrinterData(graphvizSrc, graphvizJs, project), null)
+            return
+        }
         runInEdt {
             window.toolWindow.activate(null)
             // don't stop when src does not change, update file when open multi project
             window.mermaidSrc.text = mermaidSrc
             window.plantumlSrc.text = plantumlSrc
             window.graphvizSrc.text = graphvizSrc
-            PrinterPlantuml.build(PrinterData(plantumlSrc, plantumlJs, project)) {
-                runInEdt {
-                    if (window.plantumlHtml.text != it) {
-                        window.plantumlHtml.text = it
-                        if (window.plantumlBrowser != null) window.plantumlBrowser?.load(it)
-                    }
-                }
-            }
-            PrinterMermaid.build(PrinterData(mermaidSrc, null, project)) {
-                runInEdt {
-                    if (window.mermaidHtml.text != it) {
-                        window.mermaidHtml.text = it
-                        if (window.mermaidBrowser != null) window.mermaidBrowser?.load(it)
-                    }
-                }
-            }
-            PrinterGraphviz.build(PrinterData(graphvizSrc, graphvizJs, project)) {
-                runInEdt {
-                    if (window.graphvizHtml.text != it) {
-                        window.graphvizHtml.text = it
-                        if (window.graphvizBrowser != null) window.graphvizBrowser?.load(it)
-                    }
-                }
+        }
+        PrinterPlantuml.build(PrinterData(plantumlSrc, plantumlJs, project)) {
+            update(it, window.plantumlHtml, window.plantumlBrowser)
+        }
+        PrinterMermaid.build(PrinterData(mermaidSrc, null, project)) {
+            update(it, window.mermaidHtml, window.mermaidBrowser)
+        }
+        PrinterGraphviz.build(PrinterData(graphvizSrc, graphvizJs, project)) {
+            update(it, window.graphvizHtml, window.graphvizBrowser)
+        }
+    }
+
+    private fun update(src: String, jTextArea: JTextArea, browser: Browser?) {
+        runInEdt {
+            if (jTextArea.text != src) {
+                jTextArea.text = src
+                browser?.load(src)
             }
         }
     }

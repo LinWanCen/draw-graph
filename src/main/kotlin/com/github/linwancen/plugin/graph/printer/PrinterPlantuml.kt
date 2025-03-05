@@ -73,7 +73,7 @@ skinparam defaultTextAlignment center
 
     companion object {
         @JvmStatic
-        fun build(data: PrinterData, func: Consumer<String>) {
+        fun build(data: PrinterData, func: Consumer<String>?) {
             object : Task.Backgroundable(data.project, "draw PlantUML") {
                 override fun run(indicator: ProgressIndicator) {
                     val src = data.src ?: return
@@ -84,6 +84,11 @@ skinparam defaultTextAlignment center
                     try {
                         File(path).mkdirs()
 
+                        val plantumlPath = "$path/plantuml.puml"
+                        Files.write(Path.of(plantumlPath), src.toByteArray(StandardCharsets.UTF_8))
+                        if (func == null) {
+                            return
+                        }
                         val svgFile = "$path/plantuml.svg"
                         val svgOut = FileOutputStream(svgFile)
                         val reader = SourceStringReader(src)
@@ -141,15 +146,11 @@ ${data.js ?: ""}
 <br>
 """
                         )
-
-                        val plantumlPath = "$path/plantuml.puml"
-                        Files.write(Path.of(plantumlPath), src.toByteArray(StandardCharsets.UTF_8))
-
                         val pngFile = "$path/plantuml.png"
                         val pngOut = FileOutputStream(pngFile)
                         reader.outputImage(pngOut, FileFormatOption(FileFormat.PNG))
                     } catch (e: Exception) {
-                        func.accept(
+                        func?.accept(
                             // language="html"
                             """
 <embed src="file:///${path}/plantuml.svg" type="image/svg+xml" />

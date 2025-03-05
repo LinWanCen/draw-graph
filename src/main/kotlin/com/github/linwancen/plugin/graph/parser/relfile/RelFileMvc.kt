@@ -12,7 +12,7 @@ object RelFileMvc {
     private val mvcPattern = Pattern.compile("^I?([A-Z]\\w+)(?:Controller|Service|ServiceImpl|Mapper)\\.java$")
 
     @JvmStatic
-    fun relFileOf(project: Project, files: Array<out VirtualFile>): Array<out VirtualFile> {
+    fun relFileOf(project: Project, files: List<VirtualFile>): List<VirtualFile> {
         if (!DrawGraphAppState.of().mvc) {
             return files
         }
@@ -28,6 +28,6 @@ object RelFileMvc {
         relFiles.addAll(FilenameIndex.getVirtualFilesByName(project, "I${prefix}Service.java", scope))
         relFiles.addAll(FilenameIndex.getVirtualFilesByName(project, "${prefix}ServiceImpl.java", scope))
         relFiles.addAll(FilenameIndex.getVirtualFilesByName(project, "${prefix}Mapper.java", scope))
-        return relFiles.toTypedArray()
+        return relFiles
     }
 }

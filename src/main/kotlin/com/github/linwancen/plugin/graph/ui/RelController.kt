@@ -1,6 +1,7 @@
 package com.github.linwancen.plugin.graph.ui
 
 import com.github.linwancen.plugin.common.psi.LangUtils
+import com.github.linwancen.plugin.common.vfile.ChildFileUtils
 import com.github.linwancen.plugin.graph.parser.Parser
 import com.github.linwancen.plugin.graph.parser.RelData
 import com.intellij.openapi.application.ApplicationManager
@@ -52,35 +53,52 @@ object RelController {
                 return
             }
             // for before 201.6668.113
-            buildSrc(project, window, files)
+            if (files.size == 1 && !files[0].isDirectory) {
+                ApplicationManager.getApplication().executeOnPooledThread {
+                    buildSrc(project, window, files, null)
+                }
+            } else {
+                object : Task.Backgroundable(project, "draw parse") {
+                    override fun run(indicator: ProgressIndicator) {
+                        buildSrc(project, window, files, indicator)
+                    }
+                }.queue()
+            }
         } catch (e: Throwable) {
             LOG.info("RelController.forFile() catch Throwable but log to record.", e)
         }
     }
 
-    /**
-     *
-     */
     @JvmStatic
-    fun buildSrc(project: Project, window: GraphWindow, files: Array<VirtualFile>) {
-        ApplicationManager.getApplication().executeOnPooledThread {
-            try {
-                if (files.size > 1) {
-                    window.closeAutoLoad()
+    private fun buildSrc(project: Project, window: GraphWindow, files: Array<VirtualFile>, indicator: ProgressIndicator?) {
+        try {
+            val fileList = if (files.size == 1 && !files[0].isDirectory) {
+                files.toList()
+            } else {
+                window.closeAutoLoad()
+                val map = ChildFileUtils.recurExtChildFile(files)
+                map.remove("class")
+                val mostExt = ChildFileUtils.mostExt(map) ?: return
+                val mostExtChildFile = mostExt.value
+                when (mostExt.key) {
+                    "java" -> map["kt"]?.let(mostExtChildFile::addAll)
+                    "kt" -> map["java"]?.let(mostExtChildFile::addAll)
+                    else -> LOG.info("most ext:{} size:{}", mostExt.key, mostExtChildFile.size)
                 }
-                val relData = RelData()
-                DumbService.getInstance(project).runReadActionInSmartMode {
-                    Parser.src(project, relData, files)
-                }
-                if (relData.itemMap.isEmpty()) {
-                    PlantUmlFileController.forPlantUMLFiles(project, window, files)
-                    HtmlFileController.forHtmlFiles(project, window, files)
-                    return@executeOnPooledThread
-                }
-                RelDataController.dataToWindow(project, window, relData)
-            } catch (e: Throwable) {
-                LOG.info("RelController.buildSrc() catch Throwable but log to record.", e)
+                mostExtChildFile
             }
+            val relData = RelData()
+            DumbService.getInstance(project).runReadActionInSmartMode {
+                Parser.src(project, relData, fileList, indicator)
+            }
+            if (relData.itemMap.isEmpty()) {
+                PlantUmlFileController.forPlantUMLFiles(project, window, files)
+                HtmlFileController.forHtmlFiles(project, window, files)
+                return
+            }
+            RelDataController.dataToWindow(project, window, relData)
+        } catch (e: Throwable) {
+            LOG.info("RelController.buildSrc() catch Throwable but log to record.", e)
         }
     }
 
@@ -101,7 +119,7 @@ object RelController {
                         window.closeAutoLoad()
                         val relData = RelData()
                         DumbService.getInstance(project).runReadActionInSmartMode {
-                            Parser.call(project, relData, psiElement, call)
+                            Parser.call(project, relData, psiElement, call, indicator)
                         }
                         RelDataController.dataToWindow(project, window, relData)
                     } catch (e: Throwable) {

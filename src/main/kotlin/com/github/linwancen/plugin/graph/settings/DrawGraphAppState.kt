@@ -13,6 +13,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 )
 class DrawGraphAppState : PersistentStateComponent<DrawGraphAppState?>, AbstractDrawGraphState() {
 
+    var limit = 1000
     var online = Setting.message("online") == "true"
     var path = PathInit.path
     var tempPath = if (path != null) "$path/draw-graph" else "draw-graph"

@@ -4,6 +4,7 @@
 
 ## [1.0.0]
 
+- 1.23 dir call graph and save sqlite
 - 1.22 ★ method usage graph
 - 1.21 PlantUML support RegExp, JSON, yaml, HTML injected
 - 1.20 PlantUML support RegExp, JSON, yaml file
@@ -31,6 +32,7 @@
 
 # 中文更新日志
 
+- 1.23 目录调用图和保存到 SQLite
 - 1.22 ★ 方法被调用图
 - 1.21 PlantUML 支持 RegExp, JSON, yaml, HTML 注入
 - 1.20 PlantUML 支持 RegExp, JSON, yaml 文件

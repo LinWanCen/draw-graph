@@ -1,8 +1,10 @@
 package com.github.linwancen.plugin.graph.parser
 
+import com.github.linwancen.plugin.common.TaskTool
 import com.github.linwancen.plugin.common.text.Skip
 import com.github.linwancen.plugin.graph.parser.relfile.RelFile
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
@@ -35,26 +37,41 @@ abstract class ParserLang<F : PsiElement> : Parser() {
     ) {
     }
 
-    override fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>) {
+    override fun srcImpl(project: Project, relData: RelData, files: List<VirtualFile>, indicator: ProgressIndicator?) {
         val state = DrawGraphProjectState.of(project)
         val callSetMap = mutableMapOf<String, MutableSet<String>>()
         val psiManager = PsiManager.getInstance(project)
         val relFiles = if (files.size != 1) files else RelFile.relFileOf(project, files)
-        for (file in relFiles) {
+        val parserMap = parserMap()
+        val taskTool = if (indicator == null) null else TaskTool(indicator, relFiles.size)
+        for ((index, file) in relFiles.withIndex()) {
+            if (taskTool != null) {
+                taskTool.beforeNext(index, file.path) ?: return
+            }
             val psiFile = psiManager.findFile(file) ?: continue
-            val funcs = PsiTreeUtil.findChildrenOfType(psiFile, funClass())
-            for (func in funcs) {
-                val sign = funcSign(state, func, file, relData) ?: continue
-                // overload fun
-                val callSet = callSetMap.computeIfAbsent(sign) { mutableSetOf() }
-                callSet.addAll(
-                    callList(func, true)
-                        .filter { !skipFun(state, it) }
-                        .mapNotNull { toSign(it) }
-                        .filter { !Skip.skip(it, state.includePattern, state.excludePattern) })
+            val usageService = findParser(psiFile, parserMap) ?: continue
+            if (usageService is ParserLang<*>) {
+                usageService.fileImpl(psiFile, state, file, relData, callSetMap)
             }
         }
         regCall(callSetMap, relData)
+    }
+
+    fun fileImpl(
+        psiFile: PsiFile, state: DrawGraphProjectState, file: VirtualFile,
+        relData: RelData, callSetMap: MutableMap<String, MutableSet<String>>
+    ) {
+        val funcs = PsiTreeUtil.findChildrenOfType(psiFile, funClass())
+        for (func in funcs) {
+            val sign = funcSign(state, func, file, relData) ?: continue
+            // overload fun
+            val callSet = callSetMap.computeIfAbsent(sign) { mutableSetOf() }
+            callSet.addAll(
+                callList(func, true)
+                    .filter { !skipFun(state, it) }
+                    .mapNotNull { toSign(it) }
+                    .filter { !Skip.skip(it, state.includePattern, state.excludePattern) })
+        }
     }
 
     private fun funcSign(state: DrawGraphProjectState, func: F, file: VirtualFile?, relData: RelData): String? {
@@ -89,13 +106,19 @@ abstract class ParserLang<F : PsiElement> : Parser() {
         return sign
     }
 
-    override fun callImpl(project: Project, relData: RelData, psiElement: PsiElement, isCall: Boolean) {
+    override fun callImpl(
+        project: Project,
+        relData: RelData,
+        psiElement: PsiElement,
+        isCall: Boolean,
+        indicator: ProgressIndicator?
+    ) {
         val state = DrawGraphProjectState.of(project)
         val basePath = project.basePath
         val callSetMap = mutableMapOf<String, MutableSet<String>>()
         val func = PsiTreeUtil.getParentOfType(psiElement, funClass(), false) ?: return
         funcSign(state, func, func.containingFile?.virtualFile, relData) ?: return
-        recursiveCall(1, func, isCall, mutableSetOf()) { _, usage, call ->
+        recursiveCall(1, func, isCall, mutableSetOf(), indicator) { _, usage, call ->
             val callFile = call.containingFile?.virtualFile
             if (state.skipLib && callFile?.path?.startsWith(basePath ?: "") == false) {
                 return@recursiveCall
@@ -113,15 +136,20 @@ abstract class ParserLang<F : PsiElement> : Parser() {
         usage: F,
         isCall: Boolean,
         set: MutableSet<F>,
+        indicator: ProgressIndicator?,
         callBack: (level: Int, usage: F, call: F) -> Unit,
     ) {
         if (!set.add(usage)) {
             return
         }
         val callList = callList(usage, isCall)
-        for (call in callList) {
+        val taskTool = if (indicator == null) null else TaskTool(indicator, callList.size)
+        for ((index, call) in callList.withIndex()) {
+            if (taskTool != null) {
+                taskTool.beforeNext(index, "$level $call") ?: return
+            }
             callBack.invoke(level, usage, call)
-            recursiveCall(level + 1, call, isCall, set, callBack)
+            recursiveCall(level + 1, call, isCall, set, indicator, callBack)
         }
     }
 }

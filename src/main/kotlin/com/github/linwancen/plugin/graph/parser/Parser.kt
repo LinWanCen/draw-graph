@@ -1,6 +1,8 @@
 package com.github.linwancen.plugin.graph.parser
 
+import com.intellij.lang.Language
 import com.intellij.openapi.extensions.ExtensionPointName
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
@@ -12,9 +14,20 @@ abstract class Parser {
 
     protected abstract fun id(): String
 
-    protected abstract fun srcImpl(project: Project, relData: RelData, files: Array<out VirtualFile>)
+    protected abstract fun srcImpl(
+        project: Project,
+        relData: RelData,
+        files: List<VirtualFile>,
+        indicator: ProgressIndicator?
+    )
 
-    open fun callImpl(project: Project, relData: RelData, psiElement: PsiElement, isCall: Boolean) {}
+    open fun callImpl(
+        project: Project,
+        relData: RelData,
+        psiElement: PsiElement,
+        isCall: Boolean,
+        indicator: ProgressIndicator?
+    ) {}
 
     open fun nameToElementImpl(project: Project, name: String): PsiElement? {
         return null
@@ -23,7 +36,7 @@ abstract class Parser {
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
 
-        private fun parserMap(): MutableMap<String, Parser> {
+        fun parserMap(): MutableMap<String, Parser> {
             val epn: ExtensionPointName<Parser> = ExtensionPointName.create("com.github.linwancen.drawgraph.parser")
             val parserList = epn.extensionList
             log.info("load graph parser epn {}", parserList)
@@ -39,25 +52,35 @@ abstract class Parser {
                     val parser = kotlin.createInstance() as Parser
                     parserMap["kotlin"] = parser
                     log.info("add load graph parser kotlin -> {}", parser)
-                } catch (_: Exception) {}
+                } catch (_: Exception) {
+                }
             }
             return parserMap
+        }
+
+        @JvmStatic
+        fun findParser(element: PsiElement, map: Map<String, Parser>): Parser? {
+            var language: Language = element.language
+            while (true) {
+                val impl: Parser? = map[language.id]
+                if (impl != null) {
+                    return impl
+                }
+                language = language.baseLanguage ?: return null
+            }
         }
 
         /**
          * need DumbService.getInstance(project).runReadActionInSmartMo
          */
         @JvmStatic
-        fun src(project: Project, relData: RelData, files: Array<out VirtualFile>) {
+        fun src(project: Project, relData: RelData, files: List<VirtualFile>, indicator: ProgressIndicator?) {
             val parserMap = parserMap()
-            // not get child dir easy select by shift skip dir
             for (file in files) {
                 val psiFile = PsiManager.getInstance(project).findFile(file) ?: continue
-                var language = psiFile.language
-                language.baseLanguage?.let { language = it }
-                val usageService = parserMap[language.id] ?: continue
+                val usageService = findParser(psiFile, parserMap) ?: continue
                 // not one by one because pom.xml find all files
-                usageService.srcImpl(project, relData, files)
+                usageService.srcImpl(project, relData, files, indicator)
                 // only one lang srcImpl all and return
                 return
             }
@@ -67,12 +90,18 @@ abstract class Parser {
          * need DumbService.getInstance(project).runReadActionInSmartMo
          */
         @JvmStatic
-        fun call(project: Project, relData: RelData, psiElement: PsiElement, call: Boolean) {
+        fun call(
+            project: Project,
+            relData: RelData,
+            psiElement: PsiElement,
+            call: Boolean,
+            indicator: ProgressIndicator
+        ) {
             val parserMap = parserMap()
             var language = psiElement.language
             language.baseLanguage?.let { language = it }
             val usageService = parserMap[language.id] ?: return
-            usageService.callImpl(project, relData, psiElement, call)
+            usageService.callImpl(project, relData, psiElement, call, indicator)
         }
 
         /**

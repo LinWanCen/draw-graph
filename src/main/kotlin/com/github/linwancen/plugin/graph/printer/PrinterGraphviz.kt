@@ -85,7 +85,7 @@ graph [compound=true]
     companion object {
 
         @JvmStatic
-        fun build(data: PrinterData, func: Consumer<String>) {
+        fun build(data: PrinterData, func: Consumer<String>?) {
             object : Task.Backgroundable(data.project, "draw Graphviz") {
                 override fun run(indicator: ProgressIndicator) {
                     val src = data.src ?: return
@@ -97,6 +97,9 @@ graph [compound=true]
                         File(path).mkdirs()
                         val dotPath = "$path/graphviz.dot"
                         Files.write(Path.of(dotPath), src.toByteArray(StandardCharsets.UTF_8))
+                        if (func == null) {
+                            return
+                        }
                         val commandLine =
                             CommandLineUtil.toCommandLine("dot", arrayListOf("-Tsvg", "-Tpng", "-O", dotPath))
                         val generalCommandLine = GeneralCommandLine(commandLine)
@@ -143,8 +146,7 @@ $commandLineOutputStr
                         )
                         return
                     } catch (e: Exception) {
-
-                        func.accept(
+                        func?.accept(
                             // language="html"
                             """
 <embed src="file:///$path/graphviz.dot.svg" type="image/svg+xml" />

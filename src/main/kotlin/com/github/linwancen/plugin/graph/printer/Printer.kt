@@ -42,10 +42,11 @@ abstract class Printer {
     abstract fun toSrc(relData: RelData): Pair<String, String>
 
     protected fun printerData(relData: RelData) {
+        // TODO 统一 filter
         relData.parentChildMap
             .filter { !relData.childSet.contains(it.key) }
             .forEach { printerChildren(relData, it.key, it.value) }
-        // PlantUML can not re def
+        // PlantUML cannot re def
         relData.itemMap
             .filter { !relData.parentChildMap.containsKey(it.key) }
             .filter { !relData.childSet.contains(it.key) }
@@ -72,10 +73,10 @@ abstract class Printer {
 
         /**
          * [not support english symbol #4138](https://github.com/mermaid-js/mermaid/issues/4138)
-         * PlantUML cannot use "-#,"
+         * PlantUML cannot use "-#$,"
          * "-" should in first
          */
         @JvmStatic
-        val canNotUseSymbol = Regex("[-#,。？！，、；：“”‘’（）《》【】~@()|'\"<>{}\\[\\]\\\\/ ]")
+        val canNotUseSymbol = Regex("[-#$,。？！，、；：“”‘’（）《》【】~@()|'\"<>{}\\[\\]\\\\/ ]")
     }
 }

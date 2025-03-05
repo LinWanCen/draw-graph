@@ -90,6 +90,13 @@ public class GraphWindow {
             RelController.reload(project);
         });
 
+        UiUtils.onChange(limit, String.valueOf(appState.getLimit()), s -> {
+            try {
+                int v = Integer.parseInt(s);
+                appState.setLimit(v);
+            } catch (Exception ignored) {}
+        });
+
         UiUtils.onChange(include, projectState.getInclude(), projectState::setInclude);
         UiUtils.onChange(exclude, projectState.getExclude(), projectState::setExclude);
         UiUtils.onChange(otherInclude, projectState.getOtherInclude(), projectState::setOtherInclude);
@@ -107,7 +114,7 @@ public class GraphWindow {
         @Nullable FileEditor selectedEditor = FileEditorManager.getInstance(project).getSelectedEditor();
         if (selectedEditor != null) {
             @Nullable VirtualFile file = selectedEditor.getFile();
-            RelController.buildSrc(project, this, new VirtualFile[]{file});
+            RelController.forFile(project, new VirtualFile[]{file}, false);
         }
         initOut(project);
     }
@@ -183,6 +190,7 @@ public class GraphWindow {
     private JCheckBox skipGetSetIs;
     private JCheckBox lr;
     private JCheckBox doc;
+    private JTextField limit;
     private JCheckBox impl;
     private JCheckBox mvc;
     private JTextField include;

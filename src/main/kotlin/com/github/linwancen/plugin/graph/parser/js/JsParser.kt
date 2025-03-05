@@ -8,7 +8,7 @@ import com.intellij.lang.javascript.JavascriptLanguage
 import com.intellij.lang.javascript.psi.JSFunction
 import com.intellij.lang.javascript.psi.JSReferenceExpression
 
-class JsParser : ParserLang<JSFunction>() {
+open class JsParser : ParserLang<JSFunction>() {
 
     override fun id(): String {
         return JavascriptLanguage.INSTANCE.id
