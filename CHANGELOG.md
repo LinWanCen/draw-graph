@@ -4,6 +4,7 @@
 
 ## [1.0.0]
 
+- 1.24 doc from super method
 - 1.23 dir call graph and save sqlite
 - 1.22 ★ method usage graph
 - 1.21 PlantUML support RegExp, JSON, yaml, HTML injected
@@ -32,6 +33,7 @@
 
 # 中文更新日志
 
+- 1.24 从父方法获取注释
 - 1.23 目录调用图和保存到 SQLite
 - 1.22 ★ 方法被调用图
 - 1.21 PlantUML 支持 RegExp, JSON, yaml, HTML 注入

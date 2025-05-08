@@ -2,7 +2,9 @@ package com.github.linwancen.plugin.graph.parser.java
 
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethod
+import com.intellij.psi.javadoc.PsiDocComment
 
 /**
  * java & scala
@@ -17,7 +19,38 @@ object JavaParserUtils {
     @JvmStatic
     fun funMap(func: PsiMethod, funMap: MutableMap<String, String>) {
         funMapWithoutDoc(func, funMap)
-        JavaComment.addDocParam(func.docComment, funMap)
+        val docComment = supperMethodDoc(func)
+        JavaComment.addDocParam(docComment, funMap)
+    }
+
+    @JvmStatic
+    fun supperMethodDoc(psiMethod: PsiMethod): PsiDocComment? {
+        val docComment = psiMethod.docComment
+        if (docComment != null) {
+            return docComment
+        }
+        val superMethods: Array<PsiMethod>
+        try {
+            superMethods = psiMethod.findSuperMethods()
+        } catch (e: Exception) {
+            return null
+        }
+        for (superMethod in superMethods) {
+            // .class
+            val navElement: PsiElement
+            try {
+                navElement = superMethod.navigationElement
+            } catch (e: Exception) {
+                continue
+            }
+            if (navElement is PsiMethod) {
+                val superDoc = navElement.docComment
+                if (superDoc != null) {
+                    return superDoc
+                }
+            }
+        }
+        return null
     }
 
     @JvmStatic
