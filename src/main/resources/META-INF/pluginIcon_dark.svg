@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <defs>
+    <linearGradient id="a" x1="8" y1="0.083" x2="8" y2="16.167" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#576a80"/>
+      <stop offset="1" stop-color="#2d3742"/>
+    </linearGradient>
+    <linearGradient id="b" x1="7.957" y1="3" x2="7.957" y2="12.807" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="1" stop-color="#e0efff"/>
+    </linearGradient>
+  </defs>
+  <rect width="16" height="16" fill="#f0f" opacity="0"/>
+  <g>
+    <path d="M12.5,9a3.481,3.481,0,0,0-.755.087L8.615,5.063c.011-.022.024-.042.034-.063h.7a3.5,3.5,0,1,0,0-3h-.7A3.49,3.49,0,1,0,3.194,6.112l-.271.946a3.515,3.515,0,1,0,2.883.83l.271-.946c.059-.01.12-.016.178-.029l3.13,4.025A3.455,3.455,0,0,0,9,12.5,3.5,3.5,0,1,0,12.5,9Z" fill="url(#a)"/>
+    <polygon points="12.895 12.193 6.522 4 12.5 4 12.5 3 5.5 3 5.5 3.5 5.019 3.362 3.019 10.362 3.981 10.638 5.71 4.584 12.105 12.807 12.895 12.193" fill="url(#b)"/>
+    <circle cx="12.5" cy="3.5" r="2.5" fill="#00d43b"/>
+    <circle cx="12.5" cy="3.5" r="1" fill="#f1f8ff"/>
+    <circle cx="3.5" cy="10.5" r="2.5" fill="#ff9800"/>
+    <circle cx="3.5" cy="10.5" r="1" fill="#f1f8ff"/>
+    <circle cx="5.5" cy="3.5" r="2.5" fill="#4db8ff"/>
+    <circle cx="5.5" cy="3.5" r="1" fill="#f1f8ff"/>
+    <circle cx="12.5" cy="12.5" r="2.5" fill="#fd5fff"/>
+    <circle cx="12.5" cy="12.5" r="1" fill="#f1f8ff"/>
+  </g>
+</svg>
