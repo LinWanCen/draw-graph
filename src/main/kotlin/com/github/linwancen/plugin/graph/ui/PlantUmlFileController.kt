@@ -1,6 +1,11 @@
 package com.github.linwancen.plugin.graph.ui
 
+import com.fasterxml.jackson.databind.MapperFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.github.linwancen.plugin.common.psi.LangUtils
+import com.github.linwancen.plugin.common.text.ArrayNewLinePrinter
+import com.github.linwancen.plugin.common.text.JsonValueParser
 import com.github.linwancen.plugin.graph.printer.PrinterData
 import com.github.linwancen.plugin.graph.printer.PrinterPlantuml
 import com.intellij.openapi.application.runInEdt
@@ -32,7 +37,18 @@ object PlantUmlFileController {
     @JvmStatic
     fun forPlantUMLSupportFile(psiFile: PsiElement, project: Project, window: GraphWindow, src: String?) {
         val languageId = LangUtils.matchBaseLanguageId(psiFile, *languages) ?: return
-        forPlantUMLSrc(project, window, "@start$languageId\n$src\n@end$languageId")
+        val code = if (!languageId.contains("JSON")) {
+            src
+        } else {
+            val mapper = ObjectMapper()
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+                .setDefaultPrettyPrinter(ArrayNewLinePrinter())
+            val jsonNode = mapper.readTree(src)
+            val convert = JsonValueParser.convert(mapper, jsonNode)
+            mapper.writeValueAsString(convert)
+        }
+        forPlantUMLSrc(project, window, "@start$languageId\n$code\n@end$languageId")
     }
 
     @JvmStatic
