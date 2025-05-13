@@ -28,6 +28,20 @@ open class AbstractDrawGraphState {
     var otherExcludePattern = Pattern.compile("")!!
         private set
 
+    @Transient
+    var linePattern = Pattern.compile("[\r\n]++")!!
+
+    @Transient
+    var annoDocArr = listOf(
+        "io.swagger.annotations.Api#value",
+        "io.swagger.annotations.Api#tags",
+        "io.swagger.annotations.ApiOperation#value",
+        "io.swagger.v3.oas.annotations.Operation#summary",
+        "io.swagger.v3.oas.annotations.tags.Tag#name",
+        "io.swagger.v3.oas.annotations.tags.Tag#description",
+    )
+        private set
+
     fun getInclude(): String {
         return includePattern.pattern()
     }
@@ -60,10 +74,19 @@ open class AbstractDrawGraphState {
         this.otherExcludePattern = Pattern.compile(exclude)
     }
 
+    fun getAnnoDoc(): String {
+        return annoDocArr.joinToString("\n")
+    }
+
+    fun setAnnoDoc(annoDoc: String) {
+        this.annoDocArr = annoDoc.split(linePattern)
+    }
+
     fun resetAbstract(default: AbstractDrawGraphState) {
         setInclude(default.getInclude())
         setExclude(default.getExclude())
         setOtherInclude(default.getOtherInclude())
         setOtherExclude(default.getOtherExclude())
+        setAnnoDoc(default.getAnnoDoc())
     }
 }

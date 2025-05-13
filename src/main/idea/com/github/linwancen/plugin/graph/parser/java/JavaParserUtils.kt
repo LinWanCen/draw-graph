@@ -57,6 +57,7 @@ object JavaParserUtils {
     fun funMapWithoutDoc(func: PsiMethod, funMap: MutableMap<String, String>) {
         val v = JavaModifier.symbol(func)
         funMap["name"] = "$v ${func.name}"
+        JavaAnno.addAnno(func, funMap)
     }
 
     @JvmStatic
@@ -72,6 +73,7 @@ object JavaParserUtils {
         val classMap = mutableMapOf<String, String>()
         psiClass.qualifiedName?.let { classMap["sign"] = it }
         psiClass.name?.let { classMap["name"] = it }
+        JavaAnno.addAnno(psiClass, classMap)
         return Pair(psiClass, classMap)
     }
 }

@@ -101,6 +101,7 @@ public class GraphWindow {
         UiUtils.onChange(exclude, projectState.getExclude(), projectState::setExclude);
         UiUtils.onChange(otherInclude, projectState.getOtherInclude(), projectState::setOtherInclude);
         UiUtils.onChange(otherExclude, projectState.getOtherExclude(), projectState::setOtherExclude);
+        UiUtils.onChange(annoDoc, projectState.getAnnoDoc(), projectState::setAnnoDoc);
         UiUtils.onChange(mermaidOnline, appState.getMermaidOnline(), appState::setMermaidOnline);
         UiUtils.onChange(tempPath, appState.getTempPath(), appState::setTempPath);
         resetSetting.addActionListener(e -> {
@@ -197,6 +198,7 @@ public class GraphWindow {
     private JTextField exclude;
     private JTextField otherInclude;
     private JTextField otherExclude;
+    private JTextArea annoDoc;
     private JCheckBox online;
     private JTextField mermaidOnline;
     private JTextField tempPath;
