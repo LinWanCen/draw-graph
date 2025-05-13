@@ -29,6 +29,14 @@ open class AbstractDrawGraphState {
         private set
 
     @Transient
+    var effectIncludePattern = Pattern.compile("")!!
+        private set
+
+    @Transient
+    var effectExcludePattern = Pattern.compile("Test")!!
+        private set
+
+    @Transient
     var linePattern = Pattern.compile("[\r\n]++")!!
 
     @Transient
@@ -39,6 +47,19 @@ open class AbstractDrawGraphState {
         "io.swagger.v3.oas.annotations.Operation#summary",
         "io.swagger.v3.oas.annotations.tags.Tag#name",
         "io.swagger.v3.oas.annotations.tags.Tag#description",
+        Setting.message("anno_doc"),
+    )
+        private set
+
+    @Transient
+    var effectAnnoArr = listOf(
+        "org.springframework.web.bind.annotation.RequestMapping#value",
+        "org.springframework.web.bind.annotation.GetMapping#value",
+        "org.springframework.web.bind.annotation.PostMapping#value",
+        "org.springframework.web.bind.annotation.PutMapping#value",
+        "org.springframework.web.bind.annotation.DeleteMapping#value",
+        "org.springframework.web.bind.annotation.PatchMapping#value",
+        Setting.message("effect_anno"),
     )
         private set
 
@@ -46,40 +67,65 @@ open class AbstractDrawGraphState {
         return includePattern.pattern()
     }
 
-    fun setInclude(include: String) {
-        this.includePattern = Pattern.compile(include)
+    fun setInclude(s: String) {
+        this.includePattern = Pattern.compile(s)
     }
 
     fun getExclude(): String {
         return excludePattern.pattern()
     }
 
-    fun setExclude(exclude: String) {
-        this.excludePattern = Pattern.compile(exclude)
+    fun setExclude(s: String) {
+        this.excludePattern = Pattern.compile(s)
     }
 
     fun getOtherInclude(): String {
         return otherIncludePattern.pattern()
     }
 
-    fun setOtherInclude(include: String) {
-        this.otherIncludePattern = Pattern.compile(include)
+    fun setOtherInclude(s: String) {
+        this.otherIncludePattern = Pattern.compile(s)
     }
 
     fun getOtherExclude(): String {
         return otherExcludePattern.pattern()
     }
 
-    fun setOtherExclude(exclude: String) {
-        this.otherExcludePattern = Pattern.compile(exclude)
+    fun setOtherExclude(s: String) {
+        this.otherExcludePattern = Pattern.compile(s)
+    }
+
+
+    fun getEffectInclude(): String {
+        return effectIncludePattern.pattern()
+    }
+
+    fun setEffectInclude(s: String) {
+        this.effectIncludePattern = Pattern.compile(s)
+    }
+
+    fun getEffectExclude(): String {
+        return effectExcludePattern.pattern()
+    }
+
+    fun setEffectExclude(s: String) {
+        this.effectExcludePattern = Pattern.compile(s)
     }
 
     fun getAnnoDoc(): String {
         return annoDocArr.joinToString("\n")
     }
 
-    fun setAnnoDoc(annoDoc: String) {
-        this.annoDocArr = annoDoc.split(linePattern)
+    fun setAnnoDoc(s: String) {
+        this.annoDocArr = s.split(linePattern)
+    }
+
+    fun getEffectAnno(): String {
+        return effectAnnoArr.joinToString("\n")
+    }
+
+    fun setEffectAnno(s: String) {
+        this.effectAnnoArr = s.split(linePattern)
     }
 
     fun resetAbstract(default: AbstractDrawGraphState) {
@@ -87,6 +133,9 @@ open class AbstractDrawGraphState {
         setExclude(default.getExclude())
         setOtherInclude(default.getOtherInclude())
         setOtherExclude(default.getOtherExclude())
+        setEffectInclude(default.getEffectInclude())
+        setEffectExclude(default.getEffectExclude())
         setAnnoDoc(default.getAnnoDoc())
+        setEffectAnno(default.getEffectAnno())
     }
 }

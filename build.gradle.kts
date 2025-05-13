@@ -23,6 +23,7 @@ repositories {
 
 dependencies {
    implementation("net.sourceforge.plantuml:plantuml:1.2024.3")
+    // need since 2021.1
    implementation("org.xerial:sqlite-jdbc:3.49.1.0")
 }
 

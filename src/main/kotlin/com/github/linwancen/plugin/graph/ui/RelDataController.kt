@@ -16,6 +16,11 @@ object RelDataController {
         window: GraphWindow,
         relData: RelData,
     ) {
+        RelData2Effect().save(project, relData) { set, s ->
+            runInEdt {
+                window.toolWindow.activate(null)
+            }
+        }
         val (plantumlSrc, plantumlJs) = PrinterPlantuml().toSrc(relData)
         val (mermaidSrc, _) = PrinterMermaid().toSrc(relData)
         val (graphvizSrc, graphvizJs) = PrinterGraphviz().toSrc(relData)
@@ -28,7 +33,6 @@ object RelDataController {
                     "childSet.size: ${relData.childSet.size}"
             runInEdt {
                 window.toolWindow.activate(null)
-                // don't stop when src does not change, update file when open multi project
                 window.mermaidSrc.text = it
                 window.plantumlSrc.text = it
                 window.graphvizSrc.text = it

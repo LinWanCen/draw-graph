@@ -4,6 +4,7 @@
 
 ## [1.0.0]
 
+- 1.27 effect.txt
 - 1.26 Anno Doc
 - 1.25 json format and base64, timestamp, jsonStr, multi line
 - 1.24 doc from super method
@@ -35,6 +36,7 @@
 
 # 中文更新日志
 
+- 1.27 影响清单文件
 - 1.26 注解注释
 - 1.25 JSON 格式化与 base64, 时间戳, json 字符串, 多行文本
 - 1.24 从父方法获取注释

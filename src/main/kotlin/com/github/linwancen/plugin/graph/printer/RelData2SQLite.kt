@@ -26,7 +26,7 @@ class RelData2SQLite {
                 }
                 try {
                     File(path).mkdirs()
-                    DriverManager.getConnection("jdbc:sqlite:$path/db.sqlite").use { connection ->
+                    DriverManager.getConnection("jdbc:sqlite:$path/draw_graph.sqlite").use { connection ->
                         connection.createStatement().use { s ->
                             s.execute("PRAGMA synchronous=OFF")
                             s.executeUpdate("drop table if exists itemMap")
