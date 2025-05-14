@@ -24,8 +24,7 @@ class GroovyParser : ParserLang<GrMethod>() {
     }
 
     override fun toSign(func: GrMethod): String? {
-        val clazz = func.containingClass ?: return "#${func.name}"
-        return "${clazz.qualifiedName ?: return null}#${func.name}"
+        return JavaParserUtils.sign(func)
     }
 
     override fun funMap(funMap: MutableMap<String, String>, func: GrMethod) {

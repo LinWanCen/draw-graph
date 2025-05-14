@@ -64,7 +64,7 @@ abstract class ParserLang<F : PsiElement> : Parser() {
         val funcs = PsiTreeUtil.findChildrenOfType(psiFile, funClass())
         for (func in funcs) {
             val sign = funcSign(state, func, file, relData) ?: continue
-            // overload fun
+            // override fun
             val callSet = callSetMap.computeIfAbsent(sign) { mutableSetOf() }
             callSet.addAll(
                 callList(func, true)

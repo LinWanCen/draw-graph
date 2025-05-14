@@ -2,9 +2,12 @@ package com.github.linwancen.plugin.graph.parser.kotlin
 
 import com.github.linwancen.plugin.graph.parser.Call
 import com.github.linwancen.plugin.graph.parser.ParserLang
+import com.github.linwancen.plugin.graph.parser.ParserUtils
 import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import org.jetbrains.kotlin.idea.KotlinLanguage
+import org.jetbrains.kotlin.nj2k.postProcessing.type
+import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
@@ -25,12 +28,25 @@ class KotlinParser : ParserLang<KtNamedFunction>() {
 
     override fun toSign(func: KtNamedFunction): String? {
         val classOrObject = func.containingClassOrObject ?: return "#${func.name}"
-        return "${classOrObject.fqName ?: return null}#${func.name}"
+        val params = params(classOrObject, func)
+        return "${classOrObject.fqName ?: return null}#${func.name}$params"
+    }
+
+    fun params(classOrObject: KtClassOrObject, func: KtNamedFunction): String {
+        val its = classOrObject.declarations
+            .filterIsInstance<KtNamedFunction>()
+            .filter { it.name == func.name }
+        if (its.size == 1) {
+            return ""
+        }
+        return func.valueParameters.joinToString(prefix = "(", separator = ",", postfix = ")") {
+            it.type().toString()
+        }
     }
 
     override fun funMap(funMap: MutableMap<String, String>, func: KtNamedFunction) {
         val v = KotlinModifier.symbol(func)
-        funMap["name"] = "$v ${func.name}"
+        funMap["name"] = "$v ${func.name}${ParserUtils.signParams(funMap)}"
         KotlinComment.addDocParam(func.docComment, funMap)
     }
 

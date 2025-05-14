@@ -20,7 +20,11 @@ import org.cef.handler.CefMessageRouterHandlerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.regex.Pattern;
 
 public class JcefNavigateHandler extends CefMessageRouterHandlerAdapter {
     protected Project project;
@@ -97,21 +101,52 @@ public class JcefNavigateHandler extends CefMessageRouterHandlerAdapter {
         navigate(callback, element);
     }
 
+    public static final Pattern PARAM_PATTERN = Pattern.compile("[#_(),]++");
+
     private static boolean navigateChild(@NotNull CefQueryCallback callback,
                                          @NotNull NavigatablePsiElement element, @NotNull String childName) {
-        // findChildrenOfType() slow, so getChildrenOfType() Recursive return when found
-        @NotNull List<NavigatablePsiElement> children = PsiTreeUtil.getChildrenOfTypeAsList(element,
-                NavigatablePsiElement.class);
-        for (@NotNull NavigatablePsiElement child : children) {
-            if (childName.equals(child.getName())) {
-                navigate(callback, child);
-                return true;
+        String[] params = null;
+        if (PARAM_PATTERN.matcher(childName).find()) {
+            String[] split = PARAM_PATTERN.split(childName);
+            childName = split[0];
+            params = Arrays.copyOfRange(split, 1, split.length);
+        }
+        Queue<NavigatablePsiElement> queue = new LinkedList<>();
+        queue.add(element);
+        while (!queue.isEmpty()) {
+            NavigatablePsiElement current = queue.poll();
+            List<NavigatablePsiElement> children = PsiTreeUtil.getChildrenOfTypeAsList(current, NavigatablePsiElement.class);
+            for (NavigatablePsiElement child : children) {
+                if (childName.equals(child.getName())) {
+                    if (params != null && !paramMatch(childName, child, params)) {
+                        continue;
+                    }
+                    navigate(callback, child);
+                    return true;
+                }
             }
-            if (navigateChild(callback, child, childName)) {
-                return true;
-            }
+            queue.addAll(children);
         }
         return false;
+    }
+
+    private static boolean paramMatch(@NotNull String childName, @NotNull PsiElement child, @NotNull String[] params) {
+        String text = child.getText();
+        if (params.length == 0) {
+            return text.indexOf(childName + "()") > 0;
+        }
+        int i = text.indexOf(childName + "(");
+        text = text.substring(i + childName.length() + 1);
+        i = text.indexOf(')');
+        text = text.substring(0, i);
+        for (String param : params) {
+            i = text.indexOf(param);
+            if (i < 0) {
+                return false;
+            }
+            text = text.substring(i + param.length());
+        }
+        return true;
     }
 
     private static void navigate(@NotNull CefQueryCallback callback, @NotNull NavigatablePsiElement element) {

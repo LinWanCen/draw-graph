@@ -1,5 +1,6 @@
 package com.github.linwancen.plugin.graph.parser.java
 
+import com.github.linwancen.plugin.graph.parser.ParserUtils
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
@@ -54,9 +55,26 @@ object JavaParserUtils {
     }
 
     @JvmStatic
+    fun sign(func: PsiMethod): String? {
+        val clazz = func.containingClass ?: return "#${func.name}"
+        return "${clazz.qualifiedName ?: return null}#${func.name}${params(clazz, func)}"
+    }
+
+    @JvmStatic
+    fun params(clazz: PsiClass, func: PsiMethod): String {
+        val its = clazz.findMethodsByName(func.name, false)
+        if (its.size == 1) {
+            return ""
+        }
+        return func.parameterList.parameters.joinToString(prefix = "(", separator = ",", postfix = ")") {
+            it.type.toString().substringAfterLast(':')
+        }
+    }
+
+    @JvmStatic
     fun funMapWithoutDoc(func: PsiMethod, funMap: MutableMap<String, String>) {
         val v = JavaModifier.symbol(func)
-        funMap["name"] = "$v ${func.name}"
+        funMap["name"] = "$v ${func.name}${ParserUtils.signParams(funMap)}"
         JavaAnno.addAnno(func, funMap)
     }
 

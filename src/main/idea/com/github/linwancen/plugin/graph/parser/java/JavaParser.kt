@@ -40,8 +40,7 @@ open class JavaParser : ParserLang<PsiMethod>() {
     }
 
     override fun toSign(func: PsiMethod): String? {
-        val clazz = func.containingClass ?: return "#${func.name}"
-        return "${clazz.qualifiedName ?: return null}#${func.name}"
+        return JavaParserUtils.sign(func)
     }
 
     override fun funMap(funMap: MutableMap<String, String>, func: PsiMethod) {

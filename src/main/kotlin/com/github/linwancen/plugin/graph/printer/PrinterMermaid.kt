@@ -49,7 +49,8 @@ class PrinterMermaid : Printer() {
             sb.append(if (isItem) ")" else "]")
         }
         sb.append("\n")
-        sb.append("  click '${sign(itemMap["sign"] ?: return)}' call navigate(\"${itemMap["link"]}\")")
+        val link = itemMap["link"]?.replace(")", "") ?: ""
+        sb.append("  click '${sign(itemMap["sign"] ?: return)}' call navigate(\"$link\")")
         sb.append("\n\n")
     }
 
