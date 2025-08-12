@@ -92,7 +92,7 @@ object JsonValueParser {
     }
 
     @JvmStatic
-    private val NEW_LINE_PATTERN = Pattern.compile("[\r\n]++")
+    private val NEW_LINE_PATTERN = Pattern.compile("\r|\n|\r\n")
 
     @JvmStatic
     private fun multiLineToObject(s: String): JsonNode {
