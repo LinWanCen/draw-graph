@@ -1,5 +1,6 @@
 package com.github.linwancen.plugin.graph.ui.webview;
 
+import com.github.linwancen.plugin.common.psi.PsiUnSaveUtils;
 import com.github.linwancen.plugin.graph.parser.Parser;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbService;
@@ -131,7 +132,7 @@ public class JcefNavigateHandler extends CefMessageRouterHandlerAdapter {
     }
 
     private static boolean paramMatch(@NotNull String childName, @NotNull PsiElement child, @NotNull String[] params) {
-        String text = child.getText();
+        String text = PsiUnSaveUtils.getText(child);
         if (params.length == 0) {
             return text.indexOf(childName + "()") > 0;
         }

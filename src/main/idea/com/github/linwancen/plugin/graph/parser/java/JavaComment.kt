@@ -1,5 +1,6 @@
 package com.github.linwancen.plugin.graph.parser.java
 
+import com.github.linwancen.plugin.common.psi.PsiUnSaveUtils
 import com.github.linwancen.plugin.common.text.DocText
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
@@ -48,11 +49,11 @@ open class JavaComment {
         val children = element.children
         if (children.isNotEmpty()) {
             if (children.size >= 3) {
-                DocText.addHtmlText(children[children.size - 2].text, all, currLine)
+                DocText.addHtmlText(PsiUnSaveUtils.getText(children[children.size - 2]), all, currLine)
             }
             return false
         }
-        DocText.addHtmlText(element.text, all, currLine)
+        DocText.addHtmlText(PsiUnSaveUtils.getText(element), all, currLine)
         return false
     }
 
@@ -60,7 +61,7 @@ open class JavaComment {
         for (tag in docComment.tags) {
             val name = tag.name
             val valueElement = tag.valueElement ?: tag.dataElements.firstOrNull() ?: continue
-            val value = DocText.addHtmlText(valueElement.text) ?: continue
+            val value = DocText.addHtmlText(PsiUnSaveUtils.getText(valueElement)) ?: continue
             map["@$name"] = value
         }
     }

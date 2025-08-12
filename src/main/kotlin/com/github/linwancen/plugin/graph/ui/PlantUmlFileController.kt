@@ -9,6 +9,7 @@ import com.github.linwancen.plugin.common.text.JsonValueParser
 import com.github.linwancen.plugin.graph.printer.PrinterData
 import com.github.linwancen.plugin.graph.printer.PrinterPlantuml
 import com.intellij.openapi.application.runInEdt
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
@@ -22,10 +23,12 @@ object PlantUmlFileController {
     @JvmStatic
     fun forPlantUMLFiles(project: Project, window: GraphWindow, files: Array<VirtualFile>) {
         if (files.size != 1) return
-        val name = files[0].name
+        val virtualFile = files[0]
+        val name = virtualFile.name
         DumbService.getInstance(project).runReadActionInSmartMode {
             val psiFile = PsiManager.getInstance(project).findFile(files[0]) ?: return@runReadActionInSmartMode
-            val src = psiFile.text
+            val src = FileDocumentManager.getInstance().getDocument(files[0])?.text
+                ?: psiFile.text ?: return@runReadActionInSmartMode
             if (name.endsWith(".puml") || name.endsWith(".plantuml")) {
                 forPlantUMLSrc(project, window, src)
             } else {

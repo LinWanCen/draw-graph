@@ -1,6 +1,7 @@
 package com.github.linwancen.plugin.graph.ui
 
 import com.github.linwancen.plugin.common.psi.LangUtils
+import com.github.linwancen.plugin.common.psi.PsiUnSaveUtils
 import com.github.linwancen.plugin.common.vfile.ChildFileUtils
 import com.github.linwancen.plugin.graph.parser.Parser
 import com.github.linwancen.plugin.graph.parser.RelData
@@ -143,7 +144,7 @@ object RelController {
             lastCallUsageMap.remove(project)
             val window = GraphWindowFactory.winMap[project] ?: return
             DumbService.getInstance(project).runReadActionInSmartMode {
-                val src = psiFile.text
+                val src = PsiUnSaveUtils.getText(psiFile)
                 if (LangUtils.matchBaseLanguageId(psiFile, "HTML") != null) {
                     HtmlFileController.forHtmlSrc(window, src)
                     return@runReadActionInSmartMode

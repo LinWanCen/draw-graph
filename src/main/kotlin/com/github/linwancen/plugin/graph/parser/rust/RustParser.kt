@@ -1,5 +1,6 @@
 package com.github.linwancen.plugin.graph.parser.rust
 
+import com.github.linwancen.plugin.common.psi.PsiUnSaveUtils
 import com.github.linwancen.plugin.graph.parser.Call
 import com.github.linwancen.plugin.graph.parser.ParserLang
 import com.github.linwancen.plugin.graph.parser.RelData
@@ -26,7 +27,7 @@ class RustParser : ParserLang<RsFunction>() {
     override fun toSign(func: RsFunction): String {
         val mod = PsiTreeUtil.getParentOfType(func, RsModItem::class.java)?.name
         val implItem = PsiTreeUtil.getParentOfType(func, RsImplItem::class.java)
-        val struct = implItem?.firstChild?.text
+        val struct = implItem?.firstChild?.let { PsiUnSaveUtils.getText(it) }
         var sign = "${func.name}"
         if (struct != null) {
             sign = "$struct.$sign"
@@ -45,7 +46,7 @@ class RustParser : ParserLang<RsFunction>() {
     override fun classMap(func: RsFunction, relData: RelData): MutableMap<String, String>? {
         val mod = PsiTreeUtil.getParentOfType(func, RsModItem::class.java)?.name
         val implItem = PsiTreeUtil.getParentOfType(func, RsImplItem::class.java)
-        val struct = implItem?.firstChild?.text
+        val struct = implItem?.firstChild?.let { PsiUnSaveUtils.getText(it) }
         val name = struct ?: mod ?: return null
         val classMap = mutableMapOf<String, String>()
         classMap["name"] = name
