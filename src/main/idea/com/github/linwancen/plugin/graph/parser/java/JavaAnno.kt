@@ -1,6 +1,6 @@
 package com.github.linwancen.plugin.graph.parser.java
 
-import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
+import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiField
 import com.intellij.psi.PsiModifierListOwner
@@ -17,6 +17,7 @@ open class JavaAnno {
 
     open fun addAnno(psiAnnotationOwner: PsiModifierListOwner?, map: MutableMap<String, String>) {
         psiAnnotationOwner ?: return
+        val eval = JavaPsiFacade.getInstance(psiAnnotationOwner.project).constantEvaluationHelper
         for (anno in psiAnnotationOwner.annotations) {
             val annoName = anno.qualifiedName
             for (it in anno.parameterList.attributes) {
@@ -31,7 +32,6 @@ open class JavaAnno {
                         val resolve = v.resolve()
                         if (resolve is PsiField) {
                             val initializer = resolve.initializer ?: continue
-                            val eval = JavaPsiFacade.getInstance(psiAnnotationOwner.project).constantEvaluationHelper
                             value = eval.computeConstantExpression(initializer).toString()
                         }
                     } catch (ignored: Throwable) {}
@@ -39,7 +39,7 @@ open class JavaAnno {
                 map["$annoName#${it.name ?: "value"}"] = value ?: continue
             }
         }
-        val state = DrawGraphProjectState.of(psiAnnotationOwner.project)
+        val state = DrawGraphAppState.of()
         for (key in state.annoDocArr) {
             if (key.isBlank()) {
                 continue

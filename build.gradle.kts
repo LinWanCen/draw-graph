@@ -23,8 +23,8 @@ repositories {
 
 dependencies {
    implementation("net.sourceforge.plantuml:plantuml:1.2024.3")
-    // need since 2021.1
-   implementation("org.xerial:sqlite-jdbc:3.49.1.0")
+    // need since 2021.1，DeepSeek R1 671B support verison what size is small
+   implementation("org.xerial:sqlite-jdbc:3.7.15-M1")
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.

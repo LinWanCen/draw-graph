@@ -27,6 +27,12 @@ class RelData2Effect {
                     File(path).mkdirs()
                     val haveCall = relData.callSet.map { it.second }.toSet()
                     val noCall = relData.callSet.map { it.first }.filter { it !in haveCall }.toSet()
+                    val notCallImplMap = mutableMapOf<String, MutableList<String>>()
+                    for (pair in relData.callSet) {
+                        if (noCall.contains(pair.first)) {
+                            notCallImplMap.computeIfAbsent(pair.first) { mutableListOf() }.add(pair.second)
+                        }
+                    }
                     val sb = StringBuilder()
                     noCall.forEach {
                         if (Skip.skip(it, projectState.effectIncludePattern, projectState.effectExcludePattern)) {
@@ -35,28 +41,41 @@ class RelData2Effect {
                         val map = relData.itemMap[it]
                         sb.append(it).append('\t').append(map?.get("@1") ?: "")
                         // effect anno value
-                        if (map != null) {
-                            for (anno in appState.effectAnnoArr) {
-                                if (anno.isBlank()) {
-                                    continue
-                                }
-                                val effectAnno = map[anno]
-                                if (effectAnno != null) {
-                                    sb.append('\t').append(effectAnno)
-                                    break
-                                }
-                            }
+                        appendAnnoValue(map, appState, sb)
+                        // effect impl anno value
+                        notCallImplMap[it]?.forEach {
+                            val implMap = relData.itemMap[it]
+                            appendAnnoValue(implMap, appState, sb)
                         }
+                        appendAnnoValue(map, appState, sb)
                         sb.append('\n')
                     }
                     val s = sb.toString()
+                    func.accept(noCall, s)
                     val dotPath = "$path/effect.txt"
                     Files.write(Path.of(dotPath), s.toByteArray(StandardCharsets.UTF_8))
-                    func.accept(noCall, s)
                 } catch (e: Throwable) {
                     log.info("RelData2Effect fail", e)
                 }
             }
         }.queue()
+    }
+
+    private fun appendAnnoValue(
+        map: MutableMap<String, String>?,
+        appState: DrawGraphAppState,
+        sb: StringBuilder,
+    ) {
+        if (map == null) return
+        for (anno in appState.effectAnnoArr) {
+            if (anno.isBlank()) {
+                continue
+            }
+            val effectAnno = map[anno]
+            if (effectAnno != null) {
+                sb.append('\t').append(effectAnno)
+                break
+            }
+        }
     }
 }

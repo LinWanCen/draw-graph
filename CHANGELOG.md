@@ -4,6 +4,7 @@
 
 ## [1.0.0]
 
+- 1.29 Effect UI and Add Impl Anno Value
 - 1.28 Support overloading method
 - 1.27 effect.txt
 - 1.26 Anno Doc
@@ -37,6 +38,7 @@
 
 # 中文更新日志
 
+- 1.29 影响清单界面和支持添加实现类的注解值
 - 1.28 支持重载方法
 - 1.27 影响清单文件
 - 1.26 注解注释

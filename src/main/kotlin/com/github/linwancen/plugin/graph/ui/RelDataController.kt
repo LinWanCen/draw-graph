@@ -19,12 +19,14 @@ object RelDataController {
         RelData2Effect().save(project, relData) { set, s ->
             runInEdt {
                 window.toolWindow.activate(null)
+                window.effect.text = s
             }
         }
+        RelData2SQLite().save(project, relData)
+
         val (plantumlSrc, plantumlJs) = PrinterPlantuml().toSrc(relData)
         val (mermaidSrc, _) = PrinterMermaid().toSrc(relData)
         val (graphvizSrc, graphvizJs) = PrinterGraphviz().toSrc(relData)
-        RelData2SQLite().save(project, relData)
         val limit = DrawGraphAppState.of().limit
         if (relData.itemMap.size > limit) {
             val it = "itemMap.size: ${relData.itemMap.size} > limit: $limit\n<br>" +

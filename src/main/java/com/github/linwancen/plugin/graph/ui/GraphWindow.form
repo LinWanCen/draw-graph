@@ -402,6 +402,19 @@
               </tabbedpane>
             </children>
           </grid>
+          <scrollpane id="23679">
+            <constraints>
+              <tabbedpane title-resource-bundle="messages/DrawGraphBundle" title-key="effect"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="77ca7" class="javax.swing.JTextArea" binding="effect">
+                <constraints/>
+                <properties/>
+              </component>
+            </children>
+          </scrollpane>
           <scrollpane id="45d9a">
             <constraints>
               <tabbedpane title-resource-bundle="messages/DrawGraphBundle" title-key="setting"/>

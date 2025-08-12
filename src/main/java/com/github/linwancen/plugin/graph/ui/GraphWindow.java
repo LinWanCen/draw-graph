@@ -1,7 +1,11 @@
 package com.github.linwancen.plugin.graph.ui;
 
 import com.github.linwancen.plugin.common.ui.UiUtils;
-import com.github.linwancen.plugin.graph.printer.*;
+import com.github.linwancen.plugin.graph.printer.InstallMermaid;
+import com.github.linwancen.plugin.graph.printer.PrinterData;
+import com.github.linwancen.plugin.graph.printer.PrinterGraphviz;
+import com.github.linwancen.plugin.graph.printer.PrinterMermaid;
+import com.github.linwancen.plugin.graph.printer.PrinterPlantuml;
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState;
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState;
 import com.github.linwancen.plugin.graph.ui.webview.Browser;
@@ -188,6 +192,8 @@ public class GraphWindow {
     JTextArea graphvizHtml;
     JTextArea graphvizSrc;
     // endregion html
+
+    JTextArea effect;
 
     // region setting
     private JButton resetSetting;
