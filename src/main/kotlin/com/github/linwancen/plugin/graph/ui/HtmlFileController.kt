@@ -1,11 +1,10 @@
 package com.github.linwancen.plugin.graph.ui
 
+import com.github.linwancen.plugin.common.psi.PsiUnSaveUtils
 import com.intellij.openapi.application.runInEdt
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiManager
 
 object HtmlFileController {
 
@@ -13,8 +12,7 @@ object HtmlFileController {
     fun forHtmlFiles(project: Project, window: GraphWindow, files: Array<VirtualFile>) {
         if (files.size == 1 && files[0].name.endsWith(".html")) {
             DumbService.getInstance(project).runReadActionInSmartMode {
-                val src = FileDocumentManager.getInstance().getDocument(files[0])?.text
-                    ?: PsiManager.getInstance(project).findFile(files[0])?.text ?: return@runReadActionInSmartMode
+                val src = PsiUnSaveUtils.fileText(project, files[0]) ?: return@runReadActionInSmartMode
                 forHtmlSrc(window, src)
             }
         }
