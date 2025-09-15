@@ -15,8 +15,9 @@ object RelDataController {
         project: Project,
         window: GraphWindow,
         relData: RelData,
+        isCall: Boolean,
     ) {
-        RelData2Effect().save(project, relData) { set, s ->
+        RelData2Effect().save(project, relData, isCall) { set, s ->
             runInEdt {
                 window.toolWindow.activate(null)
                 window.effect.text = s

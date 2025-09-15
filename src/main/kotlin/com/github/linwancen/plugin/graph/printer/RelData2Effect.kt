@@ -1,6 +1,7 @@
 package com.github.linwancen.plugin.graph.printer
 
 import com.github.linwancen.plugin.common.text.Skip
+import com.github.linwancen.plugin.common.text.TsvUtils
 import com.github.linwancen.plugin.graph.parser.RelData
 import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.github.linwancen.plugin.graph.settings.DrawGraphProjectState
@@ -17,7 +18,7 @@ import java.util.function.BiConsumer
 class RelData2Effect {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    fun save(project: Project, relData: RelData, func: BiConsumer<Set<String>, String>) {
+    fun save(project: Project, relData: RelData, isCall: Boolean, func: BiConsumer<Set<String>, String>) {
         object : Task.Backgroundable(project, "draw effect") {
             override fun run(indicator: ProgressIndicator) {
                 val path = DrawGraphAppState.of().tempPath
@@ -25,15 +26,19 @@ class RelData2Effect {
                 val projectState = DrawGraphProjectState.of(project)
                 try {
                     File(path).mkdirs()
-                    val haveCall = relData.callSet.map { it.second }.toSet()
-                    val noCall = relData.callSet.map { it.first }.filter { it !in haveCall }.toSet()
+                    val haveCall = relData.callSet.map { if (isCall) it.first else it.second }.toSet()
+                    val noCall =
+                        relData.callSet.map { if (isCall) it.second else it.first }.filter { it !in haveCall }.toSet()
                     val notCallImplMap = mutableMapOf<String, MutableList<String>>()
-                    for (pair in relData.callSet) {
-                        if (noCall.contains(pair.first)) {
-                            notCallImplMap.computeIfAbsent(pair.first) { mutableListOf() }.add(pair.second)
+                    for (it in relData.callSet) {
+                        if (noCall.contains(if (isCall) it.second else it.first)) {
+                            notCallImplMap.computeIfAbsent(if (isCall) it.second else it.first) { mutableListOf() }
+                                .add(if (isCall) it.first else it.second)
                         }
                     }
                     val sb = StringBuilder()
+                    val mapperTableMap = TsvUtils.load(project, ".mapperTable.tsv")
+                    val dtoTableMap = TsvUtils.load(project, ".dtoTable.tsv")
                     noCall.forEach {
                         if (Skip.skip(it, projectState.effectIncludePattern, projectState.effectExcludePattern)) {
                             return@forEach
@@ -48,6 +53,17 @@ class RelData2Effect {
                             appendAnnoValue(implMap, appState, sb)
                         }
                         appendAnnoValue(map, appState, sb)
+                        // table and comment
+                        if (isCall) {
+                            val s = mapperTableMap[it.replaceFirst('#', '.')]
+                            if (s != null) {
+                                sb.append('\t').append(s)
+                            }
+                            val s2 = dtoTableMap[it.split('#').first()]
+                            if (s2 != null) {
+                                sb.append('\t').append(s2)
+                            }
+                        }
                         sb.append('\n')
                     }
                     val s = sb.toString()

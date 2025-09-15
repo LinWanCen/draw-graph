@@ -97,7 +97,7 @@ object RelController {
                 HtmlFileController.forHtmlFiles(project, window, files)
                 return
             }
-            RelDataController.dataToWindow(project, window, relData)
+            RelDataController.dataToWindow(project, window, relData, true)
         } catch (e: Throwable) {
             LOG.info("RelController.buildSrc() catch Throwable but log to record.", e)
         }
@@ -122,7 +122,7 @@ object RelController {
                         DumbService.getInstance(project).runReadActionInSmartMode {
                             Parser.call(project, relData, psiElement, call, indicator)
                         }
-                        RelDataController.dataToWindow(project, window, relData)
+                        RelDataController.dataToWindow(project, window, relData, call)
                     } catch (e: Throwable) {
                         LOG.info("RelController.forElement() Thread catch Throwable but log to record.", e)
                     }
