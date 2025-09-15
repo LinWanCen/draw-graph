@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.TextNode
+import com.github.linwancen.plugin.common.psi.PsiUnSaveUtils
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
@@ -47,7 +48,7 @@ object JsonValueParser {
                 } catch (ignored: Exception) {
                 }
             }
-            val s64 = NEW_LINE_PATTERN.matcher(s).replaceAll("")
+            val s64 = PsiUnSaveUtils.LINE_END_PATTERN.matcher(s).replaceAll("")
             if (isBase64(s64)) {
                 try {
                     val decode = Base64.getDecoder().decode(s64)
@@ -92,11 +93,8 @@ object JsonValueParser {
     }
 
     @JvmStatic
-    private val NEW_LINE_PATTERN = Pattern.compile("\r|\n|\r\n")
-
-    @JvmStatic
     private fun multiLineToObject(s: String): JsonNode {
-        val split = NEW_LINE_PATTERN.split(s)
+        val split = PsiUnSaveUtils.LINE_END_PATTERN.split(s)
         if (split.size == 1) {
             return TextNode(s)
         }

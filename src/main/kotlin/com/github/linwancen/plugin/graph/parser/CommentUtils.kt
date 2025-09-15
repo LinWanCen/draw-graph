@@ -51,9 +51,6 @@ object CommentUtils {
     )
 
     @JvmStatic
-    private val LINE_SEPARATOR_PATTERN: Pattern = Pattern.compile("[\r\n]")
-
-    @JvmStatic
     private val HTML_PATTERN: Pattern = Pattern.compile("<[^>]++>")
 
     @JvmStatic
@@ -63,7 +60,7 @@ object CommentUtils {
 
     @JvmStatic
     fun split(s: String, map: MutableMap<String, String>) {
-        val split = LINE_SEPARATOR_PATTERN.split(s)
+        val split = PsiUnSaveUtils.LINE_END_PATTERN.split(s)
         for ((index, line) in split.withIndex()) {
             map["@${index + 1}"] = line
         }

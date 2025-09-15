@@ -1,5 +1,6 @@
 package com.github.linwancen.plugin.graph.settings
 
+import com.github.linwancen.plugin.common.psi.PsiUnSaveUtils
 import java.util.*
 import java.util.regex.Pattern
 
@@ -35,9 +36,6 @@ open class AbstractDrawGraphState {
     @Transient
     var effectExcludePattern = Pattern.compile("Test")!!
         private set
-
-    @Transient
-    var linePattern = Pattern.compile("[\r\n]++")!!
 
     @Transient
     var annoDocArr = listOf(
@@ -117,7 +115,7 @@ open class AbstractDrawGraphState {
     }
 
     fun setAnnoDoc(s: String) {
-        this.annoDocArr = s.split(linePattern)
+        this.annoDocArr = s.split(PsiUnSaveUtils.LINE_END_PATTERN)
     }
 
     fun getEffectAnno(): String {
@@ -125,7 +123,7 @@ open class AbstractDrawGraphState {
     }
 
     fun setEffectAnno(s: String) {
-        this.effectAnnoArr = s.split(linePattern)
+        this.effectAnnoArr = s.split(PsiUnSaveUtils.LINE_END_PATTERN)
     }
 
     fun resetAbstract(default: AbstractDrawGraphState) {

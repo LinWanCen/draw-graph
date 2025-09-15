@@ -2,8 +2,12 @@ package com.github.linwancen.plugin.common.psi
 
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import java.util.regex.Pattern
 
 object PsiUnSaveUtils {
+
+    @JvmStatic
+    val LINE_END_PATTERN: Pattern = Pattern.compile("\r|\n|\r\n")
 
     @JvmStatic
     fun getText(element: PsiElement): String {
