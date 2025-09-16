@@ -27,7 +27,10 @@ class ParserXml : Parser() {
     override fun srcImpl(project: Project, relData: RelData, files: List<VirtualFile>, indicator: ProgressIndicator?) {
         val callSetMap = mutableMapOf<String, MutableSet<String>>()
         val psiFiles = if (files.size == 1 && POM_FILE == files[0].name) {
+            val path = files[0].path
+            val dir = path.substring(0, path.length - POM_FILE.length)
             FilenameIndex.getFilesByName(project, POM_FILE, GlobalSearchScope.projectScope(project)).toList()
+                .filter { it.virtualFile.path.startsWith(dir) }
         } else {
             files.mapNotNull { PsiManager.getInstance(project).findFile(it) }.filter { POM_FILE == it.name }
         }
