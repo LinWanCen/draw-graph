@@ -5,6 +5,7 @@ import com.github.linwancen.plugin.common.psi.PsiUnSaveUtils
 import com.github.linwancen.plugin.common.vfile.ChildFileUtils
 import com.github.linwancen.plugin.graph.parser.Parser
 import com.github.linwancen.plugin.graph.parser.RelData
+import com.github.linwancen.plugin.graph.settings.DrawGraphAppState
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
@@ -89,6 +90,10 @@ object RelController {
                 mostExtChildFile
             }
             val relData = RelData()
+            if (DrawGraphAppState.of().htmlPreview && files.size == 1 && files[0].name.endsWith(".html")) {
+                HtmlFileController.forHtmlFiles(project, window, files)
+                return
+            }
             DumbService.getInstance(project).runReadActionInSmartMode {
                 Parser.src(project, relData, fileList, indicator)
             }

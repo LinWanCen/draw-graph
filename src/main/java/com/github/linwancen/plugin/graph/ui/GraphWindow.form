@@ -632,9 +632,17 @@
                       </grid>
                     </constraints>
                   </vspacer>
+                  <component id="95383" class="javax.swing.JCheckBox" binding="htmlPreview">
+                    <constraints>
+                      <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text resource-bundle="messages/DrawGraphBundle" key="htmlPreview"/>
+                    </properties>
+                  </component>
                   <component id="de829" class="javax.swing.JLabel">
                     <constraints>
-                      <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
                       <labelFor value="5d109"/>
@@ -643,7 +651,7 @@
                   </component>
                   <component id="5d109" class="javax.swing.JTextField" binding="limit">
                     <constraints>
-                      <grid row="0" column="3" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                      <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="50" height="-1"/>
                       </grid>
                     </constraints>

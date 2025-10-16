@@ -200,6 +200,7 @@ public class GraphWindow {
     private JCheckBox skipGetSetIs;
     private JCheckBox lr;
     private JCheckBox doc;
+    private JCheckBox htmlPreview;
     private JTextField limit;
     private JCheckBox impl;
     private JCheckBox mvc;
