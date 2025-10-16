@@ -90,7 +90,12 @@ abstract class ParserLang<F : PsiElement> : Parser() {
         val funMap = mutableMapOf<String, String>()
         funMap["sign"] = sign
         val srcFun = CommentUtils.byteToSrc(func)
-        funMap(funMap, srcFun)
+        try {
+            funMap(funMap, srcFun)
+        } catch (_: Exception) {
+            // lombok toString() byteToSrc return PsiAnno
+            return null
+        }
         val name = funMap["name"]
         val classMap = classMap(srcFun, relData)
         if (inJar) {
