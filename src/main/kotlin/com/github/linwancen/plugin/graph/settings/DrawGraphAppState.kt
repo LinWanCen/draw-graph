@@ -1,6 +1,7 @@
 package com.github.linwancen.plugin.graph.settings
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
@@ -16,8 +17,8 @@ class DrawGraphAppState : PersistentStateComponent<DrawGraphAppState?>, Abstract
     var htmlPreview = true
     var limit = 1000
     var online = Setting.message("online") == "true"
-    var path = PathInit.path
-    var tempPath = if (path != null) "$path/draw-graph" else "draw-graph"
+    var path = PathManager.getScratchPath() + "/extensions/com.github.linwancen.drawgraph"
+    var tempPath = path
     val mermaidOffline
         get() = "file:///$tempPath/mermaid.js"
     var mermaidOnline = Setting.message("mermaid_js_link")
