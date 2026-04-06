@@ -19,6 +19,7 @@ import com.intellij.psi.PsiManager
 object PlantUmlFileController {
     @JvmStatic
     val languages = arrayOf("RegExp", "JSON", "yaml")
+    val regexDelete = Regex("""\(\?\w+\)""")
 
     @JvmStatic
     fun forPlantUMLFiles(project: Project, window: GraphWindow, files: Array<VirtualFile>) {
@@ -39,7 +40,9 @@ object PlantUmlFileController {
     @JvmStatic
     fun forPlantUMLSupportFile(psiFile: PsiElement, project: Project, window: GraphWindow, src: String?) {
         val languageId = LangUtils.matchBaseLanguageId(psiFile, *languages) ?: return
-        val code = if (!languageId.contains("JSON")) {
+        val code = if (src != null && languageId == "RegExp") {
+            regexDelete.replace(src, "")
+        } else if (!languageId.contains("JSON")) {
             src
         } else {
             val mapper = ObjectMapper()

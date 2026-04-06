@@ -73,10 +73,12 @@ abstract class Printer {
 
         /**
          * [not support english symbol #4138](https://github.com/mermaid-js/mermaid/issues/4138)
-         * PlantUML cannot use "-#$,"`
-         * "-" should in first
+         *
+         * PlantUML cannot use`"#`and cannot use```-`,$?!:```in SubComponent
+         *
+         * `-` should in regex first
          */
         @JvmStatic
-        val canNotUseSymbol = Regex("[-#$,。？！，、；：“”‘’`（）《》【】~@()|'\"<>{}\\[\\]\\\\/ ]")
+        val canNotUseSymbol = Regex("[-#$,。?!:？！，、；：“”‘’`（）《》【】~@()|'\"<>{}\\[\\]\\\\/ ]")
     }
 }
